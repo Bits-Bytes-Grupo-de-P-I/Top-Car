@@ -4,21 +4,23 @@ import Colors from "@/constants/Colors";
 // Componentes
 import Botao from "@/components/ui/Botao";
 import Slider from "@/components/ui/Slider";
-import Campo from "@/components/ui/CampoDeInfo";
+import CampoDeInfo from "@/components/ui/CampoDeInfo";
 import Emergencia from "@/components/ui/Emergencia";
+import StatusDeServico from "@/components/ui/StatusDeServico";
 
 export default function Index() {
   return (
     // Container principal
     <View style={styles.container}>
-      {/* <Botao type='azul'/>
+      {/* <Botao type='azul'/>*/}
       <Botao type='verde'/>
       <Botao type='vermelho'/> 
       <Slider/>
-      <Campo tipoDeInfo='Nome'/>
-      <Campo tipoDeInfo='CPF / CNPJ'/>
-      <Campo tipoDeInfo='CEP'/>
-      <Emergencia />*/}
+      <CampoDeInfo tipoDeInfo='Nome'/>
+      <CampoDeInfo tipoDeInfo='CPF / CNPJ'/>
+      <CampoDeInfo tipoDeInfo='CEP'/>
+      <Emergencia />
+      <StatusDeServico />
     </View>
     // Fim Container principal
   );

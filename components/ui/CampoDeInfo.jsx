@@ -22,16 +22,16 @@ const styles = StyleSheet.create({
     tituloCampo: {
         fontSize: 20,
         marginBottom: 4,
-        color: 'white'
+        color: 'white',
     },
     campo: {
         borderRadius: 5,
         backgroundColor: 'white',
         fontSize: 16,
         color: 'black',
-        paddingLeft: 8
+        paddingLeft: 8,
     },
     tamanhoCampo: {
-        width: 316
+        flex: 1
     }
 })

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
 import React from "react";
+
 import Colors from "@/constants/Colors";
 
 const Botao = (props) => {
@@ -7,13 +8,14 @@ const Botao = (props) => {
     <View>
       <TouchableHighlight
         // Estilos condicionais com base nos props passados nos botões
+        underlayColor="transparent"
         style={[
           props.type === "azul"
             ? styles.btnAzul
             : props.type === "verde"
             ? styles.btnVerde
             : styles.btnVermelho,
-          styles.btn,
+          styles.btn
         ]}
       >
         <Text style={styles.btnTexto}>{props.type}</Text>
