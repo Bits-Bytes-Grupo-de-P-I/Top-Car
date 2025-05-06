@@ -36,10 +36,14 @@
       [
         "expo-font",
         {
-          "fonts": [
+          "fontDefinitions": [
             {
-              "name": "DM-Sans",
-              "path": "./assets/fonts/DM-Sans.ttf"
+              "family": "DM-Sans",
+              "fonts": [
+                {
+                  "asset": "./assets/fonts/DM-Sans.ttf"
+                }
+              ]
             }
           ]
         }
