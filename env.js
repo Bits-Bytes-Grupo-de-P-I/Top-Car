@@ -1,1 +1,1 @@
-export const APP_VERSION = 'admin'; // ou 'client'
+export const APP_VERSION = 'client'; // ou 'client'

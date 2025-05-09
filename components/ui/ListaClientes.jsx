@@ -7,7 +7,6 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-
 import Colors from "@/constants/Colors";
 import clientes from "@/assets/mocks/clientes.json";
 
@@ -31,7 +30,7 @@ const renderStatus = (status) => {
 
 const ListaClientes = () => {
   const [filtro, setFiltro] = useState("");
-
+  
   const clientesFiltrados = clientes.filter((cliente) => {
     const termo = filtro.toLowerCase();
     return (
@@ -53,20 +52,25 @@ const ListaClientes = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-        <TextInput
-          style={styles.input}
-          placeholder="Buscar cliente..."
-          value={filtro}
-          onChangeText={setFiltro}
-        />
-      </View>
-
-      <FlatList
-        data={clientesFiltrados}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
+      <TextInput
+        style={styles.input}
+        placeholder="Buscar cliente..."
+        value={filtro}
+        onChangeText={setFiltro}
       />
+      {clientesFiltrados.length === 0 ? (
+        <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
+      ) : (
+        <FlatList
+          data={clientesFiltrados}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          nestedScrollEnabled={true}
+          scrollEnabled={true}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={styles.flatListContent}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -76,12 +80,14 @@ export default ListaClientes;
 const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
-    flex: 1,
     padding: 16,
-    backgroundColor: Colors.cinzaClaro,
-    margin: 20,
-    minHeight: 300,
-    width: "100%"
+    backgroundColor: Colors.azulClaro,
+    margin: 0,
+    width: "100%",
+    height: 400, // altura fixa em vez de maxHeight
+  },
+  flatListContent: {
+    paddingBottom: 8,
   },
   input: {
     padding: 10,
@@ -117,5 +123,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.grafite,
     fontFamily: "DM-Sans",
+  },
+  naoEncontrado: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 20,
+    fontFamily: "DM-Sans",
+    color: "white",
+    fontWeight: "bold",
   },
 });
