@@ -43,7 +43,7 @@ const ListaClientes = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <View style={styles.nomeEstatus}>
+      <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
         {renderStatus(item.status)}
       </View>
@@ -80,7 +80,8 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: Colors.cinzaClaro,
     margin: 20,
-    minHeight: 300
+    minHeight: 300,
+    width: "100%"
   },
   input: {
     padding: 10,
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 2,
   },
-  nomeEstatus: {
+  nomeStatus: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 4,
@@ -105,13 +106,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.grafite,
+    fontFamily: "DM-Sans",
   },
   status: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "bold",
+    fontFamily: "DM-Sans",
   },
   cpf: {
     fontSize: 14,
     color: Colors.grafite,
+    fontFamily: "DM-Sans",
   },
 });

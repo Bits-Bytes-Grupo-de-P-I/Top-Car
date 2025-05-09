@@ -28,7 +28,25 @@ export default function Index() {
     >
       <ScrollView>
         <View style={styles.container}>
-          
+          <Text>ÁREA DO ADMIN</Text>
+          <Botao type="azul" />
+          <Botao type="verde" />
+          <Botao type="vermelho" />
+          <Slider />
+          <CampoDeInput tipoDeInfo="Nome" />
+          <CampoDeInput tipoDeInfo="CPF / CNPJ" />
+          <CampoDeInput tipoDeInfo="CEP" />
+          <Emergencia />
+          <StatusDeServico />
+          <Card
+            texto="Cadastrar novo cliente"
+            cor={Colors.verde}
+            iconName="user-plus"
+          />
+          <Card texto="Revisão" cor={Colors.amarelo} iconName="car" />
+          <VerMais />
+          <ServicosPadrao texto="Sei lá o que" preco="R$ 150,00" />
+          <ListaClientes />
         </View>
       </ScrollView>
     </ImageBackground>
