@@ -32,6 +32,21 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fontDefinitions": [
+            {
+              "family": "DM-Sans",
+              "fonts": [
+                {
+                  "asset": "./assets/fonts/DM-Sans.ttf"
+                }
+              ]
+            }
+          ]
+        }
       ]
     ],
     "experiments": {

@@ -20,16 +20,23 @@ const Slider = () => {
   return (
     <View>
       <TouchableHighlight
-        style={[styles.container, styles.position]}
+        underlayColor={Colors.aluminio}
+        style={[
+          styles.container,
+          styles.position,
+          { underlayColor: "transparent" },
+        ]}
         onPress={() => {
-          setSliderPosition(sliderPosition === "flex-start" ? "flex-end" : "flex-start");
+          setSliderPosition(
+            sliderPosition === "flex-start" ? "flex-end" : "flex-start"
+          );
           setState(!state); // Alterna a cor
         }}
       >
         <Animated.View
           style={[
             styles.slider,
-            { 
+            {
               backgroundColor: state ? Colors.verde : Colors.vermelho,
               transform: [{ translateX: position }], // Aplica a animação de de mover no eixo X
             },

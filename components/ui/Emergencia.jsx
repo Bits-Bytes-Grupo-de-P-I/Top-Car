@@ -8,11 +8,18 @@ const Emergencia = () => {
     <TouchableHighlight
       style={[
         styles.container,
-        { backgroundColor: estadoEmergencia ? Colors.vermelho : 'transparent' },
+        { backgroundColor: estadoEmergencia ? Colors.vermelho : "transparent" }, // Se for uma emergência, vai ativar o fundo vermelho, senão, vai ficar transparente
       ]}
       onPress={() => setEstadoEmergencia(!estadoEmergencia)}
     >
-      <Text style={[styles.exclamacao, { display: estadoEmergencia ? 'flex' : 'none' }]}>!</Text>
+      <Text
+        style={[
+          styles.exclamacao,
+          { display: estadoEmergencia ? "flex" : "none" },
+        ]}
+      >
+        !
+      </Text>
     </TouchableHighlight>
   );
 };
@@ -29,9 +36,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "white",
     color: "white",
+    margin: 16
   },
   exclamacao: {
     color: "white",
     fontWeight: "bold",
+    fontFamily: 'DM-Sans'
   },
 });

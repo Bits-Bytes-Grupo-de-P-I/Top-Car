@@ -1,0 +1,25 @@
+{
+  "Estrutura com imports": {
+    "scope": "javascript,typescript,javascriptreact,typescriptreact",
+    "prefix": "compimp",
+    "body": [
+      "import { StyleSheet, Text, View } from 'react-native';",
+      "import React from 'react';",
+      "",
+      "import Colors from '@/constants/Colors';",
+      "",
+      "const ${TM_FILENAME_BASE} = () => {",
+      "  return (",
+      "    <View>",
+      "      ",
+      "    </View>",
+      "  );",
+      "};",
+      "",
+      "export default ${TM_FILENAME_BASE};",
+      "",
+      "const styles = StyleSheet.create({});"
+    ],
+    "description": "Cria uma estrutura de componente em arrow function com os imports prontos"
+  }
+}
