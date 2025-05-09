@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     textTransform: "capitalize",
+    fontFamily: 'DM-Sans'
   },
   btnAzul: {
     backgroundColor: Colors.azulClaro,

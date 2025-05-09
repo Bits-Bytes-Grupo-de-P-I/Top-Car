@@ -36,9 +36,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "white",
     color: "white",
+    margin: 16
   },
   exclamacao: {
     color: "white",
     fontWeight: "bold",
+    fontFamily: 'DM-Sans'
   },
 });

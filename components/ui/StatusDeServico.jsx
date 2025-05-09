@@ -3,20 +3,20 @@ import React from "react";
 
 const StatusDeServico = () => {
   return (
-    <View>
-      {/* Container principal */}
-      <TouchableHighlight style={styles.containerPrincipal}>
-        {/* Container do texto com a bolinha de status */}
+    // Container principal
+    <View style={styles.containerPrincipal}>
 
+      <TouchableHighlight style={{width: '100%'}}>
+        {/* Container do texto com a bolinha de status */}
         <View style={styles.containerTextoEBolinha}>
           <View style={styles.bolinha}></View>
           <Text style={styles.texto}>Em andamento</Text>
         </View>
-
         {/* Container do texto com a bolinha de status */}
+
       </TouchableHighlight>
-      {/* Container principal */}
     </View>
+    // Container principal
   );
 };
 
@@ -24,10 +24,10 @@ export default StatusDeServico;
 
 const styles = StyleSheet.create({
   containerPrincipal: {
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
     height: 36,
+    width: '90%',
+    justifyContent: "space-between",
+    alignItems: "center",
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 6,
@@ -35,19 +35,20 @@ const styles = StyleSheet.create({
     boxShadow: "0 4px 4px rgba(0, 0, 0, 0.25)",
   },
   containerTextoEBolinha: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
   texto: {
     color: "black",
     fontSize: 16,
+    fontFamily: 'DM-Sans'
   },
   bolinha: {
     height: 17,
     width: 17,
     borderRadius: 50,
-    backgroundColor: 'black',
-    marginRight: 16
-  }
+    backgroundColor: "black",
+    marginRight: 16,
+  },
 });
