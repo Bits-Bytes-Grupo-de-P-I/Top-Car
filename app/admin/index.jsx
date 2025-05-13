@@ -6,6 +6,8 @@ import {
   ImageBackground,
 } from "react-native";
 
+import { useRouter } from "expo-router";
+
 import Colors from "@/constants/Colors";
 // Ícones
 import Entypo from "@expo/vector-icons/Entypo";
@@ -22,6 +24,8 @@ import ServicosPadrao from "@/components/ui/ServicosPadrao";
 import ListaClientes from "@/components/ui/ListaClientes";
 
 export default function Index() {
+
+  const router = useRouter()
   return (
     <ImageBackground
       source={require("@/assets/images/fundo.jpg")}
@@ -65,6 +69,7 @@ export default function Index() {
                 texto="Cadastrar novo cliente"
                 cor={Colors.verde}
                 iconName="user-plus"
+                onPress = {() => router.push('./admin/clientSignUp')}
               />
               <Card
                 texto="Pedidos de serviço"

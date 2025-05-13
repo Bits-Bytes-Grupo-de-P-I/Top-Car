@@ -10,15 +10,15 @@ const Botao = (props) => {
         // Estilos condicionais com base nos props passados nos botões
         underlayColor="transparent"
         style={[
-          props.type === "azul"
+          props.cor === "azul"
             ? styles.btnAzul
-            : props.type === "verde"
+            : props.cor === "verde"
             ? styles.btnVerde
             : styles.btnVermelho,
           styles.btn
         ]}
       >
-        <Text style={styles.btnTexto}>{props.type}</Text>
+        <Text style={styles.btnTexto}>{props.texto}</Text>
       </TouchableHighlight>
     </View>
   );
