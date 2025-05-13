@@ -8,6 +8,7 @@ const Colors = {
   vermelho: "#EF4444",
   laranja: "#F97316",
   verde: "#10B981",
+  verdeEscuro: "#0C7358",
 };
 
 export default Colors;

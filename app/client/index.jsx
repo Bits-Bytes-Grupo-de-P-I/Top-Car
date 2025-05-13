@@ -32,6 +32,10 @@ import {
       router.push("/client/ServicePending");
     };
 
+    const navigateToHistoryScreen = () => {
+      router.push("/client/HistoryScreen");
+    };
+
     return (
       <SafeAreaView style={{ flex: 1 }}> {/* SafeAreaView para concertar a tela no celular */}
       <ImageBackground
@@ -97,6 +101,12 @@ import {
                   texto="Gerar nota de serviço avulsa"
                   cor={Colors.grafite}
                   iconName="table-list"
+                />
+                <Card
+                  texto="Serviços realizados"
+                  cor={Colors.verdeEscuro}
+                  iconName="gear"
+                  onPress={navigateToHistoryScreen}
                 />
               </View>
               {/* Fim Container dos cards */}
