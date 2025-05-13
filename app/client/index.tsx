@@ -5,6 +5,9 @@ import {
     ScrollView,
     ImageBackground,
   } from "react-native";
+
+  import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
+  import { useRouter } from "expo-router";
   
   import Colors from "@/constants/Colors";
   // Ícones
@@ -22,7 +25,15 @@ import {
   import ListaClientes from "@/components/ui/ListaClientes";
   
   export default function Index() {
+
+    const router = useRouter();
+
+    const navigateToServicePending = () => {
+      router.push("/client/ServicePending");
+    };
+
     return (
+      <SafeAreaView style={{ flex: 1 }}> {/* SafeAreaView para concertar a tela no celular */}
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -70,6 +81,7 @@ import {
                   texto="Serviços em pendência"
                   cor={Colors.laranja}
                   iconName="triangle-exclamation"
+                  onPress={navigateToServicePending}
                 />
                 <Card
                   texto="Gerar pedido de atendimento"
@@ -95,6 +107,7 @@ import {
         </ScrollView>
         {/* Fim Container principal */}
       </ImageBackground>
+      </SafeAreaView>
     );
   }
   
