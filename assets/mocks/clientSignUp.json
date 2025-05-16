@@ -1,0 +1,82 @@
+{
+  "clientes": [
+    {
+      "id": 1,
+      "nome": "João Silva",
+      "documento": "123.456.789-00",
+      "cep": "12345-678",
+      "cidade": "São Paulo",
+      "endereco": "Rua das Flores",
+      "numero": "123",
+      "bairro": "Centro",
+      "estado": "SP",
+      "telefone": "(11) 98765-4321",
+      "veiculos": [
+        {
+          "id": 1,
+          "veiculo": "Kwid",
+          "modelo": "Zen",
+          "ano": "2022",
+          "cor": "Branco",
+          "km": "15000",
+          "placa": "ABC1D23"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Maria Oliveira",
+      "documento": "987.654.321-00",
+      "cep": "54321-876",
+      "cidade": "Rio de Janeiro",
+      "endereco": "Av. Principal",
+      "numero": "456",
+      "bairro": "Copacabana",
+      "estado": "RJ",
+      "telefone": "(21) 91234-5678",
+      "veiculos": [
+        {
+          "id": 2,
+          "veiculo": "Onix",
+          "modelo": "LT",
+          "ano": "2021",
+          "cor": "Prata",
+          "km": "28500",
+          "placa": "DEF4G56"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nome": "Oficina Mecânica Rápida Ltda",
+      "documento": "12.345.678/0001-90",
+      "cep": "31170-010",
+      "cidade": "Belo Horizonte",
+      "endereco": "Rua das Ferramentas",
+      "numero": "789",
+      "bairro": "Industrial",
+      "estado": "MG",
+      "telefone": "(31) 3333-4444",
+      "veiculos": [
+        {
+          "id": 3,
+          "veiculo": "HB20",
+          "modelo": "Comfort Plus",
+          "ano": "2023",
+          "cor": "Azul",
+          "km": "5200",
+          "placa": "GHI7J89"
+        },
+        {
+          "id": 4,
+          "veiculo": "Fiorino",
+          "modelo": "Furgão",
+          "ano": "2019",
+          "cor": "Branco",
+          "km": "120000",
+          "placa": "KLM9N01"
+        }
+      ]
+    }
+  ]
+}

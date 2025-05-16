@@ -5,8 +5,8 @@ import Colors from "@/constants/Colors";
 
 const Botao = (props) => {
   return (
-    <View>
-      <TouchableHighlight
+    <>
+      <TouchableHighlight onPress={props.onPress}
         // Estilos condicionais com base nos props passados nos botões
         underlayColor="transparent"
         style={[
@@ -20,7 +20,7 @@ const Botao = (props) => {
       >
         <Text style={styles.btnTexto}>{props.texto}</Text>
       </TouchableHighlight>
-    </View>
+    </>
   );
 };
 
@@ -33,14 +33,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "white",
-    width: 120,
-    height: 50,
+    width: 100,
+    height: 40,
     boxShadow: "3px 4px 4px rgba(0, 0, 0, 0.25)",
   },
   btnTexto: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 18,
     textTransform: "capitalize",
     fontFamily: 'DM-Sans'
   },

@@ -6,16 +6,20 @@ import {
   TextInput,
   FlatList,
   SafeAreaView,
+  TouchableOpacity
 } from "react-native";
 import Colors from "@/constants/Colors";
 import clientes from "@/assets/mocks/clientes.json";
+
+import { useRouter } from "expo-router";
+const router = useRouter();
 
 const getStatusStyle = (status) => {
   switch (status) {
     case "Em andamento":
       return { color: Colors.verde };
     case "Pendente":
-      return { color: Colors.vermelho };
+      return { color: Colors.laranja };
     default:
       return { color: Colors.aluminio };
   }
@@ -40,14 +44,28 @@ const ListaClientes = () => {
     );
   });
 
+  
+
   const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <View style={styles.nomeStatus}>
-        <Text style={styles.nome}>{item.nome}</Text>
-        {renderStatus(item.status)}
-      </View>
-      <Text style={styles.cpf}>CPF: {item.cpf}</Text>
+    
+    <TouchableOpacity
+    style={styles.item}
+    onPress={() => router.push({
+      pathname: "./admin/clientInfo",
+      params: {
+        nome: item.nome,
+        cpf: item.cpf,
+        status: item.status,
+        // passe outros dados conforme necessário
+      },
+    })}
+  >
+    <View style={styles.nomeStatus}>
+      <Text style={styles.nome}>{item.nome}</Text>
+      {renderStatus(item.status)}
     </View>
+    <Text style={styles.cpf}>CPF: {item.cpf}</Text>
+  </TouchableOpacity>
   );
 
   return (

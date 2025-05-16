@@ -11,7 +11,7 @@ const Slider = ({value, onChange}) => {
 
   useEffect(() => {
     Animated.timing(position, {
-      toValue: sliderPosition === "flex-end" ? 40 : 0, // 40px
+      toValue: sliderPosition === "flex-end" ? 30 : 0, // 40px
       duration: 150,
       useNativeDriver: false,
     }).start();
@@ -58,15 +58,17 @@ export default Slider;
 const styles = StyleSheet.create({
   container: {
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.grafite,
     backgroundColor: "white",
-    width: 80,
-    height: 40,
+    width: 60,
+    height: 30,
     justifyContent: "center",
     margin: 10,
   },
   slider: {
-    width: 40,
-    height: 40,
+    width: 28,
+    height: 28,
     borderWidth: 2,
     borderColor: "white",
     borderRadius: 40,
