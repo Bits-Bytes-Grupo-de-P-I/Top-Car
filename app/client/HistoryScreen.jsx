@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import VehicleSelector from '@/components/ui/VehicleSelector';
 import mockVehicles from '@/assets/mocks/mockVehicles.json';
 
@@ -10,7 +10,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const HistoryScreen = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleData, setVehicleData] = useState([]);
-  const [maintenanceHistory, setMaintenanceHistory] = useState([]);
+  const [oilChangeData, setOilChangeData] = useState(null);
+  const [alignmentData, setAlignmentData] = useState(null);
 
   // Simulando o carregamento de dados do banco
   useEffect(() => {
@@ -18,55 +19,51 @@ const HistoryScreen = () => {
     setVehicleData(mockVehicles.vehicles);
   }, []);
 
-  // Simula o carregamento do histórico de manutenção quando um veículo é selecionado
+  // Simula o carregamento dos dados de serviços quando um veículo é selecionado
   useEffect(() => {
     if (selectedVehicle) {
-      // Simula uma chamada à API para buscar o histórico de manutenção do veículo
-      const mockHistory = [
-        {
-          id: 1,
-          date: '2023-09-15',
-          description: 'Troca de óleo e filtros',
-          cost: 'R$ 350,00',
-          mechanic: 'José Silva'
-        },
-        {
-          id: 2,
-          date: '2023-06-22',
-          description: 'Alinhamento e balanceamento',
-          cost: 'R$ 180,00',
-          mechanic: 'Carlos Oliveira'
-        },
-        {
-          id: 3,
-          date: '2023-03-10',
-          description: 'Revisão geral',
-          cost: 'R$ 520,00',
-          mechanic: 'José Silva'
-        },
-        {
-          id: 4,
-          date: '2022-12-05',
-          description: 'Troca de pastilhas de freio',
-          cost: 'R$ 280,00',
-          mechanic: 'Marcos Santos'
+      // Simula uma chamada à API para buscar os dados de troca de óleo
+      const mockOilChange = {
+        id: 1,
+        date: '2023-09-15',
+        kilometrage: '45.000',
+        oilType: 'Sintético 5W30',
+        nextServices: {
+          engineOil: '50.000',
+          timingBelt: '90.000',
+          oilFilter: '50.000',
+          airFilter: '55.000'
         }
-      ];
+      };
       
-      setMaintenanceHistory(mockHistory);
+      // Simula uma chamada à API para buscar os dados de alinhamento/balanceamento
+      const mockAlignment = {
+        id: 2,
+        date: '2023-06-22',
+        kilometrage: '42.500',
+        nextRevision: '47.500'
+      };
+      
+      setOilChangeData(mockOilChange);
+      setAlignmentData(mockAlignment);
     } else {
-      setMaintenanceHistory([]);
+      setOilChangeData(null);
+      setAlignmentData(null);
     }
   }, [selectedVehicle]);
 
   const handleVehicleSelect = (vehicle) => {
     setSelectedVehicle(vehicle);
-    // Em uma aplicação real, você faria uma chamada API aqui para buscar o histórico do veículo
+    // Em uma aplicação real, você faria chamadas API aqui para buscar os dados de serviço do veículo
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-
+      {/* <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      > */}
       <PageHeader 
           title="Serviços realizados" 
           containerStyle={{backgroundColor: Colors.azulClaro}} 
@@ -74,8 +71,7 @@ const HistoryScreen = () => {
       /> 
 
       <ScrollView style={styles.container}>
-
-        <Text style={styles.title}>Histórico de Manutenção</Text>
+        {/* <Text style={styles.title}>Histórico de Manutenção</Text> */}
         
         {/* Componente de seleção de veículo */}
         <VehicleSelector
@@ -103,24 +99,69 @@ const HistoryScreen = () => {
               </View>
             </View>
 
-            {/* Histórico de manutenção */}
-            <View style={styles.historyContainer}>
-              <Text style={styles.sectionTitle}>Histórico de Serviços</Text>
+            {/* Cards de serviços */}
+            <View style={styles.servicesContainer}>
+              <Text style={styles.sectionTitleTwo}>Serviços Realizados</Text>
               
-              {maintenanceHistory.length > 0 ? (
-                maintenanceHistory.map((item) => (
-                  <View key={item.id} style={styles.historyItem}>
-                    <View style={styles.historyHeader}>
-                      <Text style={styles.historyDate}>{item.date}</Text>
-                      <Text style={styles.historyCost}>{item.cost}</Text>
-                    </View>
-                    <Text style={styles.historyDescription}>{item.description}</Text>
-                    <Text style={styles.historyMechanic}>Mecânico: {item.mechanic}</Text>
+              {/* Card de Troca de Óleo */}
+              {oilChangeData ? (
+                <View style={styles.serviceCard}>
+                  <View style={styles.serviceHeader}>
+                    <Text style={styles.serviceTitle}>Troca de Óleo</Text>
+                    <Text style={styles.serviceDate}>Data: {oilChangeData.date}</Text>
                   </View>
-                ))
-              ) : (
+                  
+                  <View style={styles.serviceContent}>
+                    <Text style={styles.serviceInfo}>Trocado com {oilChangeData.kilometrage} km</Text>
+                    <Text style={styles.serviceInfo}>Tipo do óleo: {oilChangeData.oilType}</Text>
+                  </View>
+                  
+                  <View style={styles.nextServicesContainer}>
+                    <Text style={styles.nextServicesTitle}>Próxima Troca:</Text>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>Óleo do motor:</Text>
+                      <Text style={styles.nextServiceValue}>{oilChangeData.nextServices.engineOil} km</Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>Correia dentada:</Text>
+                      <Text style={styles.nextServiceValue}>{oilChangeData.nextServices.timingBelt} km</Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>Filtro do óleo:</Text>
+                      <Text style={styles.nextServiceValue}>{oilChangeData.nextServices.oilFilter} km</Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>Filtro de ar:</Text>
+                      <Text style={styles.nextServiceValue}>{oilChangeData.nextServices.airFilter} km</Text>
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+              
+              {/* Card de Alinhamento/Balanceamento */}
+              {alignmentData ? (
+                <View style={styles.serviceCard}>
+                  <View style={styles.serviceHeader}>
+                    <Text style={styles.serviceTitle}>Alinhamento/Balanceamento</Text>
+                    <Text style={styles.serviceDate}>Data: {alignmentData.date}</Text>
+                  </View>
+                  
+                  <View style={styles.serviceContent}>
+                    <Text style={styles.serviceInfo}>Revisado com {alignmentData.kilometrage} km</Text>
+                  </View>
+                  
+                  <View style={styles.nextServicesContainer}>
+                    <Text style={styles.nextServicesTitle}>Próxima Revisão:</Text>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceValue}>{alignmentData.nextRevision} km</Text>
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+              
+              {!oilChangeData && !alignmentData && (
                 <Text style={styles.emptyText}>
-                  Nenhum registro de manutenção encontrado para este veículo.
+                  Nenhum registro de serviço encontrado para este veículo.
                 </Text>
               )}
             </View>
@@ -128,11 +169,12 @@ const HistoryScreen = () => {
         ) : (
           <View style={styles.placeholderContainer}>
             <Text style={styles.placeholderText}>
-              Selecione um veículo para visualizar seu histórico de manutenção
+              Selecione um veículo para visualizar seus serviços realizados
             </Text>
           </View>
         )}
       </ScrollView>
+      {/* </ImageBackground> */}
     </SafeAreaView>
   );
 };
@@ -169,6 +211,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: '#333',
   },
+
+  sectionTitleTwo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    color: '#333',
+    textAlign: 'center',
+  },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -186,45 +236,69 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  historyContainer: {
+  servicesContainer: {
+    marginBottom: 16,
+  },
+  serviceCard: {
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
+    marginBottom: 16,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  historyItem: {
-    padding: 12,
+  serviceHeader: {
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    marginBottom: 8,
+    paddingBottom: 12,
+    marginBottom: 12,
   },
-  historyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  historyDate: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  historyCost: {
-    fontSize: 14,
-    color: '#007AFF',
+  serviceTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  historyDescription: {
-    fontSize: 16,
-    color: '#333',
+    color: '#007AFF',
     marginBottom: 4,
   },
-  historyMechanic: {
+  serviceDate: {
     fontSize: 14,
     color: '#666',
+  },
+  serviceContent: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    marginBottom: 12,
+  },
+  serviceInfo: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 6,
+  },
+  nextServicesContainer: {
+    paddingTop: 8,
+  },
+  nextServicesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  nextServiceItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  nextServiceLabel: {
+    fontSize: 15,
+    color: '#666',
+  },
+  nextServiceValue: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '500',
   },
   placeholderContainer: {
     backgroundColor: '#fff',

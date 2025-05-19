@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "veiculo": "Ford",
+    "modelo": "Fiesta",
+    "placa": "ABC1234",
+    "descricao": "Problema no sistema de freios. Necessário trocar as pastilhas e verificar os discos. Cliente relatou barulho ao frear.",
+    "dataRegistro": "2025-05-10"
+  },
+  {
+    "id": "2",
+    "veiculo": "Chevrolet",
+    "modelo": "Onix",
+    "placa": "XYZ5678",
+    "descricao": "Luz do motor acesa. Diagnóstico indicou problema no sensor de oxigênio. Necessário substituição e recalibração do sistema.",
+    "dataRegistro": "2025-05-12"
+  },
+  {
+    "id": "3",
+    "veiculo": "Honda",
+    "modelo": "Civic",
+    "placa": "DEF9012",
+    "descricao": "Ar condicionado não está gelando adequadamente. Verificar carga de gás e possível vazamento no sistema de refrigeração.",
+    "dataRegistro": "2025-05-15"
+  }
+]
