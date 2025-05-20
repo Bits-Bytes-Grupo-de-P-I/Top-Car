@@ -73,7 +73,7 @@ export default function Index() {
               
               {/* ATENÇÃO EXCLUIR ESSE BOTAO */}
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                  <Text>Página do Cliente</Text>
+                  <Text>Página do administrador</Text>
                   <BackToHomeButton />
                 </View>
               {/* ATENÇÃO EXCLUIR ESSE BOTAO */}

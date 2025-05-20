@@ -24,6 +24,8 @@ import {
   import ServicosPadrao from "@/components/ui/ServicosPadrao";
   import ListaClientes from "@/components/ui/ListaClientes";
 
+  import CardWork from "@/components/ui/CardWork";
+
   // IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
   import BackToHomeButton from "@/components/ui/BackToHomeButton";
   
@@ -106,11 +108,11 @@ import {
                   cor={Colors.amarelo}
                   iconName="pen-to-square"
                 />
-                <Card
+                {/* <Card
                   texto="Dúvidas frequentes"
                   cor={Colors.azul}
                   iconName="circle-question"
-                />
+                /> */}
                 <Card
                   texto="Serviços realizados"
                   cor={Colors.verdeEscuro}
@@ -119,6 +121,12 @@ import {
                 />
               </View>
               {/* Fim Container dos cards */}
+
+
+              
+              <CardWork />              
+
+
   
             </View>
             {/* Fim Container conteudo */}
@@ -169,5 +177,28 @@ import {
     containerListaClientes: {
       width: "100%",
     },
+
+    // //suahsuhaushaushauhsaushauhsuahs
+
+    // container: {
+    //   flex: 1,
+    //   padding: 16,
+    // },
+    // welcomeTitle: {
+    //   fontSize: 20,
+    //   color: '#6B7280', // gray-600
+    // },
+    // appTitle: {
+    //   fontSize: 32,
+    //   fontWeight: 'bold',
+    //   color: '#1F2937', // gray-800
+    //   marginBottom: 24,
+    // },
+    // sectionTitle: {
+    //   fontSize: 18,
+    //   fontWeight: '600',
+    //   color: '#4B5563', // gray-700
+    //   marginBottom: 12,
+    // },
   });
   
