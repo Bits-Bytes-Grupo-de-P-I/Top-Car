@@ -1,26 +1,52 @@
 [
   {
     "id": "1",
-    "veiculo": "Ford",
-    "modelo": "Fiesta",
-    "placa": "ABC1234",
-    "descricao": "Problema no sistema de freios. Necessário trocar as pastilhas e verificar os discos. Cliente relatou barulho ao frear.",
-    "dataRegistro": "2025-05-10"
+    "clientId": "123",
+    "vehicle": "Honda Civic",
+    "licensePlate": "ABC1234",
+    "description": "Troca de pastilhas de freio dianteiras e verificação do sistema de freios.",
+    "isAccepted": false,
+    "createdAt": "2025-05-15T10:00:00Z",
+    "createdBy": "admin456"
   },
   {
     "id": "2",
-    "veiculo": "Chevrolet",
-    "modelo": "Onix",
-    "placa": "XYZ5678",
-    "descricao": "Luz do motor acesa. Diagnóstico indicou problema no sensor de oxigênio. Necessário substituição e recalibração do sistema.",
-    "dataRegistro": "2025-05-12"
+    "clientId": "123",
+    "vehicle": "Honda Civic",
+    "licensePlate": "ABC1234",
+    "description": "Verificação e troca de filtro de ar condicionado com higienização completa.",
+    "isAccepted": true,
+    "createdAt": "2025-05-10T14:30:00Z",
+    "createdBy": "admin456"
   },
   {
     "id": "3",
-    "veiculo": "Honda",
-    "modelo": "Civic",
-    "placa": "DEF9012",
-    "descricao": "Ar condicionado não está gelando adequadamente. Verificar carga de gás e possível vazamento no sistema de refrigeração.",
-    "dataRegistro": "2025-05-15"
+    "clientId": "456",
+    "vehicle": "Toyota Corolla",
+    "licensePlate": "XYZ5678",
+    "description": "Troca de óleo e filtro de óleo. Verificação dos níveis de fluidos.",
+    "isAccepted": false,
+    "createdAt": "2025-05-18T09:15:00Z",
+    "createdBy": "admin456"
+  },
+  {
+    "id": "4",
+    "clientId": "789",
+    "vehicle": "Volkswagen Golf",
+    "licensePlate": "DEF9012",
+    "description": "Diagnóstico do sistema elétrico. Luz do motor acendendo intermitentemente.",
+    "isAccepted": false,
+    "createdAt": "2025-05-19T16:45:00Z",
+    "createdBy": "admin789"
+  },
+  {
+    "id": "5",
+    "clientId": "123",
+    "vehicle": "Honda Civic",
+    "licensePlate": "ABC1234",
+    "description": "Alinhamento e balanceamento das quatro rodas.",
+    "isAccepted": false,
+    "createdAt": "2025-05-20T08:30:00Z",
+    "createdBy": "admin456"
   }
 ]

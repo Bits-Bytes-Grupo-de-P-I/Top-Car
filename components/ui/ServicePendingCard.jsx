@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 /**
- * Componente de card para exibir pendências de serviço (apenas visualização)
+ * Componente de card para exibir pendências de serviço (apenas visualização)  ///////////////// SE DER CERTO ESSE AQUI É PRA SER EXCLUIDO
  * @param {Object} props - Propriedades do componente
  * @param {Object} props.pendencia - Dados da pendência
  */
