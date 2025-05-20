@@ -25,6 +25,11 @@ import VerMais from "@/components/ui/VerMais";
 import ServicosPadrao from "@/components/ui/ServicosPadrao";
 import ListaClientes from "@/components/ui/ListaClientes";
 
+
+// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
+import BackToHomeButton from "@/components/ui/BackToHomeButton";
+
+
 export default function Index() {
   const router = useRouter();
   return (
@@ -64,6 +69,17 @@ export default function Index() {
               </View>
               {/* Fim Container do titulo */}
 
+              
+              
+              {/* ATENÇÃO EXCLUIR ESSE BOTAO */}
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text>Página do Cliente</Text>
+                  <BackToHomeButton />
+                </View>
+              {/* ATENÇÃO EXCLUIR ESSE BOTAO */}
+
+
+
               {/* Container dos cards */}
               <View style={styles.containerCards}>
                 <Card
@@ -90,12 +106,12 @@ export default function Index() {
                   iconName="triangle-exclamation"
                   onPress={() => router.push("./admin/pendingServices")}
                 />
-                {/* <Card
+                <Card
                   texto="Gerar nota de serviço avulsa"
                   cor={Colors.grafite}
                   iconName="table-list"
                   onPress={() => router.push("./admin/generateBill")}
-                /> */}
+                />
               </View>
               {/* Fim Container dos cards */}
 

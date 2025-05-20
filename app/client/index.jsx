@@ -23,6 +23,9 @@ import {
   import VerMais from "@/components/ui/VerMais";
   import ServicosPadrao from "@/components/ui/ServicosPadrao";
   import ListaClientes from "@/components/ui/ListaClientes";
+
+  // IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
+  import BackToHomeButton from "@/components/ui/BackToHomeButton";
   
   export default function Index() {
 
@@ -73,6 +76,17 @@ import {
                 <Text style={styles.titulo}>início</Text>
               </View>
               {/* Fim Container do titulo */}
+
+
+
+              {/* ATENÇÃO EXCLUIR ESSE BOTAO */}
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>Página do Cliente</Text>
+                <BackToHomeButton />
+              </View>
+              {/* ATENÇÃO EXCLUIR ESSE BOTAO */}
+
+              
   
               {/* Container dos cards */}
               <View style={styles.containerCards}>
@@ -82,7 +96,7 @@ import {
                   iconName="car"
                 />
                 <Card
-                  texto="Serviços em pendência"
+                  texto="Serviços pendentes"
                   cor={Colors.laranja}
                   iconName="triangle-exclamation"
                   onPress={navigateToServicePending}
@@ -96,11 +110,6 @@ import {
                   texto="Dúvidas frequentes"
                   cor={Colors.azul}
                   iconName="circle-question"
-                />
-                <Card
-                  texto="Gerar nota de serviço avulsa"
-                  cor={Colors.grafite}
-                  iconName="table-list"
                 />
                 <Card
                   texto="Serviços realizados"
