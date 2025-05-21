@@ -6,17 +6,20 @@ import {
   TextInput,
   FlatList,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
-
 import Colors from "@/constants/Colors";
 import clientes from "@/assets/mocks/clientes.json";
+
+import { useRouter } from "expo-router";
+const router = useRouter();
 
 const getStatusStyle = (status) => {
   switch (status) {
     case "Em andamento":
       return { color: Colors.verde };
     case "Pendente":
-      return { color: Colors.vermelho };
+      return { color: Colors.laranja };
     default:
       return { color: Colors.aluminio };
   }
@@ -29,7 +32,7 @@ const renderStatus = (status) => {
   return <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>;
 };
 
-const ListaClientes = () => {
+const ClientList = () => {
   const [filtro, setFiltro] = useState("");
 
   const clientesFiltrados = clientes.filter((cliente) => {
@@ -42,46 +45,66 @@ const ListaClientes = () => {
   });
 
   const renderItem = ({ item }) => (
-    <View style={styles.item}>
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() =>
+        router.push({
+          pathname: "./admin/clientInfo",
+          params: {
+            nome: item.nome,
+            cpf: item.cpf,
+            status: item.status,
+            // passe outros dados conforme necessário
+          },
+        })
+      }
+    >
       <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
         {renderStatus(item.status)}
       </View>
       <Text style={styles.cpf}>CPF: {item.cpf}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-        <TextInput
-          style={styles.input}
-          placeholder="Buscar cliente..."
-          value={filtro}
-          onChangeText={setFiltro}
-        />
-      </View>
-
-      <FlatList
-        data={clientesFiltrados}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
+      <TextInput
+        style={styles.input}
+        placeholder="Buscar cliente..."
+        value={filtro}
+        onChangeText={setFiltro}
       />
+      {clientesFiltrados.length === 0 ? (
+        <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
+      ) : (
+        <FlatList
+          data={clientesFiltrados}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          nestedScrollEnabled={true}
+          scrollEnabled={true}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={styles.flatListContent}
+        />
+      )}
     </SafeAreaView>
   );
 };
 
-export default ListaClientes;
+export default ClientList;
 
 const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
-    flex: 1,
     padding: 16,
-    backgroundColor: Colors.cinzaClaro,
-    margin: 20,
-    minHeight: 300,
-    width: "100%"
+    backgroundColor: Colors.azulClaro,
+    margin: 0,
+    width: "100%",
+    height: 400, // altura fixa em vez de maxHeight
+  },
+  flatListContent: {
+    paddingBottom: 8,
   },
   input: {
     padding: 10,
@@ -117,5 +140,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.grafite,
     fontFamily: "DM-Sans",
+  },
+  naoEncontrado: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 20,
+    fontFamily: "DM-Sans",
+    color: "white",
+    fontWeight: "bold",
   },
 });

@@ -1,0 +1,37 @@
+{
+  "client": {
+    "id": 1,
+    "nome": "João Silva",
+    "tipoPessoa": "fisica",
+    "documento": "123.456.789-00",
+    "telefone": "(11) 98765-4321",
+    "cep": "01234-567",
+    "endereco": "Rua das Flores",
+    "numero": "123",
+    "bairro": "Jardim Primavera",
+    "cidade": "São Paulo",
+    "estado": "SP"
+  },
+  "vehicles": [
+    {
+      "id": 1,
+      "veiculo": "Renault",
+      "modelo": "Kwid",
+      "ano": "2020",
+      "cor": "Branco",
+      "km": 35000,
+      "placa": "ABC1D23",
+      "inShop": true
+    },
+    {
+      "id": 2,
+      "veiculo": "Volkswagen",
+      "modelo": "Gol",
+      "ano": "2018",
+      "cor": "Prata",
+      "km": 75000,
+      "placa": "XYZ4W56",
+      "inShop": false
+    }
+  ]
+}

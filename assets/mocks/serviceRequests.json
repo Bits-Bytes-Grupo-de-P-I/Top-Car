@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "cliente": {
+      "nome": "João Silva",
+      "telefone": "(11) 98765-4321"
+    },
+    "veiculo": {
+      "modelo": "Fiat Uno",
+      "ano": "2018",
+      "placa": "ABC-1234"
+    },
+    "resumo": "Troca de óleo e filtro",
+    "descricao": "Cliente solicita troca de óleo e filtro. Veículo com cerca de 10.000 km rodados desde a última manutenção. Prefere óleo sintético e solicita verificação das pastilhas de freio.",
+    "status": "pendente",
+    "dataPedido": "2025-05-12T14:30:00"
+  },
+  {
+    "id": "2",
+    "cliente": {
+      "nome": "Maria Oliveira",
+      "telefone": "(11) 91234-5678"
+    },
+    "veiculo": {
+      "modelo": "Honda Civic",
+      "ano": "2020",
+      "placa": "DEF-5678"
+    },
+    "resumo": "Problemas na embreagem",
+    "descricao": "Cliente relata dificuldade para engatar marchas e barulho ao pressionar o pedal da embreagem. Veículo com 45.000 km rodados. Solicita orçamento para reparo.",
+    "status": "pendente",
+    "dataPedido": "2025-05-13T09:15:00"
+  },
+  {
+    "id": "3",
+    "cliente": {
+      "nome": "Pedro Santos",
+      "telefone": "(11) 97777-8888"
+    },
+    "veiculo": {
+      "modelo": "Volkswagen Gol",
+      "ano": "2017",
+      "placa": "GHI-9012"
+    },
+    "resumo": "Revisão completa",
+    "descricao": "Cliente deseja fazer revisão completa antes de viagem. Solicita verificação de suspensão, freios, alinhamento, balanceamento e troca de óleo. Veículo com 60.000 km rodados.",
+    "status": "pendente",
+    "dataPedido": "2025-05-13T16:45:00"
+  },
+  {
+    "id": "4",
+    "cliente": {
+      "nome": "Ana Pereira",
+      "telefone": "(11) 95555-4444"
+    },
+    "veiculo": {
+      "modelo": "Hyundai HB20",
+      "ano": "2021",
+      "placa": "JKL-3456"
+    },
+    "resumo": "Barulho na suspensão",
+    "descricao": "Cliente relata barulho na suspensão dianteira ao passar por lombadas e buracos. Também menciona vibração no volante em velocidades acima de 80 km/h. Solicita diagnóstico e orçamento.",
+    "status": "pendente",
+    "dataPedido": "2025-05-14T10:30:00"
+  },
+  {
+    "id": "5",
+    "cliente": {
+      "nome": "Carlos Mendes",
+      "telefone": "(11) 93333-2222"
+    },
+    "veiculo": {
+      "modelo": "Toyota Corolla",
+      "ano": "2019",
+      "placa": "MNO-7890"
+    },
+    "resumo": "Troca de correia dentada",
+    "descricao": "Cliente solicita troca da correia dentada. Veículo com 80.000 km rodados. Pergunta se é necessário trocar bomba d'água junto e solicita orçamento completo do serviço.",
+    "status": "pendente",
+    "dataPedido": "2025-05-14T13:20:00"
+  }
+]

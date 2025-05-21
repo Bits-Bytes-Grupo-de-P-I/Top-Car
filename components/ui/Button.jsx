@@ -3,28 +3,29 @@ import React from "react";
 
 import Colors from "@/constants/Colors";
 
-const Botao = (props) => {
+const Button = (props) => {
   return (
-    <View>
+    <>
       <TouchableHighlight
+        onPress={props.onPress}
         // Estilos condicionais com base nos props passados nos botões
         underlayColor="transparent"
         style={[
-          props.type === "azul"
+          props.cor === "azul"
             ? styles.btnAzul
-            : props.type === "verde"
+            : props.cor === "verde"
             ? styles.btnVerde
             : styles.btnVermelho,
-          styles.btn
+          styles.btn,
         ]}
       >
-        <Text style={styles.btnTexto}>{props.type}</Text>
+        <Text style={styles.btnTexto}>{props.texto}</Text>
       </TouchableHighlight>
-    </View>
+    </>
   );
 };
 
-export default Botao;
+export default Button;
 
 const styles = StyleSheet.create({
   btn: {
@@ -33,16 +34,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "white",
-    width: 120,
-    height: 50,
+    width: 100,
+    height: 40,
     boxShadow: "3px 4px 4px rgba(0, 0, 0, 0.25)",
   },
   btnTexto: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 18,
     textTransform: "capitalize",
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   btnAzul: {
     backgroundColor: Colors.azulClaro,
