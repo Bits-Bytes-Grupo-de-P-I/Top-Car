@@ -4,7 +4,7 @@ import { useState } from "react";
 import Colors from "@/constants/Colors";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const ServicosPadrao = (props) => {
+const StandardServices = (props) => {
   const [selecionado, setSelecionado] = useState(false);
   return (
     // Container principal
@@ -27,17 +27,17 @@ const ServicosPadrao = (props) => {
             <FontAwesome6 name="check" size={20} color="white" />
           </View>
         </TouchableHighlight>
-        <Text style={{fontFamily: "DM-Sans"}}>{props.texto}</Text>
+        <Text style={{ fontFamily: "DM-Sans" }}>{props.texto}</Text>
       </View>
       {/* Container do icone e texto */}
 
-      <Text style={{fontFamily: "DM-Sans"}}>{props.preco}</Text>
+      <Text style={{ fontFamily: "DM-Sans" }}>{props.preco}</Text>
     </View>
     // Container principal
   );
 };
 
-export default ServicosPadrao;
+export default StandardServices;
 
 const styles = StyleSheet.create({
   container: {
@@ -59,11 +59,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "black",
     color: "white",
-    marginRight: 8
+    marginRight: 8,
   },
   checkTexto: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  }
+  },
 });

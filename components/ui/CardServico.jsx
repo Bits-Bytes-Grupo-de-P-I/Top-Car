@@ -1,31 +1,30 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import React from 'react';
-import { FontAwesome6 } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
-import Emergencia from './Emergencia';
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React from "react";
+import { FontAwesome6 } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import Emergency from "./Emergency";
 
 const CardServico = ({ item, onPress }) => {
   return (
     <TouchableOpacity
-      style={[
-        styles.servicoItem,
-        item.urgente ? styles.servicoUrgente : {}
-      ]}
+      style={[styles.servicoItem, item.urgente ? styles.servicoUrgente : {}]}
       onPress={() => onPress(item)}
     >
       <View style={styles.servicoHeader}>
         <Text style={styles.clienteNome}>{item.clienteNome}</Text>
         {item.urgente && (
           <View style={styles.urgenteBadge}>
-            <Emergencia/>
+            <Emergency />
           </View>
         )}
       </View>
-     
+
       <View style={styles.servicoInfo}>
         <View style={styles.infoRow}>
           <FontAwesome6 name="car" size={14} color={Colors.azulClaro} />
-          <Text style={styles.infoText}>{item.veiculo} - {item.placa}</Text>
+          <Text style={styles.infoText}>
+            {item.veiculo} - {item.placa}
+          </Text>
         </View>
         <View style={styles.infoRow}>
           <FontAwesome6 name="wrench" size={14} color={Colors.azulClaro} />
@@ -36,17 +35,25 @@ const CardServico = ({ item, onPress }) => {
           <Text style={styles.infoText}>{item.dataAgendada}</Text>
         </View>
       </View>
-     
+
       <View style={styles.statusContainer}>
-        <Text style={[
-          styles.statusText,
-          item.status === 'Finalizado' ? styles.statusFinalizado :
-          item.status === 'Aguardando peça' ? styles.statusAguardandoPeca :
-          styles.statusAndamento
-        ]}>
+        <Text
+          style={[
+            styles.statusText,
+            item.status === "Finalizado"
+              ? styles.statusFinalizado
+              : item.status === "Aguardando peça"
+              ? styles.statusAguardandoPeca
+              : styles.statusAndamento,
+          ]}
+        >
           {item.status}
         </Text>
-        <FontAwesome6 name="chevron-right" size={16} color={Colors.cinzaEscuro} />
+        <FontAwesome6
+          name="chevron-right"
+          size={16}
+          color={Colors.cinzaEscuro}
+        />
       </View>
     </TouchableOpacity>
   );

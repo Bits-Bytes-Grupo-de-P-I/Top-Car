@@ -10,10 +10,10 @@ import {
 import React, { useState } from "react";
 
 // Componentes
-import CampoDeInput from "@/components/ui/CampoDeInput";
+import InputField from "@/components/ui/InputField";
 import Slider from "@/components/ui/Slider";
-import Botao from "@/components/ui/Botao";
-import Titulo from "@/components/ui/Titulo";
+import Button from "@/components/ui/Button";
+import PageHeader from "@/components/ui/PageHeader";
 
 import Colors from "@/constants/Colors";
 
@@ -46,6 +46,11 @@ const clientSignUp = () => {
       style={styles.background}
       resizeMode="cover"
     >
+      <PageHeader
+        title="Serviços Pendentes da Oficina"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
       <ScrollView
         nestedScrollEnabled={true}
         keyboardShouldPersistTaps="handled"
@@ -54,19 +59,17 @@ const clientSignUp = () => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          
           <View style={styles.containerPrincipal}>
-            <Titulo titulo="Cadastro de Cliente" />
             {/* Container dos campos de cadastro */}
             <View style={styles.container}>
-              <CampoDeInput
+              <InputField
                 tipoDeInfo="Nome"
                 keyboardType="default"
                 valor={nome}
                 onChangeText={setNome}
                 placeholder="Digite o nome completo"
               />
-              <CampoDeInput
+              <InputField
                 tipoDeInfo="CPF/CNPJ"
                 keyboardType="number-pad"
                 mascara="999.999.999-99" // FALTA A LÓGICA DE DIFERENCIAR O CPF DO CNPJ
@@ -74,7 +77,7 @@ const clientSignUp = () => {
                 onChangeText={setCpf}
                 placeholder="000.000.000-00 ou 00.000.000/0000-00"
               />
-              <CampoDeInput
+              <InputField
                 tipoDeInfo="CEP"
                 keyboardType="numeric"
                 mascara="99999-999"
@@ -83,7 +86,7 @@ const clientSignUp = () => {
                 placeholder="00000-000"
               />
               <View style={styles.containerInterior}>
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Cidade"
                   keyboardType="default"
                   valor={cidade}
@@ -91,7 +94,7 @@ const clientSignUp = () => {
                   placeholder="Cidade"
                   largura="65%"
                 />
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Estado"
                   keyboardType="default"
                   largura="30%"
@@ -101,7 +104,7 @@ const clientSignUp = () => {
                   placeholder="UF"
                 />
               </View>
-              <CampoDeInput
+              <InputField
                 tipoDeInfo="Endereço"
                 keyboardType="default"
                 valor={endereco}
@@ -110,7 +113,7 @@ const clientSignUp = () => {
               />
 
               <View style={styles.containerInterior}>
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Número"
                   keyboardType="numeric"
                   largura="30%"
@@ -118,7 +121,7 @@ const clientSignUp = () => {
                   onChangeText={setNumero}
                   placeholder="Nº"
                 />
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Bairro"
                   keyboardType="default"
                   largura="65%"
@@ -127,7 +130,7 @@ const clientSignUp = () => {
                   placeholder="Rua/Avenida"
                 />
               </View>
-              <CampoDeInput
+              <InputField
                 tipoDeInfo="Telefone"
                 keyboardType=""
                 valor={telefone}
@@ -137,8 +140,8 @@ const clientSignUp = () => {
               />
               {/* Container dos botões de cadastro do cliente */}
               <View style={styles.containerBotoes}>
-                <Botao cor="verde" texto="Cadastrar" />
-                <Botao cor="vermelho" texto="Cancelar" />
+                <Button cor="verde" texto="Cadastrar" />
+                <Button cor="vermelho" texto="Cancelar" />
               </View>
               {/* Fim Container dos botões de cadastro do cliente */}
             </View>
@@ -147,7 +150,7 @@ const clientSignUp = () => {
             {/* Container do slider */}
             <View style={styles.containerSlider}>
               <Text
-                style={{ fontSize: 18, fontFamily: "DM-Sans", color: 'white' }}
+                style={{ fontSize: 18, fontFamily: "DM-Sans", color: "white" }}
               >
                 Cadastrar Veículo
               </Text>
@@ -163,14 +166,14 @@ const clientSignUp = () => {
               <View style={styles.container}>
                 <Text style={styles.subtituloSecao}>Cadastro de Veículo</Text>
 
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Veículo"
                   keyboardType="default"
                   valor={veiculo}
                   onChangeText={setVeiculo}
                   placeholder="Ex: Kwid"
                 />
-                <CampoDeInput
+                <InputField
                   tipoDeInfo="Modelo"
                   keyboardType="default"
                   valor={modelo}
@@ -179,7 +182,7 @@ const clientSignUp = () => {
                 />
 
                 <View style={styles.containerInterior}>
-                  <CampoDeInput
+                  <InputField
                     tipoDeInfo="Ano"
                     keyboardType="numeric"
                     largura="48%"
@@ -187,7 +190,7 @@ const clientSignUp = () => {
                     onChangeText={setAno}
                     placeholder="2023"
                   />
-                  <CampoDeInput
+                  <InputField
                     tipoDeInfo="Cor"
                     keyboardType="default"
                     largura="48%"
@@ -197,7 +200,7 @@ const clientSignUp = () => {
                   />
 
                   <View style={styles.containerInterior}>
-                    <CampoDeInput
+                    <InputField
                       tipoDeInfo="KM"
                       keyboardType="number-pad"
                       largura="48%"
@@ -205,7 +208,7 @@ const clientSignUp = () => {
                       onChangeText={setKm}
                       placeholder="Ex: 45000"
                     />
-                    <CampoDeInput
+                    <InputField
                       tipoDeInfo="Placa"
                       keyboardType="default"
                       largura="48%"
@@ -218,8 +221,8 @@ const clientSignUp = () => {
                 </View>
 
                 <View style={styles.containerBotoes}>
-                  <Botao cor="verde" texto="Cadastrar" />
-                  <Botao cor="vermelho" texto="Cancelar" />
+                  <Button cor="verde" texto="Cadastrar" />
+                  <Button cor="vermelho" texto="Cancelar" />
                 </View>
               </View>
             )}

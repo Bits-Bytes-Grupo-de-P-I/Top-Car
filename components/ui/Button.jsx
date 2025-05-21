@@ -3,10 +3,11 @@ import React from "react";
 
 import Colors from "@/constants/Colors";
 
-const Botao = (props) => {
+const Button = (props) => {
   return (
     <>
-      <TouchableHighlight onPress={props.onPress}
+      <TouchableHighlight
+        onPress={props.onPress}
         // Estilos condicionais com base nos props passados nos botões
         underlayColor="transparent"
         style={[
@@ -15,7 +16,7 @@ const Botao = (props) => {
             : props.cor === "verde"
             ? styles.btnVerde
             : styles.btnVermelho,
-          styles.btn
+          styles.btn,
         ]}
       >
         <Text style={styles.btnTexto}>{props.texto}</Text>
@@ -24,7 +25,7 @@ const Botao = (props) => {
   );
 };
 
-export default Botao;
+export default Button;
 
 const styles = StyleSheet.create({
   btn: {
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     textTransform: "capitalize",
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   btnAzul: {
     backgroundColor: Colors.azulClaro,

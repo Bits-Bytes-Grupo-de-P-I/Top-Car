@@ -2,20 +2,20 @@ import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import { useState } from "react";
 import Colors from "@/constants/Colors";
 
-const Emergencia = () => {
-  const [estadoEmergencia, setEstadoEmergencia] = useState(true);
+const Emergency = () => {
+  const [estadoEmergency, setEstadoEmergency] = useState(true);
   return (
     <TouchableHighlight
       style={[
         styles.container,
-        { backgroundColor: estadoEmergencia ? Colors.laranja : "transparent" }, // Se for uma emergência, vai ativar o fundo vermelho, senão, vai ficar transparente
+        { backgroundColor: estadoEmergency ? Colors.laranja : "transparent" }, // Se for uma emergência, vai ativar o fundo vermelho, senão, vai ficar transparente
       ]}
-      onPress={() => setEstadoEmergencia(!estadoEmergencia)}
+      onPress={() => setEstadoEmergency(!estadoEmergency)}
     >
       <Text
         style={[
           styles.exclamacao,
-          { display: estadoEmergencia ? "flex" : "none" },
+          { display: estadoEmergency ? "flex" : "none" },
         ]}
       >
         !
@@ -24,7 +24,7 @@ const Emergencia = () => {
   );
 };
 
-export default Emergencia;
+export default Emergency;
 
 const styles = StyleSheet.create({
   container: {
@@ -36,11 +36,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.aluminio,
     color: Colors.grafite,
-    margin: 16
+    margin: 16,
   },
   exclamacao: {
     color: "white",
     fontWeight: "bold",
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
 });

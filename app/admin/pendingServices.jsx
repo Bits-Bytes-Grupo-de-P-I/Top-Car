@@ -15,7 +15,7 @@
 // import Entypo from "@expo/vector-icons/Entypo";
 
 // import Titulo from "@/components/ui/Titulo";
-// import Emergencia from "@/components/ui/Emergencia";
+// import Emergency from "@/components/ui/Emergency";
 
 // // Dados de exemplo para serviços pendentes
 // const servicosPendentesExemplo = [
@@ -74,22 +74,22 @@
 // // Componente para cada item da lista de serviços pendentes
 // const ServicoItem = ({ item, onPress }) => {
 //   return (
-//     <TouchableOpacity 
+//     <TouchableOpacity
 //       style={[
-//         styles.servicoItem, 
+//         styles.servicoItem,
 //         item.urgente ? styles.servicoUrgente : {}
-//       ]} 
+//       ]}
 //       onPress={() => onPress(item)}
 //     >
 //       <View style={styles.servicoHeader}>
 //         <Text style={styles.clienteNome}>{item.clienteNome}</Text>
 //         {item.urgente && (
 //           <View style={styles.urgenteBadge}>
-//             <Emergencia/>
+//             <Emergency/>
 //           </View>
 //         )}
 //       </View>
-      
+
 //       <View style={styles.servicoInfo}>
 //         <View style={styles.infoRow}>
 //           <FontAwesome6 name="car" size={14} color={Colors.azulClaro} />
@@ -104,10 +104,10 @@
 //           <Text style={styles.infoText}>{item.dataAgendada}</Text>
 //         </View>
 //       </View>
-      
+
 //       <View style={styles.statusContainer}>
 //         {/* <Text style={[
-//           styles.statusText, 
+//           styles.statusText,
 //           item.status === 'Agendado' ? styles.statusAgendado :
 //           item.status === 'Aguardando peças' ? styles.statusAguardandoPecas :
 //           styles.statusAguardandoAprovacao
@@ -132,8 +132,8 @@
 //   };
 
 //   // Filtrar os serviços com base no filtro ativo
-//   const servicosFiltrados = filtroAtivo === 'Todos' 
-//     ? servicos 
+//   const servicosFiltrados = filtroAtivo === 'Todos'
+//     ? servicos
 //     : filtroAtivo === 'Urgentes'
 //       ? servicos.filter(s => s.urgente)
 //       : servicos.filter(s => s.status === filtroAtivo);
@@ -154,7 +154,7 @@
 //         {/* <View style={styles.filtrosContainer}>
 //           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
 //             {['Todos', 'Urgentes', 'Agendado', 'Aguardando peças', 'Aguardando aprovação'].map((filtro) => (
-//               <TouchableOpacity 
+//               <TouchableOpacity
 //                 key={filtro}
 //                 style={[
 //                   styles.filtroItem,
@@ -190,7 +190,7 @@
 //         />
 
 //         {/* Botão de adicionar novo serviço */}
-//         <TouchableOpacity style={styles.botaoAdicionar}>
+//         <TouchableOpacity style={styles.ButtonAdicionar}>
 //           <FontAwesome6 name="plus" size={20} color="white" />
 //         </TouchableOpacity>
 //       </ImageBackground>
@@ -325,7 +325,7 @@
 //     color: Colors.cinzaEscuro,
 //     textAlign: "center",
 //   },
-//   botaoAdicionar: {
+//   ButtonAdicionar: {
 //     position: "absolute",
 //     bottom: 20,
 //     right: 20,
@@ -343,15 +343,15 @@
 //   },
 // });
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 
-import { SafeAreaView } from 'react-native-safe-area-context';
-import PageHeader from '@/components/ui/PageHeader';
-import Colors from '@/constants/Colors';
+import { SafeAreaView } from "react-native-safe-area-context";
+import PageHeader from "@/components/ui/PageHeader";
+import Colors from "@/constants/Colors";
 
-import ServiceCard from '@/components/ui/ServiceCard'; //componente de card de serviços pendentes
-import mockServices from '@/assets/mocks/pendenciasMock.json'; // Mock de serviços pendentes
+import ServiceCard from "@/components/ui/ServiceCard"; //componente de card de serviços pendentes
+import mockServices from "@/assets/mocks/pendenciasMock.json"; // Mock de serviços pendentes
 
 /**
  * Tela de serviços pendentes para o ADMINISTRADOR
@@ -360,19 +360,19 @@ import mockServices from '@/assets/mocks/pendenciasMock.json'; // Mock de servi�
 
 const pendingServices = () => {
   const [services, setServices] = useState([]);
-  
+
   // ID do administrador atual (em uma aplicação real, viria do contexto de autenticação)
   const adminId = "456";
 
   useEffect(() => {
-    // Função para carregar todos os serviços 
+    // Função para carregar todos os serviços
     const loadAllServices = () => {
       // Em uma aplicação real, você faria uma chamada à API
       // e possivelmente filtraria pelos serviços criados por este admin específico
       // const adminServices = mockServices.filter(
       //   service => service.createdBy === `admin${adminId}`
       // );
-      
+
       // Neste exemplo, estamos mostrando todos os serviços para o admin
       setServices(mockServices);
     };
@@ -384,42 +384,36 @@ const pendingServices = () => {
   const handleEditService = (serviceId) => {
     console.log(`Editar serviço ID: ${serviceId}`);
     // Aqui você navegaria para uma tela de edição ou abriria um modal
-    // navigate(`/service/edit/${serviceId}`); 
+    // navigate(`/service/edit/${serviceId}`);
   };
 
   const handleDeleteService = (serviceId) => {
     console.log(`Excluir serviço ID: ${serviceId}`);
     // Aqui você removeria o serviço da lista e faria uma chamada à API
-    setServices(services.filter(service => service.id !== serviceId));
+    setServices(services.filter((service) => service.id !== serviceId));
     // Em produção você faria algo como: deleteServiceAPI(serviceId)
   };
 
   const handleAcceptService = (serviceId) => {
     console.log(`Aceitar serviço ID: ${serviceId}`);
     // Atualiza o status do serviço localmente
-    setServices(services.map(service => 
-      service.id === serviceId 
-        ? { ...service, isAccepted: !service.isAccepted } 
-        : service
-    ));
+    setServices(
+      services.map((service) =>
+        service.id === serviceId
+          ? { ...service, isAccepted: !service.isAccepted }
+          : service
+      )
+    );
     // Em produção você faria algo como: updateServiceStatusAPI(serviceId, 'accepted')
   };
 
   return (
     <SafeAreaView style={styles.container}>
-
-      <PageHeader 
-        title="Serviços Pendentes da Oficina" 
-        containerStyle={{backgroundColor: Colors.azulClaro}} 
-        titleStyle={{color: '#fff'}}
+      <PageHeader
+        title="Serviços Pendentes da Oficina"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
       />
-
-      {/* <View style={styles.header}>
-        <Text style={styles.title}>Gerenciar Serviços</Text>
-        <Text style={styles.subtitle}>
-          Todos os serviços pendentes da oficina
-        </Text>
-      </View> */}
 
       {services.length === 0 ? (
         <View style={styles.emptyState}>
@@ -450,22 +444,22 @@ const pendingServices = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
   },
   list: {
@@ -473,14 +467,14 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
 });
 

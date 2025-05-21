@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
 
-import Titulo from "@/components/ui/Titulo";
+import PageHeader from "@/components/ui/PageHeader";
 import Dropdown from "@/components/ui/Dropdown";
 
 import Colors from "@/constants/Colors";
@@ -17,24 +17,28 @@ import Colors from "@/constants/Colors";
 const generateBill = () => {
   return (
     <ImageBackground
-          source={require("@/assets/images/fundo.jpg")}
-          style={styles.background}
-          resizeMode="cover"
-        >
-          <ScrollView
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.scrollContent}
-          >
-    <View style={styles.containerPrincipal}>
-      <Titulo titulo="Informações do Cliente" />
-      <View style={styles.container}>
-        <Dropdown title='Deu certo?'>
-            <Text>Deu certo!</Text>
-        </Dropdown>
-      </View>
-    </View>
-    </ScrollView>
+      source={require("@/assets/images/fundo.jpg")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <PageHeader
+        title="Serviços Pendentes da Oficina"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
+      <ScrollView
+        nestedScrollEnabled={true}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.containerPrincipal}>
+          <View style={styles.container}>
+            <Dropdown title="Deu certo?">
+              <Text>Deu certo!</Text>
+            </Dropdown>
+          </View>
+        </View>
+      </ScrollView>
     </ImageBackground>
   );
 };

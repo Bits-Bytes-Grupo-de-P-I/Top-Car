@@ -8,49 +8,49 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
-import { FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome6 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import CardServico from "@/components/ui/CardServico";
-import Titulo from "@/components/ui/Titulo";
-import Emergencia from "@/components/ui/Emergencia";
+import PageHeader from "@/components/ui/PageHeader";
+import Emergency from "@/components/ui/Emergency";
 
 const ongoingServices = () => {
   // Dados de exemplo
   const [servicos, setServicos] = useState([
     {
-      id: '1',
-      clienteNome: 'João Silva',
-      veiculo: 'Honda Civic',
-      placa: 'ABC1234',
-      servico: 'Troca de óleo',
-      dataAgendada: '16/05/2025',
-      status: 'Finalizado',
-      urgente: false
+      id: "1",
+      clienteNome: "João Silva",
+      veiculo: "Honda Civic",
+      placa: "ABC1234",
+      servico: "Troca de óleo",
+      dataAgendada: "16/05/2025",
+      status: "Finalizado",
+      urgente: false,
     },
     {
-      id: '2',
-      clienteNome: 'Maria Oliveira',
-      veiculo: 'Toyota Corolla',
-      placa: 'XYZ5678',
-      servico: 'Revisão completa',
-      dataAgendada: '17/05/2025',
-      status: 'Aguardando peça',
-      urgente: true
+      id: "2",
+      clienteNome: "Maria Oliveira",
+      veiculo: "Toyota Corolla",
+      placa: "XYZ5678",
+      servico: "Revisão completa",
+      dataAgendada: "17/05/2025",
+      status: "Aguardando peça",
+      urgente: true,
     },
     {
-      id: '3',
-      clienteNome: 'Carlos Pereira',
-      veiculo: 'Volkswagen Golf',
-      placa: 'DEF9012',
-      servico: 'Troca de pastilhas de freio',
-      dataAgendada: '18/05/2025',
-      status: 'Andamento',
-      urgente: false
-    }
+      id: "3",
+      clienteNome: "Carlos Pereira",
+      veiculo: "Volkswagen Golf",
+      placa: "DEF9012",
+      servico: "Troca de pastilhas de freio",
+      dataAgendada: "18/05/2025",
+      status: "Andamento",
+      urgente: false,
+    },
   ]);
 
   const handleServicoPress = (item) => {
-    console.log('Serviço selecionado:', item);
+    console.log("Serviço selecionado:", item);
     // Navegação para detalhes do serviço
   };
 
@@ -60,28 +60,32 @@ const ongoingServices = () => {
       style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.barraTopo}>
-        <Titulo titulo='Serviços em Andamento'/>
-      </View>
+      <PageHeader
+        title="Serviços em Andamento"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
 
       <ScrollView
         nestedScrollEnabled={true}
         keyboardShouldPersistTaps="handled"
       >
-        
-
         <View style={styles.listaContainer}>
           {servicos.length > 0 ? (
-            servicos.map(item => (
-              <CardServico 
-                key={item.id} 
-                item={item} 
-                onPress={handleServicoPress} 
+            servicos.map((item) => (
+              <CardServico
+                key={item.id}
+                item={item}
+                onPress={handleServicoPress}
               />
             ))
           ) : (
             <View style={styles.emptyContainer}>
-              <FontAwesome6 name="clipboard-list" size={48} color={Colors.cinzaEscuro} />
+              <FontAwesome6
+                name="clipboard-list"
+                size={48}
+                color={Colors.cinzaEscuro}
+              />
               <Text style={styles.emptyText}>Nenhum serviço encontrado</Text>
             </View>
           )}
@@ -96,19 +100,6 @@ export default ongoingServices;
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-  },
-  barraTopo: {
-    width: "100%",
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  tituloTopo: {
-    fontFamily: "DM-Sans",
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
   },
   filtrosContainer: {
     paddingVertical: 12,
@@ -150,7 +141,7 @@ const styles = StyleSheet.create({
     color: Colors.cinzaEscuro,
     textAlign: "center",
   },
-  botaoAdicionar: {
+  ButtonAdicionar: {
     position: "absolute",
     bottom: 20,
     right: 20,

@@ -13,15 +13,15 @@ import Colors from "@/constants/Colors";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import mockData from "@/assets/mocks/serviceRequests";
 
-import Titulo from "@/components/ui/Titulo";
-import Botao from "@/components/ui/Botao";
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
 // import Titulo from '@/components/ui/Titulo'
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPedido, setSelectedPedido] = useState(null);
 
-  const handleVerMais = (pedido) => {
+  const handleSeeMoreBtn = (pedido) => {
     setSelectedPedido(pedido);
     setModalVisible(true);
   };
@@ -54,13 +54,16 @@ const serviceRequests = () => {
       style={styles.background}
       resizeMode="cover"
     >
+      <PageHeader
+        title="Serviços em Andamento"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
       <ScrollView
         nestedScrollEnabled={true}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.container}>
-          <Titulo titulo="Pedidos de Serviço" />
-
           {mockData.map((pedido) => (
             <View key={pedido.id} style={styles.card}>
               <View style={styles.cardHeader}>
@@ -87,10 +90,10 @@ const serviceRequests = () => {
                 </View>
 
                 <TouchableOpacity
-                  style={styles.verMaisButton}
-                  onPress={() => handleVerMais(pedido)}
+                  style={styles.SeeMoreBtnButton}
+                  onPress={() => handleSeeMoreBtn(pedido)}
                 >
-                  <Text style={styles.verMaisText}>Ver mais +</Text>
+                  <Text style={styles.SeeMoreBtnText}>Ver mais +</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -163,12 +166,12 @@ const serviceRequests = () => {
                   </View>
 
                   <View style={styles.modalActions}>
-                    <Botao
+                    <Button
                       cor="vermelho"
                       texto="Rejeitar"
                       onPress={() => handleReject(selectedPedido.id)}
                     />
-                    <Botao
+                    <Button
                       cor="verde"
                       texto="Aceitar"
                       onPress={() => handleAccept(selectedPedido.id)}
@@ -259,17 +262,17 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
   },
-  verMaisButton: {
+  SeeMoreBtnButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: Colors.primary,
     borderRadius: 20,
   },
-  verMaisText: {
+  SeeMoreBtnText: {
     color: Colors.azul,
     fontSize: 14,
     fontWeight: "500",
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   // Estilos do Modal
   centeredView: {
@@ -301,7 +304,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: Colors.grafite,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   closeButton: {
     padding: 5,
@@ -318,13 +321,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: Colors.grafite,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalClientPhone: {
     fontSize: 14,
     color: Colors.grafite,
     marginTop: 2,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalVehicleInfo: {
     marginBottom: 16,
@@ -332,13 +335,13 @@ const styles = StyleSheet.create({
   modalVehicleModel: {
     fontSize: 15,
     color: Colors.grafite,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalVehiclePlate: {
     fontSize: 15,
     color: Colors.text,
     marginTop: 4,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   boldText: {
     fontWeight: "bold",
@@ -351,26 +354,26 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.grafite,
     marginBottom: 4,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalResumo: {
     fontSize: 16,
     color: Colors.grafite,
     marginBottom: 12,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalDescricaoTitle: {
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.text,
     marginBottom: 4,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalDescricao: {
     fontSize: 16,
     color: Colors.text,
     lineHeight: 22,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalDate: {
     marginBottom: 20,
@@ -379,10 +382,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "italic",
     color: Colors.grafite,
-    fontFamily: 'DM-Sans'
+    fontFamily: "DM-Sans",
   },
   modalActions: {
     flexDirection: "row",
     justifyContent: "space-around",
-  }
+  },
 });

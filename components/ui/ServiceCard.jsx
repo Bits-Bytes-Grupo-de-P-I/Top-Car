@@ -77,8 +77,8 @@ const ServiceCard = ({
               ]} 
               onPress={handleAccept}
             >
-              <Ionicons name={service.isAccepted ? "checkmark-circle" : "checkmark-circle-outline"} size={18} color="#FFF" />
-              <Text style={styles.actionText}>{service.isAccepted ? "Aceito" : "Aceitar"}</Text>
+              <Ionicons name={service.isAccepted ? "checkmark-circle" : "checkmark-circle-outline"} size={18} color={service.isAccepted ? '#fff' : '#2ecc71'} />
+              <Text style={service.isAccepted ? styles.actionText : styles.acceptText}>{service.isAccepted ? "Aceito" : "Aceitar"}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -141,15 +141,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   editButton: {
+    borderWidth: 1,
+    borderColor: '#3498db',
     backgroundColor: '#3498db',
   },
   deleteButton: {
+    borderWidth: 1,
+    borderColor: '#e74c3c',
     backgroundColor: '#e74c3c',
   },
   acceptButton: {
-    backgroundColor: '#2ecc71',
+    borderWidth: 1,
+    borderColor: '#2ecc71',
+  },
+  acceptText: {
+    color: '#27ae60',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 4,
   },
   acceptedButton: {
+    borderWidth: 1,
+    borderColor: '#27ae60',
     backgroundColor: '#27ae60',
   },
   actionText: {

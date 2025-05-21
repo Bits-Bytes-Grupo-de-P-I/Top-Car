@@ -2,9 +2,9 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { MaskedTextInput } from "react-native-mask-text";
 
-import Colors from '@/constants/Colors'
+import Colors from "@/constants/Colors";
 
-const CampoDeInput = (props) => {
+const InputField = (props) => {
   return (
     <View style={[styles.container, { width: props.largura || "100%" }]}>
       <Text style={styles.tituloCampo}>{props.tipoDeInfo}</Text>
@@ -22,7 +22,7 @@ const CampoDeInput = (props) => {
   );
 };
 
-export default CampoDeInput;
+export default InputField;
 
 const styles = StyleSheet.create({
   container: {

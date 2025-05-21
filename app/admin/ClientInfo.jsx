@@ -16,8 +16,8 @@ import { AntDesign, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import mock from "@/assets/mocks/clientAndVehiclesInfo";
 
 import Slider from "@/components/ui/Slider";
-import Titulo from "@/components/ui/Titulo";
-import Botao from "@/components/ui/Botao";
+import PageHeader from "@/components/ui/PageHeader";
+import Button from "@/components/ui/Button";
 
 import Colors from "@/constants/Colors";
 
@@ -101,12 +101,12 @@ const clientInfo = () => {
       style={styles.background}
       resizeMode="cover"
     >
+      <PageHeader
+        title="Serviços Pendentes da Oficina"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
       <ScrollView style={styles.container}>
-        {/* Cabeçalho */}
-        <View style={styles.header}>
-          <Titulo titulo="Informações do Cliente" />
-        </View>
-
         {/* Informações do Cliente */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -318,12 +318,12 @@ const clientInfo = () => {
               />
 
               <View style={styles.modalButtons}>
-                <Botao
+                <Button
                   cor="vermelho"
                   texto="Cancelar"
                   onPress={() => setEditClientModal(false)}
                 />
-                <Botao
+                <Button
                   cor="verde"
                   texto="Cancelar"
                   onPress={saveClientChanges}
@@ -406,12 +406,12 @@ const clientInfo = () => {
               />
 
               <View style={styles.modalButtons}>
-                <Botao
+                <Button
                   cor="vermelho"
                   texto="Cancelar"
                   onPress={() => setVehicleModal(false)}
                 />
-                <Botao
+                <Button
                   cor="verde"
                   texto="Cancelar"
                   onPress={saveVehicleChanges}
