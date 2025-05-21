@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import React, { useState } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
@@ -55,6 +56,7 @@ const ongoingServices = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ImageBackground
       source={require("@/assets/images/fundo.jpg")}
       style={styles.background}
@@ -92,6 +94,7 @@ const ongoingServices = () => {
         </View>
       </ScrollView>
     </ImageBackground>
+    </SafeAreaView>
   );
 };
 

@@ -8,6 +8,7 @@ import {
   Modal,
   Pressable,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
@@ -15,7 +16,6 @@ import mockData from "@/assets/mocks/serviceRequests";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
-// import Titulo from '@/components/ui/Titulo'
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -49,6 +49,7 @@ const serviceRequests = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ImageBackground
       source={require("@/assets/images/fundo.jpg")}
       style={styles.background}
@@ -184,6 +185,7 @@ const serviceRequests = () => {
         </Modal>
       </ScrollView>
     </ImageBackground>
+    </SafeAreaView>
   );
 };
 

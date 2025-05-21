@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import React, { useState } from "react";
 
 // Componentes
@@ -41,6 +42,7 @@ const clientSignUp = () => {
   const [placa, setPlaca] = useState("");
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ImageBackground
       source={require("@/assets/images/fundo.jpg")}
       style={styles.background}
@@ -230,6 +232,7 @@ const clientSignUp = () => {
         </KeyboardAvoidingView>
       </ScrollView>
     </ImageBackground>
+    </SafeAreaView>
   );
 };
 

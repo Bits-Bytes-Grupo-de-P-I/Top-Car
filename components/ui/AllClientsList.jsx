@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  FlatList,
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
@@ -11,7 +12,7 @@ import Colors from "@/constants/Colors";
 import clientes from "@/assets/mocks/clientes.json";
 import { useRouter } from "expo-router";
 
-const ClientList = () => {
+const AllClientsList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
   
@@ -42,34 +43,27 @@ const ClientList = () => {
     );
   });
 
-  // Limitar a no máximo 5 clientes para exibição estática
-  const mostrarClientes = clientesFiltrados.slice(0, 5);
-
-  // Renderizar cada cliente individualmente
-  const renderClientes = () => {
-    return mostrarClientes.map((cliente) => (
-      <TouchableOpacity
-        key={cliente.id.toString()}
-        style={styles.item}
-        onPress={() =>
-          router.push({
-            pathname: "./admin/clientInfo",
-            params: {
-              nome: cliente.nome,
-              cpf: cliente.cpf,
-              status: cliente.status,
-            },
-          })
-        }
-      >
-        <View style={styles.nomeStatus}>
-          <Text style={styles.nome}>{cliente.nome}</Text>
-          {renderStatus(cliente.status)}
-        </View>
-        <Text style={styles.cpf}>CPF: {cliente.cpf}</Text>
-      </TouchableOpacity>
-    ));
-  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() =>
+        router.push({
+          pathname: "./admin/clientInfo",
+          params: {
+            nome: item.nome,
+            cpf: item.cpf,
+            status: item.status,
+          },
+        })
+      }
+    >
+      <View style={styles.nomeStatus}>
+        <Text style={styles.nome}>{item.nome}</Text>
+        {renderStatus(item.status)}
+      </View>
+      <Text style={styles.cpf}>CPF: {item.cpf}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,36 +77,30 @@ const ClientList = () => {
       {clientesFiltrados.length === 0 ? (
         <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
       ) : (
-        <View style={styles.clientesContainer}>
-          {renderClientes()}
-          
-          {clientesFiltrados.length > 5 && (
-            <TouchableOpacity 
-              style={styles.verMaisBtn}
-              onPress={() => router.push("./admin/allClients")}
-            >
-              <Text style={styles.verMaisTxt}>
-                Ver todos os clientes ({clientesFiltrados.length})
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <FlatList
+          data={clientesFiltrados}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={styles.flatListContent}
+        />
       )}
     </SafeAreaView>
   );
 };
 
-export default ClientList;
+export default AllClientsList;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     borderRadius: 10,
     padding: 16,
     backgroundColor: Colors.azulClaro,
     width: "100%",
   },
-  clientesContainer: {
-    width: "100%",
+  flatListContent: {
+    paddingBottom: 8,
   },
   input: {
     padding: 10,
@@ -157,16 +145,4 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  verMaisBtn: {
-    padding: 12,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  verMaisTxt: {
-    color: Colors.grafite,
-    fontWeight: "bold",
-    fontFamily: "DM-Sans",
-  }
 });

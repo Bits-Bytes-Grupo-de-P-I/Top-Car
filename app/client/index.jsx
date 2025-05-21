@@ -14,14 +14,8 @@ import Colors from "@/constants/Colors";
 import Entypo from "@expo/vector-icons/Entypo";
 
 // Componentes
-import Button from "@/components/ui/Button";
-import Slider from "@/components/ui/Slider";
-import InputField from "@/components/ui/InputField";
-import Emergency from "@/components/ui/Emergency";
-import StatusDeServico from "@/components/ui/StatusDeServico";
+
 import Card from "@/components/ui/Card";
-import SeeMoreBtn from "@/components/ui/SeeMoreBtn";
-import StandardServices from "@/components/ui/StandardServices";
 import ClientList from "@/components/ui/ClientList";
 
 import CardWork from "@/components/ui/CardWork";
@@ -42,7 +36,6 @@ export default function Index() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {" "}
       {/* SafeAreaView para concertar a tela no celular */}
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}

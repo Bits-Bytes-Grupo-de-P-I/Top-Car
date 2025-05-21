@@ -12,7 +12,8 @@ import {
   ImageBackground,
 } from "react-native";
 import { router } from "expo-router";
-import { AntDesign, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import mock from "@/assets/mocks/clientAndVehiclesInfo";
 
 import Slider from "@/components/ui/Slider";
@@ -96,6 +97,7 @@ const clientInfo = () => {
   // Saporra aqui é tudo IA com dado mockado
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ImageBackground
       source={require("@/assets/images/fundo.jpg")}
       style={styles.background}
@@ -423,6 +425,7 @@ const clientInfo = () => {
         {/* Fim Modal para editar informações do veículo */}
       </ScrollView>
     </ImageBackground>
+    </SafeAreaView>
   );
 };
 

@@ -8,38 +8,40 @@ import {
   Animated,
 } from "react-native";
 import React, { useState, useRef, useEffect } from "react";
-
+import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import PageHeader from "@/components/ui/PageHeader";
-import Dropdown from "@/components/ui/Dropdown";
+import ExpandableMenu from "@/components/ui/ExpandableMenu";
 
 import Colors from "@/constants/Colors";
 
 const generateBill = () => {
   return (
-    <ImageBackground
-      source={require("@/assets/images/fundo.jpg")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <PageHeader
-        title="Serviços Pendentes da Oficina"
-        containerStyle={{ backgroundColor: Colors.azulClaro }}
-        titleStyle={{ color: "#fff" }}
-      />
-      <ScrollView
-        nestedScrollEnabled={true}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.scrollContent}
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <View style={styles.containerPrincipal}>
-          <View style={styles.container}>
-            <Dropdown title="Deu certo?">
-              <Text>Deu certo!</Text>
-            </Dropdown>
+        <PageHeader
+          title="Serviços Pendentes da Oficina"
+          containerStyle={{ backgroundColor: Colors.azulClaro }}
+          titleStyle={{ color: "#fff" }}
+        />
+        <ScrollView
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.containerPrincipal}>
+            <View style={styles.container}>
+              <ExpandableMenu title="Deu certo?">
+                <Text>Deu certo!</Text>
+              </ExpandableMenu>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </ImageBackground>
+        </ScrollView>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  dropdown: {
+  ExpandableMenu: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,

@@ -12,7 +12,7 @@ import React, { useState, useRef, useEffect } from "react";
 
 import Colors from "@/constants/Colors";
 
-const Dropdown = ({ title, children }) => {
+const ExpandableMenu = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
   const animatedHeight = useRef(new Animated.Value(0)).current;
@@ -35,7 +35,9 @@ const Dropdown = ({ title, children }) => {
         <Text style={styles.buttonText}>{title}</Text>
       </TouchableOpacity>
 
-      <Animated.View style={[styles.dropdown, { height: animatedHeight }]}>
+      <Animated.View
+        style={[styles.ExpandableMenu, { height: animatedHeight }]}
+      >
         {/* Medir o conteúdo e armazenar altura apenas uma vez */}
         <View
           style={styles.innerContent}
@@ -53,7 +55,7 @@ const Dropdown = ({ title, children }) => {
   );
 };
 
-export default Dropdown;
+export default ExpandableMenu;
 
 const styles = StyleSheet.create({
   button: {
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  dropdown: {
+  ExpandableMenu: {
     overflow: "hidden",
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 8,
