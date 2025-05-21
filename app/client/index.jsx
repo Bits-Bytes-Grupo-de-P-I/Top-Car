@@ -34,6 +34,10 @@ export default function Index() {
     router.push("/client/HistoryScreen");
   };
 
+  const navigateToServiceRequestForm = () => {
+    router.push("/client/ServiceRequestForm");
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {/* SafeAreaView para concertar a tela no celular */}
@@ -103,6 +107,7 @@ export default function Index() {
                   texto="Gerar pedido de atendimento"
                   cor={Colors.amarelo}
                   iconName="pen-to-square"
+                  onPress={navigateToServiceRequestForm}
                 />
                 {/* <Card
                   texto="Dúvidas frequentes"
