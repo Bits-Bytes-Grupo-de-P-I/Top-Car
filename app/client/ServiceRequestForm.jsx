@@ -116,7 +116,7 @@ const ServiceRequestForm = () => {
     <SafeAreaView style={{ flex: 1 }}>
 
     <PageHeader 
-        title="Meus Serviços Pendentes" 
+        title="Solicitar Pedido de Atendimento" 
         containerStyle={{backgroundColor: Colors.azulClaro}} 
         titleStyle={{color: '#fff'}}
     />

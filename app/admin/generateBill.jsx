@@ -10,7 +10,7 @@ import {
 import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import PageHeader from "@/components/ui/PageHeader";
-import ExpandableMenu from "@/components/ui/ExpandableMenu";
+import ServiceStatus from "@/components/ui/ServiceStatus";
 
 import Colors from "@/constants/Colors";
 
@@ -23,7 +23,7 @@ const generateBill = () => {
         resizeMode="cover"
       >
         <PageHeader
-          title="Serviços Pendentes da Oficina"
+          title="Gerar Nota de Serviço"
           containerStyle={{ backgroundColor: Colors.azulClaro }}
           titleStyle={{ color: "#fff" }}
         />
@@ -34,9 +34,9 @@ const generateBill = () => {
         >
           <View style={styles.containerPrincipal}>
             <View style={styles.container}>
-              <ExpandableMenu title="Deu certo?">
-                <Text>Deu certo!</Text>
-              </ExpandableMenu>
+              <ServiceStatus/>
+                
+              
             </View>
           </View>
         </ScrollView>

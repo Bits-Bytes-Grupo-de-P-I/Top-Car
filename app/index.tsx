@@ -34,6 +34,10 @@ export default function Index() {
       <TouchableOpacity style={styles.button} onPress={() => handleRedirect('admin')}>
         <Text style={styles.buttonText}>Mecânico</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => router.push("./login")}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }

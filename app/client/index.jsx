@@ -104,7 +104,7 @@ export default function Index() {
                   onPress={navigateToServicePending}
                 />
                 <Card
-                  texto="Gerar pedido de atendimento"
+                  texto="Solicitar pedido de atendimento"
                   cor={Colors.amarelo}
                   iconName="pen-to-square"
                   onPress={navigateToServiceRequestForm}

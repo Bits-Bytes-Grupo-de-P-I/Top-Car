@@ -56,7 +56,7 @@ const serviceRequests = () => {
       resizeMode="cover"
     >
       <PageHeader
-        title="Serviços em Andamento"
+        title="Pedidos de Serviço"
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
