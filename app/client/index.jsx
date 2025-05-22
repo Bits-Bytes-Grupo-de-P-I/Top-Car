@@ -26,6 +26,10 @@ import BackToHomeButton from "@/components/ui/BackToHomeButton";
 export default function Index() {
   const router = useRouter();
 
+  const navigateToServiceStatus = () => {
+    router.push("/client/ServiceStatus");
+  }
+
   const navigateToServicePending = () => {
     router.push("/client/ServicePending");
   };
@@ -93,9 +97,10 @@ export default function Index() {
               {/* Container dos cards */}
               <View style={styles.containerCards}>
                 <Card
-                  texto="Status do serviço"
+                  texto="Meus serviços"
                   cor={Colors.verde}
                   iconName="car"
+                  onPress={navigateToServiceStatus}
                 />
                 <Card
                   texto="Serviços pendentes"

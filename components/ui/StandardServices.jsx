@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useState } from "react";
 
 import Colors from "@/constants/Colors";
@@ -11,7 +11,7 @@ const StandardServices = (props) => {
     <View style={styles.container}>
       {/* Container do icone e texto */}
       <View style={styles.checkTexto}>
-        <TouchableHighlight
+        <TouchableOpacity
           style={[
             styles.check,
             { backgroundColor: selecionado ? Colors.verde : "transparent" }, // Se for uma emergência, vai ativar o fundo vermelho, senão, vai ficar transparente
@@ -26,7 +26,7 @@ const StandardServices = (props) => {
           >
             <FontAwesome6 name="check" size={20} color="white" />
           </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
         <Text style={{ fontFamily: "DM-Sans" }}>{props.texto}</Text>
       </View>
       {/* Container do icone e texto */}

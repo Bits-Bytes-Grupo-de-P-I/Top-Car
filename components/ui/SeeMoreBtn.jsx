@@ -2,15 +2,13 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import Colors from "@/constants/Colors";
-import { TouchableHighlight } from "react-native";
+import { TouchableOpacity } from "react-native";
 
-const SeeMoreBtn = () => {
+const SeeMoreBtn = (props) => {
   return (
-    <View>
-      <TouchableHighlight style={styles.container}>
-        <Text style={styles.texto}>Ver mais +</Text>
-      </TouchableHighlight>
-    </View>
+    <TouchableOpacity style={styles.container} onPress={props.onPress}>
+      <Text style={styles.texto}>Ver mais +</Text>
+    </TouchableOpacity>
   );
 };
 
@@ -18,17 +16,14 @@ export default SeeMoreBtn;
 
 const styles = StyleSheet.create({
   container: {
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingHorizontal: 24,
-    paddingVertical: 2,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: Colors.azulClaro,
+    borderRadius: 20,
   },
   texto: {
-    fontSize: 16,
-    color: Colors.azulClaro,
+    color: "#fff",
+    fontSize: 14,
     fontWeight: "bold",
     fontFamily: "DM-Sans",
   },

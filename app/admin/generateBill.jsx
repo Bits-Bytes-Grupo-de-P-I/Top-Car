@@ -10,7 +10,7 @@ import {
 import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import PageHeader from "@/components/ui/PageHeader";
-import ServiceStatus from "@/components/ui/ServiceStatus";
+import ExpandableMenu from "@/components/ui/ExpandableMenu";
 
 import Colors from "@/constants/Colors";
 
@@ -34,9 +34,7 @@ const generateBill = () => {
         >
           <View style={styles.containerPrincipal}>
             <View style={styles.container}>
-              <ServiceStatus/>
-                
-              
+              <ExpandableMenu />
             </View>
           </View>
         </ScrollView>
@@ -58,6 +56,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.azulClaro,
     justifyContent: "center",
     alignItems: "center",
+    flex: 1,
   },
   ExpandableMenu: {
     borderWidth: 1,

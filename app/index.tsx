@@ -17,6 +17,7 @@
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import Colors from "@/constants/Colors";
 
 export default function Index() {
   const handleRedirect = (userType: 'client' | 'admin') => {
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: Colors.azulClaro,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
