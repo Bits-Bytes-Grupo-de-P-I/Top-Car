@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Badge from '@/components/ui/Badge'
+import Colors from "@/constants/Colors";
 
 /**
  * Componente de card de serviço para exibir serviços pendentes
@@ -8,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
  * @param {Object} props
  * @param {Object} props.service - Dados do serviço pendente
  * @param {boolean} props.isAdminView - Define se o card está sendo usado na visão de administrador
+ * @param {boolean} props.isAccepted - Define se o serviço foi aceito ou não
  * @param {Function} props.onEdit - Função para editar o serviço (apenas admin)
  * @param {Function} props.onDelete - Função para excluir o serviço (apenas admin)
  */
@@ -39,6 +42,7 @@ const ServiceCard = ({
         <View style={styles.row}>
           <Text style={styles.label}>Veículo:</Text>
           <Text style={styles.value}>{service.vehicle}</Text>
+          {/* {service.isAccepted && <Badge color={Colors.verde} text="ACEITO"/> } */}
         </View>
 
         <View style={styles.row}>
@@ -138,6 +142,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     marginLeft: 4,
+  },
+  modalUrgenteBadge: {
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
 });
 
