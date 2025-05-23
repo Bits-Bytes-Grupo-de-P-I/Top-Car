@@ -20,55 +20,57 @@ import BackToHomeButton from "@/components/ui/BackToHomeButton";
 
 export default function Index() {
   const router = useRouter();
-  
+
   // Dados para o FlatList
   const sections = [
-    { 
-      type: 'title', 
-      data: { text: 'início' } 
+    {
+      type: "title",
+      data: { text: "início" },
     },
-    { 
-      type: 'adminButton', 
-      data: {} 
+    {
+      type: "adminButton",
+      data: {},
     },
-    { 
-      type: 'cards', 
-      data: {} 
+    {
+      type: "cards",
+      data: {},
     },
-    { 
-      type: 'title', 
-      data: { text: 'Clientes' } 
+    {
+      type: "title",
+      data: { text: "Clientes" },
     },
-    { 
-      type: 'clientList', 
-      data: {} 
+    {
+      type: "clientList",
+      data: {},
     },
   ];
-  
+
   // Renderizar cada tipo de seção
   const renderItem = ({ item }) => {
     switch (item.type) {
-      case 'title':
+      case "title":
         return (
           <View style={styles.containerTitulo}>
             <Text style={styles.titulo}>{item.data.text}</Text>
           </View>
         );
-        
-      case 'adminButton':
+
+      case "adminButton":
         return (
-          <View style={{
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 20,
-          }}>
+          <View
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
             <Text>Página do administrador</Text>
             <BackToHomeButton />
           </View>
         );
-        
-      case 'cards':
+
+      case "cards":
         return (
           <View style={styles.containerCards}>
             <Card
@@ -99,23 +101,23 @@ export default function Index() {
               texto="Gerar nota de serviço avulsa"
               cor={Colors.grafite}
               iconName="table-list"
-              onPress={() => router.push("./admin/generateBill")}
+              onPress={() => router.push("./admin/serviceBill")}
             />
           </View>
         );
-        
-      case 'clientList':
+
+      case "clientList":
         return (
           <View style={styles.containerClientList}>
             <ClientList />
           </View>
         );
-        
+
       default:
         return null;
     }
   };
-  
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
@@ -138,7 +140,7 @@ export default function Index() {
           </Text>
           <Entypo name="login" size={24} color="white" />
         </View>
-        
+
         {/* Container principal - usando FlatList em vez de ScrollView */}
         <FlatList
           data={sections}
