@@ -30,6 +30,12 @@ const NotaServico = () => {
     servicos: false,
   });
 
+  // Índices para edição/adição em produtos e serviços (-1 para novo)
+  const [editingIndex, setEditingIndex] = useState({
+    produtos: null,
+    servicos: null,
+  });
+
   // Dados mockados baseados nos arquivos fornecidos
   const [dadosNota, setDadosNota] = useState({
     cliente: {
@@ -93,7 +99,7 @@ const NotaServico = () => {
     numeroNota: "NS-2025-001234",
   });
 
-  // Estados temporários para edição
+  // Estados temporários para edição/adição
   const [tempData, setTempData] = useState({});
 
   const toggleSection = (section) => {
@@ -103,9 +109,41 @@ const NotaServico = () => {
     }));
   };
 
-  const openModal = (section) => {
-    // Copia os dados atuais para edição temporária
-    setTempData({ ...dadosNota[section] });
+  const openModal = (section, index = null) => {
+    if ((section === "produtos" || section === "servicos") && index !== null) {
+      // Editing existing item
+      if (section === "produtos") {
+        setTempData({ ...dadosNota.produtos[index] });
+      } else {
+        setTempData({ ...dadosNota.servicos[index] });
+      }
+      setEditingIndex((prev) => ({ ...prev, [section]: index }));
+    } else if ((section === "produtos" || section === "servicos") && index === null) {
+      // Adding new item
+      if (section === "produtos") {
+        setTempData({
+          id: Date.now(), // Temporary ID
+          nome: "",
+          quantidade: 0,
+          unidade: "",
+          valorUnitario: 0,
+          valorTotal: 0,
+        });
+      } else {
+        setTempData({
+          id: Date.now(), // Temporary ID
+          descricao: "",
+          valorMaoDeObra: 0,
+          tempo: "",
+        });
+      }
+      setEditingIndex((prev) => ({ ...prev, [section]: -1 }));
+    } else {
+      // Sections cliente, veiculo
+      setTempData({ ...dadosNota[section] });
+      setEditingIndex((prev) => ({ ...prev, [section]: null }));
+    }
+
     setModalsVisible((prev) => ({
       ...prev,
       [section]: true,
@@ -118,15 +156,94 @@ const NotaServico = () => {
       [section]: false,
     }));
     setTempData({});
+    setEditingIndex((prev) => ({ ...prev, [section]: null }));
   };
 
   const saveChanges = (section) => {
-    setDadosNota((prev) => ({
-      ...prev,
-      [section]: { ...tempData },
-    }));
+    if (section === "produtos") {
+      setDadosNota((prev) => {
+        const updatedProdutos = [...prev.produtos];
+        if (editingIndex.produtos === -1) {
+          // Adding new
+          const newProduto = {
+            ...tempData,
+            quantidade: Number(tempData.quantidade),
+            valorUnitario: Number(tempData.valorUnitario),
+            valorTotal: Number(tempData.valorUnitario) * Number(tempData.quantidade),
+          };
+          updatedProdutos.push(newProduto);
+        } else {
+          // Editing
+          const index = editingIndex.produtos;
+          const updatedProduto = {
+            ...tempData,
+            quantidade: Number(tempData.quantidade),
+            valorUnitario: Number(tempData.valorUnitario),
+            valorTotal: Number(tempData.valorUnitario) * Number(tempData.quantidade),
+          };
+          updatedProdutos[index] = updatedProduto;
+        }
+        return { ...prev, produtos: updatedProdutos };
+      });
+    } else if (section === "servicos") {
+      setDadosNota((prev) => {
+        const updatedServicos = [...prev.servicos];
+        if (editingIndex.servicos === -1) {
+          // Adding new
+          const newServico = {
+            ...tempData,
+            valorMaoDeObra: Number(tempData.valorMaoDeObra),
+          };
+          updatedServicos.push(newServico);
+        } else {
+          // Editing
+          const index = editingIndex.servicos;
+          updatedServicos[index] = {
+            ...tempData,
+            valorMaoDeObra: Number(tempData.valorMaoDeObra),
+          };
+        }
+        return { ...prev, servicos: updatedServicos };
+      });
+    } else {
+      setDadosNota((prev) => ({
+        ...prev,
+        [section]: { ...tempData },
+      }));
+    }
+
     closeModal(section);
     Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
+  };
+
+  const deleteItem = (section, index) => {
+    Alert.alert(
+      "Confirmar exclusão",
+      "Tem certeza que deseja excluir este item?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () => {
+            setDadosNota((prev) => {
+              if (section === "produtos") {
+                const newProdutos = prev.produtos.filter((_, i) => i !== index);
+                return { ...prev, produtos: newProdutos };
+              } else if (section === "servicos") {
+                const newServicos = prev.servicos.filter((_, i) => i !== index);
+                return { ...prev, servicos: newServicos };
+              } else {
+                return prev;
+              }
+            });
+          },
+        },
+      ]
+    );
   };
 
   const calcularTotalProdutos = () => {
@@ -154,7 +271,7 @@ const NotaServico = () => {
     );
   };
 
-  const renderSection = (title, sectionKey, content) => { // Parâmetros da função
+  const renderSection = (title, sectionKey, content, addButton) => {
     const isExpanded = expandedSections[sectionKey];
 
     return (
@@ -181,7 +298,12 @@ const NotaServico = () => {
           </View>
         </TouchableOpacity>
 
-        {isExpanded && <View style={styles.sectionContent}>{content}</View>}
+        {isExpanded && (
+          <View style={styles.sectionContent}>
+            {content}
+            {addButton}
+          </View>
+        )}
       </View>
     );
   };
@@ -244,15 +366,18 @@ const NotaServico = () => {
 
   const renderProdutosContent = () => (
     <View>
-      {dadosNota.produtos.map((produto) => (
+      {dadosNota.produtos.map((produto, index) => (
         <View key={produto.id} style={styles.itemContainer}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
             <Text style={styles.itemNome}>{produto.nome}</Text>
-            <TouchableOpacity onPress={() => {}}>
-              <Ionicons name="pencil" size={15} color={Colors.azul} />
-            </TouchableOpacity>
+            <View style={{flexDirection: "row", gap: 12, alignItems: 'center'}}>
+              <TouchableOpacity onPress={() => openModal("produtos", index)}>
+                <Ionicons name="pencil" size={15} color={Colors.azul} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteItem("produtos", index)}>
+                <Ionicons name="trash" size={18} color={Colors.vermelho} />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.itemDetails}>
             <Text style={styles.itemInfo}>
@@ -277,15 +402,18 @@ const NotaServico = () => {
 
   const renderServicosContent = () => (
     <View>
-      {dadosNota.servicos.map((servico) => (
+      {dadosNota.servicos.map((servico, index) => (
         <View key={servico.id} style={styles.itemContainer}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
             <Text style={styles.itemNome}>{servico.descricao}</Text>
-            <TouchableOpacity onPress={() => {openModal()}}>
-              <Ionicons name="pencil" size={15} color={Colors.azul} />
-            </TouchableOpacity>
+            <View style={{flexDirection: "row", gap: 12, alignItems: 'center'}}>
+              <TouchableOpacity onPress={() => openModal("servicos", index)}>
+                <Ionicons name="pencil" size={15} color={Colors.azul} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteItem("servicos", index)}>
+                <Ionicons name="trash" size={18} color={Colors.vermelho} />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={styles.itemDetails}>
             <Text style={styles.itemInfo}>Tempo: {servico.tempo}</Text>
@@ -301,6 +429,16 @@ const NotaServico = () => {
         </Text>
       </View>
     </View>
+  );
+
+  const renderAddButton = (section) => (
+    <TouchableOpacity
+      style={styles.addButton}
+      onPress={() => openModal(section, null)}
+    >
+      <Ionicons name="add-circle-outline" size={24} color={Colors.verde} />
+      <Text style={styles.addButtonText}>Adicionar {section === "produtos" ? "Produto" : "Serviço"}</Text>
+    </TouchableOpacity>
   );
 
   // Modais de edição
@@ -542,26 +680,74 @@ const NotaServico = () => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Editar Produtos</Text>
+            <Text style={styles.modalTitle}>{editingIndex.produtos === -1 ? "Adicionar Produto" : "Editar Produto"}</Text>
             <TouchableOpacity onPress={() => closeModal("produtos")}>
               <Ionicons name="close" size={24} color={Colors.grafite} />
             </TouchableOpacity>
           </View>
-
-          <View style={styles.modalContent}>
-            <Text style={styles.modalNote}>
-              Funcionalidade de edição de produtos será implementada em breve.
-              {"\n\n"}Por enquanto, os produtos podem ser gerenciados através do
-              sistema principal.
-            </Text>
-          </View>
-
+          <ScrollView
+            style={styles.modalContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Nome do Produto</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.nome || ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, nome: text }))
+                }
+                placeholder="Nome do produto"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Quantidade</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.quantidade !== undefined ? String(tempData.quantidade) : ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, quantidade: text }))
+                }
+                placeholder="Quantidade"
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Unidade</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.unidade || ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, unidade: text }))
+                }
+                placeholder="Unidade (ex: litros, unidade, jogo)"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Valor Unitário</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.valorUnitario !== undefined ? String(tempData.valorUnitario) : ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, valorUnitario: text }))
+                }
+                placeholder="valor unitário"
+                keyboardType="numeric"
+              />
+            </View>
+          </ScrollView>
           <View style={styles.modalButtons}>
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => closeModal("produtos")}
             >
-              <Text style={styles.cancelButtonText}>Fechar</Text>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => saveChanges("produtos")}
+            >
+              <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -579,26 +765,62 @@ const NotaServico = () => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Editar Serviços</Text>
+            <Text style={styles.modalTitle}>{editingIndex.servicos === -1 ? "Adicionar Serviço" : "Editar Serviço"}</Text>
             <TouchableOpacity onPress={() => closeModal("servicos")}>
               <Ionicons name="close" size={24} color={Colors.grafite} />
             </TouchableOpacity>
           </View>
-
-          <View style={styles.modalContent}>
-            <Text style={styles.modalNote}>
-              Funcionalidade de edição de serviços será implementada em breve.
-              {"\n\n"}Por enquanto, os serviços podem ser gerenciados através do
-              sistema principal.
-            </Text>
-          </View>
-
+          <ScrollView
+            style={styles.modalContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Descrição do Serviço</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.descricao || ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, descricao: text }))
+                }
+                placeholder="Descrição do serviço"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Tempo</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.tempo || ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, tempo: text }))
+                }
+                placeholder="Tempo estimado (ex: 1h 30min)"
+              />
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Valor Mão de Obra</Text>
+              <TextInput
+                style={styles.input}
+                value={tempData.valorMaoDeObra !== undefined ? String(tempData.valorMaoDeObra) : ""}
+                onChangeText={(text) =>
+                  setTempData((prev) => ({ ...prev, valorMaoDeObra: text }))
+                }
+                placeholder="valor mão de obra"
+                keyboardType="numeric"
+              />
+            </View>
+          </ScrollView>
           <View style={styles.modalButtons}>
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => closeModal("servicos")}
             >
-              <Text style={styles.cancelButtonText}>Fechar</Text>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => saveChanges("servicos")}
+            >
+              <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -622,16 +844,32 @@ const NotaServico = () => {
           <View style={styles.header}>
             <Text style={styles.headerTitle}>NOTA DE SERVIÇO</Text>
             <Text style={styles.numeroNota}>Nº {dadosNota.numeroNota}</Text>
-            <Text style={styles.dataServico}>
-              Data: {dadosNota.dataServico}
-            </Text>
+            <Text style={styles.dataServico}>Data: {dadosNota.dataServico}</Text>
           </View>
 
           {/* Seções Expansíveis */}
-          {renderSection("CLIENTE", "cliente", renderClienteContent())}
-          {renderSection("VEÍCULO", "veiculo", renderVeiculoContent())}
-          {renderSection("PRODUTOS", "produtos", renderProdutosContent())}
-          {renderSection("SERVIÇOS", "servicos", renderServicosContent())}
+          {renderSection(
+            "CLIENTE",
+            "cliente",
+            renderClienteContent()
+          )}
+          {renderSection(
+            "VEÍCULO",
+            "veiculo",
+            renderVeiculoContent()
+          )}
+          {renderSection(
+            "PRODUTOS",
+            "produtos",
+            renderProdutosContent(),
+            renderAddButton("produtos")
+          )}
+          {renderSection(
+            "SERVIÇOS",
+            "servicos",
+            renderServicosContent(),
+            renderAddButton("servicos")
+          )}
 
           {/* Total Geral */}
           <View style={styles.totalGeralContainer}>
@@ -878,6 +1116,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginLeft: 8,
   },
+  addButton: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.verde,
+  },
   // Estilos dos Modais
   modalOverlay: {
     flex: 1,
@@ -970,9 +1219,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveButtonText: {
-    fontWeight: 'bold',
-    fontFamily: 'DM-Sans',
-    color: 'white',
+    fontWeight: "bold",
+    fontFamily: "DM-Sans",
+    color: "white",
     fontSize: 16,
-  }
+  },
 });
+
