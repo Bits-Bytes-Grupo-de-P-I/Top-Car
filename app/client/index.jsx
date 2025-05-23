@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ImageBackground,
+  Image
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
@@ -28,7 +29,7 @@ export default function Index() {
 
   const navigateToServiceStatus = () => {
     router.push("/client/ServiceStatus");
-  }
+  };
 
   const navigateToServicePending = () => {
     router.push("/client/ServicePending");
@@ -40,7 +41,7 @@ export default function Index() {
 
   const navigateToServiceRequestForm = () => {
     router.push("/client/ServiceRequestForm");
-  }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -58,17 +59,10 @@ export default function Index() {
           <View>
             {/* Barra do topo */}
             <View style={styles.barraTopo}>
-              <Text
-                style={{
-                  fontFamily: "DM-Sans",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  fontStyle: "italic",
-                  color: "white",
-                }}
-              >
-                Top Car
-              </Text>
+              <Image
+                source={require("@/assets/images/logo.png")}
+                style={{ width: 120, height: 120 }}
+              />
               <Entypo name="login" size={24} color="white" />
             </View>
             {/* Fim Barra do topo */}

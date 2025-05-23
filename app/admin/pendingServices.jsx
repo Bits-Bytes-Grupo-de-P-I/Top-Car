@@ -64,7 +64,7 @@ const pendingServices = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PageHeader
-        title="Serviços Pendentes da Oficina"
+        title="Serviços em Pendência"
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />

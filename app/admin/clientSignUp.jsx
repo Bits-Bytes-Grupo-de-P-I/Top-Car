@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
@@ -14,7 +15,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 // Componentes
 import InputField from "@/components/ui/InputField";
-import Button from "@/components/ui/Button";
+import Slider from "@/components/ui/Slider";
 import PageHeader from "@/components/ui/PageHeader";
 import Colors from "@/constants/Colors";
 
@@ -53,7 +54,7 @@ const ClientSignUp = () => {
     setBairro("");
     setEstado("");
     setTelefone("");
-    
+
     // Limpa dados do veículo também
     setVeiculo("");
     setModelo("");
@@ -67,7 +68,10 @@ const ClientSignUp = () => {
   const handleSubmit = async () => {
     // Validação básica
     if (!nome || !cpf || !telefone || !endereco) {
-      Alert.alert("Campos obrigatórios", "Por favor, preencha todos os campos obrigatórios.");
+      Alert.alert(
+        "Campos obrigatórios",
+        "Por favor, preencha todos os campos obrigatórios."
+      );
       return;
     }
 
@@ -85,41 +89,42 @@ const ClientSignUp = () => {
         bairro,
         estado,
         telefone,
-        veiculo: cadastrarVeiculo ? {
-          nome: veiculo,
-          modelo,
-          ano,
-          cor,
-          km,
-          placa
-        } : null
+        veiculo: cadastrarVeiculo
+          ? {
+              nome: veiculo,
+              modelo,
+              ano,
+              cor,
+              km,
+              placa,
+            }
+          : null,
       };
 
       // Simulação de envio para API
       console.log("Enviando dados:", clientData);
-      
+
       // Aqui você faria sua chamada para a API
       // await api.post('/clients', clientData);
-      
-      // Simulando um tempo de processamento
-      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      Alert.alert(
-        "Cadastro Realizado",
-        "Cliente cadastrado com sucesso!",
-        [
-          { 
-            text: "OK", 
-            onPress: () => {
-              handleClearForm();
-              // router.back(); // Se quiser voltar para tela anterior
-            }
-          }
-        ]
-      );
+      // Simulando um tempo de processamento
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      Alert.alert("Cadastro Realizado", "Cliente cadastrado com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => {
+            handleClearForm();
+            // router.back(); // Se quiser voltar para tela anterior
+          },
+        },
+      ]);
     } catch (error) {
       console.error("Erro ao cadastrar cliente:", error);
-      Alert.alert("Erro", "Não foi possível cadastrar o cliente. Por favor, tente novamente.");
+      Alert.alert(
+        "Erro",
+        "Não foi possível cadastrar o cliente. Por favor, tente novamente."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +137,11 @@ const ClientSignUp = () => {
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
+      {/* <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      > */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -255,22 +265,7 @@ const ClientSignUp = () => {
                   Marque esta opção para cadastrar um veículo para o cliente
                 </Text>
               </View>
-              <TouchableOpacity
-                style={[
-                  styles.switchButton,
-                  cadastrarVeiculo && styles.switchButtonActive,
-                ]}
-                onPress={() => setCadastrarVeiculo(!cadastrarVeiculo)}
-              >
-                <Text
-                  style={[
-                    styles.switchButtonText,
-                    cadastrarVeiculo && styles.switchButtonTextActive,
-                  ]}
-                >
-                  {cadastrarVeiculo ? "Sim" : "Não"}
-                </Text>
-              </TouchableOpacity>
+              <Slider value={cadastrarVeiculo} onChange={setCadastrarVeiculo} />
             </View>
 
             {cadastrarVeiculo && (
@@ -299,7 +294,7 @@ const ClientSignUp = () => {
                     placeholder="Ex: Zen"
                   />
                 </View>
-                
+
                 <View style={styles.row}>
                   <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
                     <InputField
@@ -358,9 +353,12 @@ const ClientSignUp = () => {
               >
                 <Text style={styles.clearButtonText}>Limpar</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
-                style={[styles.submitButton, isLoading && styles.disabledButton]}
+                style={[
+                  styles.submitButton,
+                  isLoading && styles.disabledButton,
+                ]}
                 onPress={handleSubmit}
                 disabled={isLoading}
               >
@@ -369,7 +367,12 @@ const ClientSignUp = () => {
                 ) : (
                   <>
                     <Text style={styles.submitButtonText}>Cadastrar</Text>
-                    <MaterialIcons name="check-circle" size={18} color="#fff" style={styles.sendIcon} />
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="#fff"
+                      style={styles.sendIcon}
+                    />
                   </>
                 )}
               </TouchableOpacity>
@@ -377,6 +380,7 @@ const ClientSignUp = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {/* </ImageBackground> */}
     </SafeAreaView>
   );
 };
@@ -386,7 +390,7 @@ export default ClientSignUp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
+    // backgroundColor: "#f9f9f9",
   },
   formContainer: {
     padding: 16,
@@ -465,20 +469,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ddd",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.azulClaro,
     minWidth: 100,
     alignItems: "center",
   },
   clearButtonText: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#666",
+    color: "white",
   },
   submitButton: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.azulClaro,
+    backgroundColor: Colors.verde,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,

@@ -4,6 +4,7 @@ import {
   StyleSheet,
   FlatList,
   ImageBackground,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -127,17 +128,11 @@ export default function Index() {
       >
         {/* Barra do topo (fora da FlatList) */}
         <View style={styles.barraTopo}>
-          <Text
-            style={{
-              fontFamily: "DM-Sans",
-              fontSize: 16,
-              fontWeight: "bold",
-              fontStyle: "italic",
-              color: "white",
-            }}
-          >
-            Top Car
-          </Text>
+          <Image
+            source={require("@/assets/images/logo.png")}
+            style={{ width: 120, height: 120 }}
+          />
+
           <Entypo name="login" size={24} color="white" />
         </View>
 

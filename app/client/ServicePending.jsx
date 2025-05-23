@@ -43,9 +43,9 @@
 
 //   return (
 //     <SafeAreaView style={{ flex: 1 }}>
-//       <PageHeader 
-//           title="Pendências de Serviço" 
-//           containerStyle={{backgroundColor: Colors.azulClaro}} 
+//       <PageHeader
+//           title="Pendências de Serviço"
+//           containerStyle={{backgroundColor: Colors.azulClaro}}
 //           titleStyle={{color: '#fff'}}
 //       />
 
@@ -108,14 +108,20 @@
 
 // export default ServicePending;
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import PageHeader from '@/components/ui/PageHeader';
-import Colors from '@/constants/Colors';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import PageHeader from "@/components/ui/PageHeader";
+import Colors from "@/constants/Colors";
 
-import ServiceCard from '@/components/ui/ServiceCard'; //componente de card de serviços pendentes
-import mockServices from '@/assets/mocks/pendenciasMock.json'; // Mock de serviços pendentes
+import ServiceCard from "@/components/ui/ServiceCard"; //componente de card de serviços pendentes
+import mockServices from "@/assets/mocks/pendenciasMock.json"; // Mock de serviços pendentes
 
 /**
  * Tela de serviços pendentes para o CLIENTE
@@ -124,19 +130,19 @@ import mockServices from '@/assets/mocks/pendenciasMock.json'; // Mock de servi�
 
 const ServicePending = () => {
   const [services, setServices] = useState([]);
-  
+
   // ID do cliente atual (em uma aplicação real, viria do contexto de autenticação)
   const clientId = "123";
 
   useEffect(() => {
     // Função para carregar os serviços do cliente
     const loadClientServices = () => {
-      // Em uma aplicação real, você faria uma chamada à API para buscar 
+      // Em uma aplicação real, você faria uma chamada à API para buscar
       // apenas os serviços do cliente logado
       const clientServices = mockServices.filter(
-        service => service.clientId === clientId
+        (service) => service.clientId === clientId
       );
-      
+
       setServices(clientServices);
     };
 
@@ -145,40 +151,37 @@ const ServicePending = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-
-      <PageHeader 
-          title="Meus Serviços Pendentes" 
-          containerStyle={{backgroundColor: Colors.azulClaro}} 
-          titleStyle={{color: '#fff'}}
+      <PageHeader
+        title="Meus Serviços Pendentes"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
       />
-
-      {/* <View style={styles.header}>
-        <Text style={styles.title}>Meus Serviços Pendentes</Text>
-        <Text style={styles.subtitle}>
-          Serviços pendentes para seus veículos
-        </Text>
-      </View> */}
-
-      {services.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyStateText}>
-            Você não possui serviços pendentes no momento.
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={services}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ServiceCard
-              service={item}
-              isAdminView={false} // Não é visão de admin
-              // Não precisamos passar as funções de ação para a visão do cliente
-            />
-          )}
-          contentContainerStyle={styles.list}
-        />
-      )}
+      <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        {services.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              Você não possui serviços pendentes no momento.
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={services}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ServiceCard
+                service={item}
+                isAdminView={false} // Não é visão de admin
+                // Não precisamos passar as funções de ação para a visão do cliente
+              />
+            )}
+            contentContainerStyle={styles.list}
+          />
+        )}
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -186,22 +189,22 @@ const ServicePending = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   header: {
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 4,
   },
   list: {
@@ -209,14 +212,14 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
 });
 

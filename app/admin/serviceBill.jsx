@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-
+import PageHeader from "@/components/ui/PageHeader";
 import Colors from "@/constants/Colors";
 
 const NotaServico = () => {
@@ -94,9 +94,7 @@ const NotaServico = () => {
         valorMaoDeObra: 150.0,
         tempo: "2h 00min",
       },
-    ],
-    dataServico: "23/05/2025",
-    numeroNota: "NS-2025-001234",
+    ]
   });
 
   // Estados temporários para edição/adição
@@ -118,7 +116,10 @@ const NotaServico = () => {
         setTempData({ ...dadosNota.servicos[index] });
       }
       setEditingIndex((prev) => ({ ...prev, [section]: index }));
-    } else if ((section === "produtos" || section === "servicos") && index === null) {
+    } else if (
+      (section === "produtos" || section === "servicos") &&
+      index === null
+    ) {
       // Adding new item
       if (section === "produtos") {
         setTempData({
@@ -169,7 +170,8 @@ const NotaServico = () => {
             ...tempData,
             quantidade: Number(tempData.quantidade),
             valorUnitario: Number(tempData.valorUnitario),
-            valorTotal: Number(tempData.valorUnitario) * Number(tempData.quantidade),
+            valorTotal:
+              Number(tempData.valorUnitario) * Number(tempData.quantidade),
           };
           updatedProdutos.push(newProduto);
         } else {
@@ -179,7 +181,8 @@ const NotaServico = () => {
             ...tempData,
             quantidade: Number(tempData.quantidade),
             valorUnitario: Number(tempData.valorUnitario),
-            valorTotal: Number(tempData.valorUnitario) * Number(tempData.quantidade),
+            valorTotal:
+              Number(tempData.valorUnitario) * Number(tempData.quantidade),
           };
           updatedProdutos[index] = updatedProduto;
         }
@@ -275,7 +278,19 @@ const NotaServico = () => {
     const isExpanded = expandedSections[sectionKey];
 
     return (
-      <View style={styles.sectionContainer}>
+      <View
+        style={[
+          styles.sectionContainer,
+          title === "CLIENTE" && {
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+          },
+          title === "SERVIÇOS" && {
+            borderBottomLeftRadius: 10,
+            borderBottomRightRadius: 10,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.sectionHeader}
           onPress={() => toggleSection(sectionKey)}
@@ -293,7 +308,7 @@ const NotaServico = () => {
             <Ionicons
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={24}
-              color={Colors.azul}
+              color={Colors.grafite}
             />
           </View>
         </TouchableOpacity>
@@ -368,9 +383,17 @@ const NotaServico = () => {
     <View>
       {dadosNota.produtos.map((produto, index) => (
         <View key={produto.id} style={styles.itemContainer}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.itemNome}>{produto.nome}</Text>
-            <View style={{flexDirection: "row", gap: 12, alignItems: 'center'}}>
+            <View
+              style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
+            >
               <TouchableOpacity onPress={() => openModal("produtos", index)}>
                 <Ionicons name="pencil" size={15} color={Colors.azul} />
               </TouchableOpacity>
@@ -404,9 +427,17 @@ const NotaServico = () => {
     <View>
       {dadosNota.servicos.map((servico, index) => (
         <View key={servico.id} style={styles.itemContainer}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.itemNome}>{servico.descricao}</Text>
-            <View style={{flexDirection: "row", gap: 12, alignItems: 'center'}}>
+            <View
+              style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
+            >
               <TouchableOpacity onPress={() => openModal("servicos", index)}>
                 <Ionicons name="pencil" size={15} color={Colors.azul} />
               </TouchableOpacity>
@@ -437,7 +468,9 @@ const NotaServico = () => {
       onPress={() => openModal(section, null)}
     >
       <Ionicons name="add-circle-outline" size={24} color={Colors.verde} />
-      <Text style={styles.addButtonText}>Adicionar {section === "produtos" ? "Produto" : "Serviço"}</Text>
+      <Text style={styles.addButtonText}>
+        Adicionar {section === "produtos" ? "Produto" : "Serviço"}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -680,7 +713,11 @@ const NotaServico = () => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{editingIndex.produtos === -1 ? "Adicionar Produto" : "Editar Produto"}</Text>
+            <Text style={styles.modalTitle}>
+              {editingIndex.produtos === -1
+                ? "Adicionar Produto"
+                : "Editar Produto"}
+            </Text>
             <TouchableOpacity onPress={() => closeModal("produtos")}>
               <Ionicons name="close" size={24} color={Colors.grafite} />
             </TouchableOpacity>
@@ -704,7 +741,11 @@ const NotaServico = () => {
               <Text style={styles.inputLabel}>Quantidade</Text>
               <TextInput
                 style={styles.input}
-                value={tempData.quantidade !== undefined ? String(tempData.quantidade) : ""}
+                value={
+                  tempData.quantidade !== undefined
+                    ? String(tempData.quantidade)
+                    : ""
+                }
                 onChangeText={(text) =>
                   setTempData((prev) => ({ ...prev, quantidade: text }))
                 }
@@ -727,7 +768,11 @@ const NotaServico = () => {
               <Text style={styles.inputLabel}>Valor Unitário</Text>
               <TextInput
                 style={styles.input}
-                value={tempData.valorUnitario !== undefined ? String(tempData.valorUnitario) : ""}
+                value={
+                  tempData.valorUnitario !== undefined
+                    ? String(tempData.valorUnitario)
+                    : ""
+                }
                 onChangeText={(text) =>
                   setTempData((prev) => ({ ...prev, valorUnitario: text }))
                 }
@@ -765,7 +810,11 @@ const NotaServico = () => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{editingIndex.servicos === -1 ? "Adicionar Serviço" : "Editar Serviço"}</Text>
+            <Text style={styles.modalTitle}>
+              {editingIndex.servicos === -1
+                ? "Adicionar Serviço"
+                : "Editar Serviço"}
+            </Text>
             <TouchableOpacity onPress={() => closeModal("servicos")}>
               <Ionicons name="close" size={24} color={Colors.grafite} />
             </TouchableOpacity>
@@ -800,7 +849,11 @@ const NotaServico = () => {
               <Text style={styles.inputLabel}>Valor Mão de Obra</Text>
               <TextInput
                 style={styles.input}
-                value={tempData.valorMaoDeObra !== undefined ? String(tempData.valorMaoDeObra) : ""}
+                value={
+                  tempData.valorMaoDeObra !== undefined
+                    ? String(tempData.valorMaoDeObra)
+                    : ""
+                }
                 onChangeText={(text) =>
                   setTempData((prev) => ({ ...prev, valorMaoDeObra: text }))
                 }
@@ -830,6 +883,11 @@ const NotaServico = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <PageHeader
+        title="Serviços em Pendência"
+        containerStyle={{ backgroundColor: Colors.azulClaro }}
+        titleStyle={{ color: "#fff" }}
+      />
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -840,24 +898,9 @@ const NotaServico = () => {
           keyboardShouldPersistTaps="handled"
           style={styles.container}
         >
-          {/* Header da Nota */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>NOTA DE SERVIÇO</Text>
-            <Text style={styles.numeroNota}>Nº {dadosNota.numeroNota}</Text>
-            <Text style={styles.dataServico}>Data: {dadosNota.dataServico}</Text>
-          </View>
-
           {/* Seções Expansíveis */}
-          {renderSection(
-            "CLIENTE",
-            "cliente",
-            renderClienteContent()
-          )}
-          {renderSection(
-            "VEÍCULO",
-            "veiculo",
-            renderVeiculoContent()
-          )}
+          {renderSection("CLIENTE", "cliente", renderClienteContent())}
+          {renderSection("VEÍCULO", "veiculo", renderVeiculoContent())}
           {renderSection(
             "PRODUTOS",
             "produtos",
@@ -915,27 +958,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  header: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.grafite,
-    marginBottom: 8,
-  },
   numeroNota: {
     fontSize: 16,
     color: Colors.grafite,
@@ -947,8 +969,7 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
-    borderRadius: 12,
-    marginBottom: 12,
+
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -964,6 +985,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
+    borderStyle: "dashed",
     borderBottomColor: Colors.aluminio,
   },
   headerIcons: {
@@ -975,7 +997,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: Colors.grafite,
   },
@@ -1002,7 +1024,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     backgroundColor: Colors.cinzaClaro,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 8,
   },
   itemNome: {
@@ -1028,7 +1050,7 @@ const styles = StyleSheet.create({
   totalContainer: {
     backgroundColor: Colors.azulClaro,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginTop: 8,
   },
   totalText: {
@@ -1040,7 +1062,7 @@ const styles = StyleSheet.create({
   totalGeralContainer: {
     backgroundColor: "rgba(16, 185, 129, 0.1)",
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 10,
     marginVertical: 20,
     borderWidth: 2,
     borderColor: Colors.verde,
@@ -1054,7 +1076,7 @@ const styles = StyleSheet.create({
   assinaturaContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     padding: 24,
-    borderRadius: 12,
+    borderRadius: 10,
     marginBottom: 20,
     alignItems: "center",
     shadowColor: "#000",
@@ -1094,12 +1116,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   botaoPrimario: {
-    backgroundColor: Colors.verde,
+    backgroundColor: Colors.azul,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 10,
     flex: 1,
     shadowColor: "#000",
     shadowOffset: {
@@ -1136,7 +1158,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 10,
     width: "90%",
     maxHeight: "80%",
     shadowColor: "#000",
@@ -1183,7 +1205,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: Colors.aluminio,
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 12,
     fontSize: 16,
     backgroundColor: Colors.cinzaClaro,
@@ -1202,7 +1224,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.vermelho,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     flex: 1,
     alignItems: "center",
   },
@@ -1214,7 +1236,7 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: Colors.verde,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     flex: 1,
     alignItems: "center",
   },
@@ -1225,4 +1247,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
