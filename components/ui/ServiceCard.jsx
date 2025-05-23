@@ -10,15 +10,13 @@ import { Ionicons } from '@expo/vector-icons';
  * @param {boolean} props.isAdminView - Define se o card está sendo usado na visão de administrador
  * @param {Function} props.onEdit - Função para editar o serviço (apenas admin)
  * @param {Function} props.onDelete - Função para excluir o serviço (apenas admin)
- * @param {Function} props.onAccept - Função para marcar serviço como aceito (apenas admin)
  */
 
 const ServiceCard = ({ 
   service, 
   isAdminView = false, 
   onEdit, 
-  onDelete, 
-  onAccept 
+  onDelete
 }) => {
   const handleEdit = () => {
     if (onEdit) onEdit(service.id);
@@ -33,10 +31,6 @@ const ServiceCard = ({
         { text: "Excluir", onPress: () => onDelete && onDelete(service.id), style: "destructive" }
       ]
     );
-  };
-
-  const handleAccept = () => {
-    if (onAccept) onAccept(service.id);
   };
 
   return (
@@ -68,17 +62,6 @@ const ServiceCard = ({
             <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDelete}>
               <Ionicons name="trash" size={18} color="#FFF" />
               <Text style={styles.actionText}>Excluir</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[
-                styles.actionButton, 
-                service.isAccepted ? styles.acceptedButton : styles.acceptButton
-              ]} 
-              onPress={handleAccept}
-            >
-              <Ionicons name={service.isAccepted ? "checkmark-circle" : "checkmark-circle-outline"} size={18} color={service.isAccepted ? '#fff' : '#2ecc71'} />
-              <Text style={service.isAccepted ? styles.actionText : styles.acceptText}>{service.isAccepted ? "Aceito" : "Aceitar"}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -149,21 +132,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e74c3c',
     backgroundColor: '#e74c3c',
-  },
-  acceptButton: {
-    borderWidth: 1,
-    borderColor: '#2ecc71',
-  },
-  acceptText: {
-    color: '#27ae60',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 4,
-  },
-  acceptedButton: {
-    borderWidth: 1,
-    borderColor: '#27ae60',
-    backgroundColor: '#27ae60',
   },
   actionText: {
     color: '#FFF',

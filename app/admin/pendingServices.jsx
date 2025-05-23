@@ -48,19 +48,6 @@ const pendingServices = () => {
     // Em produção você faria algo como: deleteServiceAPI(serviceId)
   };
 
-  const handleAcceptService = (serviceId) => {
-    console.log(`Aceitar serviço ID: ${serviceId}`);
-    // Atualiza o status do serviço localmente
-    setServices(
-      services.map((service) =>
-        service.id === serviceId
-          ? { ...service, isAccepted: !service.isAccepted }
-          : service
-      )
-    );
-    // Em produção você faria algo como: updateServiceStatusAPI(serviceId, 'accepted')
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PageHeader
@@ -89,7 +76,6 @@ const pendingServices = () => {
                 isAdminView={true} // É visão de admin
                 onEdit={handleEditService}
                 onDelete={handleDeleteService}
-                onAccept={handleAcceptService}
               />
             )}
             contentContainerStyle={styles.list}
