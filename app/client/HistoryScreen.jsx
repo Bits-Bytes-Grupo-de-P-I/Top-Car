@@ -6,10 +6,10 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import VehicleSelector from "@/components/ui/VehicleSelector";
+import VehicleSelector from "@/components/VehicleSelector";
 import mockVehicles from "@/assets/mocks/mockVehicles.json";
 
-import PageHeader from "@/components/ui/PageHeader";
+import PageHeader from "@/components/PageHeader";
 import Colors from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -75,146 +75,140 @@ const HistoryScreen = () => {
         style={styles.background}
         resizeMode="cover"
       > */}
-        <ScrollView style={styles.container}>
-          {/* <Text style={styles.title}>Histórico de Manutenção</Text> */}
+      <ScrollView style={styles.container}>
+        {/* <Text style={styles.title}>Histórico de Manutenção</Text> */}
 
-          {/* Componente de seleção de veículo */}
-          <VehicleSelector
-            vehicles={vehicleData}
-            onVehicleSelect={handleVehicleSelect}
-            initialVehicleId={null}
-          />
+        {/* Componente de seleção de veículo */}
+        <VehicleSelector
+          vehicles={vehicleData}
+          onVehicleSelect={handleVehicleSelect}
+          initialVehicleId={null}
+        />
 
-          {/* Informações do veículo selecionado */}
-          {selectedVehicle ? (
-            <View style={styles.content}>
-              <View style={styles.vehicleInfoCard}>
-                <Text style={styles.sectionTitle}>Informações do Veículo</Text>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Modelo:</Text>
-                  <Text style={styles.detailValue}>{selectedVehicle.name}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Placa:</Text>
-                  <Text style={styles.detailValue}>
-                    {selectedVehicle.plate}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Ano:</Text>
-                  <Text style={styles.detailValue}>{selectedVehicle.year}</Text>
-                </View>
+        {/* Informações do veículo selecionado */}
+        {selectedVehicle ? (
+          <View style={styles.content}>
+            <View style={styles.vehicleInfoCard}>
+              <Text style={styles.sectionTitle}>Informações do Veículo</Text>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Modelo:</Text>
+                <Text style={styles.detailValue}>{selectedVehicle.name}</Text>
               </View>
-
-              {/* Cards de serviços */}
-              <View style={styles.servicesContainer}>
-                <Text style={styles.sectionTitleTwo}>Serviços Realizados</Text>
-
-                {/* Card de Troca de Óleo */}
-                {oilChangeData ? (
-                  <View style={styles.serviceCard}>
-                    <View style={styles.serviceHeader}>
-                      <Text style={styles.serviceTitle}>Troca de Óleo</Text>
-                      <Text style={styles.serviceDate}>
-                        Data: {oilChangeData.date}
-                      </Text>
-                    </View>
-
-                    <View style={styles.serviceContent}>
-                      <Text style={styles.serviceInfo}>
-                        Trocado com {oilChangeData.kilometrage} km
-                      </Text>
-                      <Text style={styles.serviceInfo}>
-                        Tipo do óleo: {oilChangeData.oilType}
-                      </Text>
-                    </View>
-
-                    <View style={styles.nextServicesContainer}>
-                      <Text style={styles.nextServicesTitle}>
-                        Próxima Troca:
-                      </Text>
-                      <View style={styles.nextServiceItem}>
-                        <Text style={styles.nextServiceLabel}>
-                          Óleo do motor:
-                        </Text>
-                        <Text style={styles.nextServiceValue}>
-                          {oilChangeData.nextServices.engineOil} km
-                        </Text>
-                      </View>
-                      <View style={styles.nextServiceItem}>
-                        <Text style={styles.nextServiceLabel}>
-                          Correia dentada:
-                        </Text>
-                        <Text style={styles.nextServiceValue}>
-                          {oilChangeData.nextServices.timingBelt} km
-                        </Text>
-                      </View>
-                      <View style={styles.nextServiceItem}>
-                        <Text style={styles.nextServiceLabel}>
-                          Filtro do óleo:
-                        </Text>
-                        <Text style={styles.nextServiceValue}>
-                          {oilChangeData.nextServices.oilFilter} km
-                        </Text>
-                      </View>
-                      <View style={styles.nextServiceItem}>
-                        <Text style={styles.nextServiceLabel}>
-                          Filtro de ar:
-                        </Text>
-                        <Text style={styles.nextServiceValue}>
-                          {oilChangeData.nextServices.airFilter} km
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                ) : null}
-
-                {/* Card de Alinhamento/Balanceamento */}
-                {alignmentData ? (
-                  <View style={styles.serviceCard}>
-                    <View style={styles.serviceHeader}>
-                      <Text style={styles.serviceTitle}>
-                        Alinhamento/Balanceamento
-                      </Text>
-                      <Text style={styles.serviceDate}>
-                        Data: {alignmentData.date}
-                      </Text>
-                    </View>
-
-                    <View style={styles.serviceContent}>
-                      <Text style={styles.serviceInfo}>
-                        Revisado com {alignmentData.kilometrage} km
-                      </Text>
-                    </View>
-
-                    <View style={styles.nextServicesContainer}>
-                      <Text style={styles.nextServicesTitle}>
-                        Próxima Revisão:
-                      </Text>
-                      <View style={styles.nextServiceItem}>
-                        <Text style={styles.nextServiceValue}>
-                          {alignmentData.nextRevision} km
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                ) : null}
-
-                {!oilChangeData && !alignmentData && (
-                  <Text style={styles.emptyText}>
-                    Nenhum registro de serviço encontrado para este veículo.
-                  </Text>
-                )}
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Placa:</Text>
+                <Text style={styles.detailValue}>{selectedVehicle.plate}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Ano:</Text>
+                <Text style={styles.detailValue}>{selectedVehicle.year}</Text>
               </View>
             </View>
-          ) : (
-            <View style={styles.placeholderContainer}>
-              <Text style={styles.placeholderText}>
-                Selecione um veículo para visualizar seus serviços realizados
-              </Text>
+
+            {/* Cards de serviços */}
+            <View style={styles.servicesContainer}>
+              <Text style={styles.sectionTitleTwo}>Serviços Realizados</Text>
+
+              {/* Card de Troca de Óleo */}
+              {oilChangeData ? (
+                <View style={styles.serviceCard}>
+                  <View style={styles.serviceHeader}>
+                    <Text style={styles.serviceTitle}>Troca de Óleo</Text>
+                    <Text style={styles.serviceDate}>
+                      Data: {oilChangeData.date}
+                    </Text>
+                  </View>
+
+                  <View style={styles.serviceContent}>
+                    <Text style={styles.serviceInfo}>
+                      Trocado com {oilChangeData.kilometrage} km
+                    </Text>
+                    <Text style={styles.serviceInfo}>
+                      Tipo do óleo: {oilChangeData.oilType}
+                    </Text>
+                  </View>
+
+                  <View style={styles.nextServicesContainer}>
+                    <Text style={styles.nextServicesTitle}>Próxima Troca:</Text>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>
+                        Óleo do motor:
+                      </Text>
+                      <Text style={styles.nextServiceValue}>
+                        {oilChangeData.nextServices.engineOil} km
+                      </Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>
+                        Correia dentada:
+                      </Text>
+                      <Text style={styles.nextServiceValue}>
+                        {oilChangeData.nextServices.timingBelt} km
+                      </Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>
+                        Filtro do óleo:
+                      </Text>
+                      <Text style={styles.nextServiceValue}>
+                        {oilChangeData.nextServices.oilFilter} km
+                      </Text>
+                    </View>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceLabel}>Filtro de ar:</Text>
+                      <Text style={styles.nextServiceValue}>
+                        {oilChangeData.nextServices.airFilter} km
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+
+              {/* Card de Alinhamento/Balanceamento */}
+              {alignmentData ? (
+                <View style={styles.serviceCard}>
+                  <View style={styles.serviceHeader}>
+                    <Text style={styles.serviceTitle}>
+                      Alinhamento/Balanceamento
+                    </Text>
+                    <Text style={styles.serviceDate}>
+                      Data: {alignmentData.date}
+                    </Text>
+                  </View>
+
+                  <View style={styles.serviceContent}>
+                    <Text style={styles.serviceInfo}>
+                      Revisado com {alignmentData.kilometrage} km
+                    </Text>
+                  </View>
+
+                  <View style={styles.nextServicesContainer}>
+                    <Text style={styles.nextServicesTitle}>
+                      Próxima Revisão:
+                    </Text>
+                    <View style={styles.nextServiceItem}>
+                      <Text style={styles.nextServiceValue}>
+                        {alignmentData.nextRevision} km
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+
+              {!oilChangeData && !alignmentData && (
+                <Text style={styles.emptyText}>
+                  Nenhum registro de serviço encontrado para este veículo.
+                </Text>
+              )}
             </View>
-          )}
-        </ScrollView>
+          </View>
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <Text style={styles.placeholderText}>
+              Selecione um veículo para visualizar seus serviços realizados
+            </Text>
+          </View>
+        )}
+      </ScrollView>
       {/* </ImageBackground> */}
     </SafeAreaView>
   );

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import PageHeader from "@/components/ui/PageHeader";
+import PageHeader from "@/components/PageHeader";
 import Colors from "@/constants/Colors";
 
 const NotaServico = () => {
@@ -94,7 +94,7 @@ const NotaServico = () => {
         valorMaoDeObra: 150.0,
         tempo: "2h 00min",
       },
-    ]
+    ],
   });
 
   // Estados temporários para edição/adição

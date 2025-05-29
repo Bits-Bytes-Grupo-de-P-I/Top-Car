@@ -14,9 +14,9 @@ import React, { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 
 // Componentes
-import InputField from "@/components/ui/InputField";
-import Slider from "@/components/ui/Slider";
-import PageHeader from "@/components/ui/PageHeader";
+import InputField from "@/components/InputField";
+import Slider from "@/components/Slider";
+import PageHeader from "@/components/PageHeader";
 import Colors from "@/constants/Colors";
 
 const ClientSignUp = () => {

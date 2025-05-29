@@ -16,10 +16,10 @@ import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import VehicleSelector from "@/components/ui/VehicleSelector"; // Ajuste o caminho conforme sua estrutura
+import VehicleSelector from "@/components/VehicleSelector"; // Ajuste o caminho conforme sua estrutura
 
 import Colors from "@/constants/Colors"; // Ajuste o caminho conforme sua estrutura
-import PageHeader from "@/components/ui/PageHeader"; // Ajuste o caminho conforme sua estrutura
+import PageHeader from "@/components/PageHeader"; // Ajuste o caminho conforme sua estrutura
 
 const ServiceRequestForm = () => {
   const router = useRouter();
@@ -356,8 +356,8 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 16,
     fontWeight: "500",
-    color: 'white',
-    fontWeight: 'bold'
+    color: "white",
+    fontWeight: "bold",
   },
   submitButton: {
     flexDirection: "row",

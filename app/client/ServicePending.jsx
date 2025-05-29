@@ -8,10 +8,10 @@ import {
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import PageHeader from "@/components/ui/PageHeader";
+import PageHeader from "@/components/PageHeader";
 import Colors from "@/constants/Colors";
 
-import ServiceCard from "@/components/ui/ServiceCard"; //componente de card de serviços pendentes
+import ServiceCard from "@/components/ServiceCard"; //componente de card de serviços pendentes
 import mockServices from "@/assets/mocks/pendenciasMock.json"; // Mock de serviços pendentes
 
 /**

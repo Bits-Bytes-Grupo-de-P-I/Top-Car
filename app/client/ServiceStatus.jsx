@@ -9,8 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import ClientServiceCard from "@/components/ui/ClientServiceCard";
-import PageHeader from "@/components/ui/PageHeader";
+import ClientServiceCard from "@/components/ClientServiceCard";
+import PageHeader from "@/components/PageHeader";
 
 const clientServices = () => {
   // Dados de exemplo para o cliente
@@ -24,7 +24,8 @@ const clientServices = () => {
       dataAgendada: "16/05/2025",
       status: "Finalizado",
       urgente: false,
-      observacoes: "Serviço realizado com sucesso. Próxima troca recomendada em 10.000 km.",
+      observacoes:
+        "Serviço realizado com sucesso. Próxima troca recomendada em 10.000 km.",
     },
     {
       id: "2",
@@ -35,7 +36,8 @@ const clientServices = () => {
       dataAgendada: "17/05/2025",
       status: "Aguardando peça",
       urgente: true,
-      observacoes: "Aguardando chegada da peça de reposição. Previsão: 2-3 dias úteis.",
+      observacoes:
+        "Aguardando chegada da peça de reposição. Previsão: 2-3 dias úteis.",
     },
     {
       id: "3",
@@ -73,10 +75,10 @@ const clientServices = () => {
         >
           <View style={styles.listaContainer}>
             <View style={styles.infoContainer}>
-              <FontAwesome6 
-                name="info-circle" 
-                size={16} 
-                color={Colors.azulClaro} 
+              <FontAwesome6
+                name="info-circle"
+                size={16}
+                color={Colors.azulClaro}
               />
               <Text style={styles.infoText}>
                 Toque em um serviço para ver mais detalhes

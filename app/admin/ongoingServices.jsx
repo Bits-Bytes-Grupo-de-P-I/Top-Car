@@ -9,8 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import OngoingServiceCard from "@/components/ui/OngoingServiceCard";
-import PageHeader from "@/components/ui/PageHeader";
+import OngoingServiceCard from "@/components/OngoingServiceCard";
+import PageHeader from "@/components/PageHeader";
 
 const ongoingServices = () => {
   // Dados de exemplo
@@ -139,5 +139,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.cinzaEscuro,
     textAlign: "center",
-  }
+  },
 });

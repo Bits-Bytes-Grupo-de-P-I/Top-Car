@@ -8,7 +8,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-import PageHeader from "@/components/ui/PageHeader";
+import PageHeader from "@/components/PageHeader";
 
 import Colors from "@/constants/Colors";
 
@@ -18,7 +18,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 // Componentes
 // Importamos o componente AllClientsList que criamos especificamente para esta tela
-import AllClientsList from "@/components/ui/AllClientsList";
+import AllClientsList from "@/components/AllClientsList";
 
 export default function AllClients() {
   const router = useRouter();

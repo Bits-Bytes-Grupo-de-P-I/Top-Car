@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   ImageBackground,
-  Image
+  Image,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
@@ -16,13 +16,13 @@ import Entypo from "@expo/vector-icons/Entypo";
 
 // Componentes
 
-import Card from "@/components/ui/Card";
-import ClientList from "@/components/ui/ClientList";
+import Card from "@/components/Card";
+import ClientList from "@/components/ClientList";
 
-import CardWork from "@/components/ui/CardWork";
+import CardWork from "@/components/CardWork";
 
 // IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
-import BackToHomeButton from "@/components/ui/BackToHomeButton";
+import BackToHomeButton from "@/components/BackToHomeButton";
 
 export default function Index() {
   const router = useRouter();

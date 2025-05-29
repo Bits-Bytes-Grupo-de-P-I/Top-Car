@@ -15,9 +15,9 @@ import Colors from "@/constants/Colors";
 import Entypo from "@expo/vector-icons/Entypo";
 
 // Componentes
-import Card from "@/components/ui/Card";
-import ClientList from "@/components/ui/ClientList";
-import BackToHomeButton from "@/components/ui/BackToHomeButton";
+import Card from "@/components/Card";
+import ClientList from "@/components/ClientList";
+import BackToHomeButton from "@/components/BackToHomeButton";
 
 export default function Index() {
   const router = useRouter();

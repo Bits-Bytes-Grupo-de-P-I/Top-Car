@@ -13,9 +13,9 @@ import Colors from "@/constants/Colors";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import mockData from "@/assets/mocks/serviceRequests";
 
-import PageHeader from "@/components/ui/PageHeader";
-import SeeMoreBtn from "@/components/ui/SeeMoreBtn";
-import Button from "@/components/ui/Button";
+import PageHeader from "@/components/PageHeader";
+import SeeMoreBtn from "@/components/SeeMoreBtn";
+import Button from "@/components/Button";
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);

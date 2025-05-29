@@ -1,12 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Badge from '@/components/ui/Badge'
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import Badge from "@/components/Badge";
 import Colors from "@/constants/Colors";
 
 /**
  * Componente de card de serviço para exibir serviços pendentes
- * 
+ *
  * @param {Object} props
  * @param {Object} props.service - Dados do serviço pendente
  * @param {boolean} props.isAdminView - Define se o card está sendo usado na visão de administrador
@@ -15,12 +15,7 @@ import Colors from "@/constants/Colors";
  * @param {Function} props.onDelete - Função para excluir o serviço (apenas admin)
  */
 
-const ServiceCard = ({ 
-  service, 
-  isAdminView = false, 
-  onEdit, 
-  onDelete
-}) => {
+const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
   const handleEdit = () => {
     if (onEdit) onEdit(service.id);
   };
@@ -31,7 +26,11 @@ const ServiceCard = ({
       `Deseja realmente excluir o serviço pendente para o veículo ${service.vehicle}?`,
       [
         { text: "Cancelar", style: "cancel" },
-        { text: "Excluir", onPress: () => onDelete && onDelete(service.id), style: "destructive" }
+        {
+          text: "Excluir",
+          onPress: () => onDelete && onDelete(service.id),
+          style: "destructive",
+        },
       ]
     );
   };
@@ -58,12 +57,18 @@ const ServiceCard = ({
         {/* Botões de ação apenas para a visão de administrador */}
         {isAdminView && (
           <View style={styles.actions}>
-            <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={handleEdit}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.editButton]}
+              onPress={handleEdit}
+            >
               <Ionicons name="pencil" size={18} color="#FFF" />
               <Text style={styles.actionText}>Editar</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDelete}>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.deleteButton]}
+              onPress={handleDelete}
+            >
               <Ionicons name="trash" size={18} color="#FFF" />
               <Text style={styles.actionText}>Excluir</Text>
             </TouchableOpacity>
@@ -76,11 +81,11 @@ const ServiceCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderRadius: 8,
     marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -90,18 +95,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 8,
   },
   label: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 14,
     marginRight: 8,
-    color: '#333',
+    color: "#333",
   },
   value: {
     fontSize: 14,
-    color: '#444',
+    color: "#444",
     flex: 1,
   },
   descriptionContainer: {
@@ -109,18 +114,18 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#444',
+    color: "#444",
     marginTop: 4,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 12,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 4,
@@ -129,18 +134,18 @@ const styles = StyleSheet.create({
   },
   editButton: {
     borderWidth: 1,
-    borderColor: '#3498db',
-    backgroundColor: '#3498db',
+    borderColor: "#3498db",
+    backgroundColor: "#3498db",
   },
   deleteButton: {
     borderWidth: 1,
-    borderColor: '#e74c3c',
-    backgroundColor: '#e74c3c',
+    borderColor: "#e74c3c",
+    backgroundColor: "#e74c3c",
   },
   actionText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 4,
   },
   modalUrgenteBadge: {
