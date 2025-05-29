@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   ImageBackground,
-  TouchableOpacity,
   Modal,
   Pressable,
 } from "react-native";
@@ -166,15 +165,15 @@ const serviceRequests = () => {
 
                     <View style={styles.modalActions}>
                       <Button
-                        cor="vermelho"
+                        cor={Colors.vermelho}
                         texto="Rejeitar"
                         onPress={() => handleReject(selectedPedido.id)}
-                      />
+                      ></Button>
                       <Button
-                        cor="verde"
+                        cor={Colors.verde}
                         texto="Aceitar"
                         onPress={() => handleAccept(selectedPedido.id)}
-                      />
+                      ></Button>
                     </View>
                   </>
                 )}

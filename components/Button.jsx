@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { Children } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Colors from "@/constants/Colors";
 
@@ -10,15 +10,9 @@ const Button = (props) => {
         onPress={props.onPress}
         // Estilos condicionais com base nos props passados nos botões
         underlayColor="transparent"
-        style={[
-          props.cor === "azul"
-            ? styles.btnAzul
-            : props.cor === "verde"
-            ? styles.btnVerde
-            : styles.btnVermelho,
-          styles.btn,
-        ]}
+        style={[styles.btn, { backgroundColor: props.cor }]}
       >
+        {props.children}
         <Text style={styles.btnTexto}>{props.texto}</Text>
       </TouchableOpacity>
     </>
