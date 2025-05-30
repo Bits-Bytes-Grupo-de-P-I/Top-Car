@@ -1,15 +1,9 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-} from "react-native";
-import React, { useState } from "react";
-import Colors from "@/constants/Colors";
+import { StyleSheet, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { useState } from "react";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 const ServiceStatus = () => {
   const data = [

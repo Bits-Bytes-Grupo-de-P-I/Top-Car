@@ -1,27 +1,15 @@
-import {
-  Text,
-  View,
-  StyleSheet,
-  ImageBackground,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, ImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 
-import PageHeader from "@/components/PageHeader";
-
-import Colors from "@/constants/Colors";
-
-// Ícones
-import Entypo from "@expo/vector-icons/Entypo";
-import { FontAwesome5 } from "@expo/vector-icons";
 
 // Componentes
-// Importamos o componente AllClientsList que criamos especificamente para esta tela
-import AllClientsList from "@/components/AllClientsList";
+import PageHeader from "@/components/PageHeader";
+import AllClientsList from "@/components/admin/AllClientsList";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 export default function AllClients() {
-  const router = useRouter();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -38,8 +26,8 @@ export default function AllClients() {
 
         {/* Container conteudo */}
         <View style={styles.container}>
-          {/* Container da lista de clientes - usando toda a altura disponível */}
-          <View style={styles.containerClientList}>
+          {/* Container da lista de clientes */}
+          <View style={styles.containerShortClientList}>
             <AllClientsList />
           </View>
         </View>
@@ -87,7 +75,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.azulClaro,
   },
-  containerClientList: {
+  containerShortClientList: {
     flex: 1,
     width: "100%",
   },

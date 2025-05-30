@@ -10,13 +10,15 @@ import {
   ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import { useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 
 // Componentes
 import InputField from "@/components/InputField";
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
+
+// Cores
 import Colors from "@/constants/Colors";
 
 const ClientSignUp = () => {

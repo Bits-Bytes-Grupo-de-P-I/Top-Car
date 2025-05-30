@@ -9,15 +9,16 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-import Colors from "@/constants/Colors";
-
-// Ícones
-import Entypo from "@expo/vector-icons/Entypo";
-
 // Componentes
 import Card from "@/components/Card";
-import ClientList from "@/components/ClientList";
+import ShortClientList from "@/components/admin/ShortClientList";
 import BackToHomeButton from "@/components/BackToHomeButton";
+
+// Ícones
+import {Entypo} from "@expo/vector-icons";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 export default function Index() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function Index() {
       data: { text: "Clientes" },
     },
     {
-      type: "clientList",
+      type: "ShortClientList",
       data: {},
     },
   ];
@@ -107,10 +108,10 @@ export default function Index() {
           </View>
         );
 
-      case "clientList":
+      case "ShortClientList":
         return (
-          <View style={styles.containerClientList}>
-            <ClientList />
+          <View style={styles.containerShortClientList}>
+            <ShortClientList />
           </View>
         );
 
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  containerClientList: {
+  containerShortClientList: {
     width: "100%",
   },
 });

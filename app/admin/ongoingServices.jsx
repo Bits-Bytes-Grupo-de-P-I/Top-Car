@@ -5,12 +5,16 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { useState } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors";
-import OngoingServiceCard from "@/components/OngoingServiceCard";
+
+// Componentes
+import OngoingServiceCard from "@/components/admin/OngoingServiceCard";
 import PageHeader from "@/components/PageHeader";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 const ongoingServices = () => {
   // Dados de exemplo

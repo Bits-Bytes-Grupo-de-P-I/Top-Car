@@ -6,10 +6,23 @@ import {
   Modal,
   Pressable,
 } from "react-native";
+<<<<<<< Updated upstream:components/client/ClientServiceCard.jsx
 import React, { useState } from "react";
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
 import Badge from "../Badge";
+=======
+import { useState } from "react";
+
+// Componentes
+import Badge from "./Badge";
+>>>>>>> Stashed changes:components/ClientServiceCard.jsx
+
+// ícones
+import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 const ClientServiceCard = ({ item, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -52,7 +65,7 @@ const ClientServiceCard = ({ item, onPress }) => {
           <Text style={styles.clienteNome}>{item.clienteNome}</Text>
           {item.urgente && (
             <View style={styles.urgenteBadge}>
-              <Badge color={Colors.laranja} text="Urgente"/>
+              <Badge color={Colors.laranja} text="Urgente" />
             </View>
           )}
         </View>
@@ -106,7 +119,7 @@ const ClientServiceCard = ({ item, onPress }) => {
                 <Text style={styles.modalClientName}>{item.clienteNome}</Text>
                 {item.urgente && (
                   <View style={styles.modalUrgenteBadge}>
-                    <Badge color={Colors.laranja} text="Urgente"/>
+                    <Badge color={Colors.laranja} text="Urgente" />
                   </View>
                 )}
               </View>

@@ -4,18 +4,19 @@ import {
   View,
   ScrollView,
   ImageBackground,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
   Modal,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import PageHeader from "@/components/PageHeader";
 import Colors from "@/constants/Colors";
 
 const NotaServico = () => {
+  // States para definir se a seção está expandida ou não
   const [expandedSections, setExpandedSections] = useState({
     cliente: false,
     veiculo: false,
@@ -23,6 +24,7 @@ const NotaServico = () => {
     servicos: false,
   });
 
+  // States para definir se o modal está visível ou não
   const [modalsVisible, setModalsVisible] = useState({
     cliente: false,
     veiculo: false,

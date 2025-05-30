@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Switch,
   TouchableOpacity,
   Modal,
   TextInput,
@@ -12,17 +11,22 @@ import {
   ImageBackground,
 } from "react-native";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
-import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import mock from "@/assets/mocks/clientAndVehiclesInfo";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
+// Componentes
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
 
+// Dados mockados
+import mock from "@/assets/mocks/clientAndVehiclesInfo";
+
+// Ícones
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+
+// Cores
 import Colors from "@/constants/Colors";
 
-// Saporra aqui é tudo IA com dado mockado
 const clientInfo = () => {
   const [client, setClient] = useState(mock.client);
   const [vehicles, setVehicles] = useState(mock.vehicles);
@@ -94,7 +98,6 @@ const clientInfo = () => {
       },
     ]);
   };
-  // Saporra aqui é tudo IA com dado mockado
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -104,7 +107,7 @@ const clientInfo = () => {
         resizeMode="cover"
       >
         <PageHeader
-          title="Serviços Pendentes da Oficina"
+          title="Informações do Cliente"
           containerStyle={{ backgroundColor: Colors.azulClaro }}
           titleStyle={{ color: "#fff" }}
         />

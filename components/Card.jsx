@@ -5,10 +5,12 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
 
+// Ícones
+import { FontAwesome6 } from "@expo/vector-icons";
+
+// Cores
 import Colors from "@/constants/Colors";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const Card = (props) => {
   return (
