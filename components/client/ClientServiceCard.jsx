@@ -6,17 +6,10 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-<<<<<<< Updated upstream:components/client/ClientServiceCard.jsx
-import React, { useState } from "react";
-import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
-import Colors from "@/constants/Colors";
-import Badge from "../Badge";
-=======
 import { useState } from "react";
 
 // Componentes
 import Badge from "./Badge";
->>>>>>> Stashed changes:components/ClientServiceCard.jsx
 
 // ícones
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
