@@ -1,27 +1,10 @@
-// import { Redirect } from "expo-router";
-// import { APP_VERSION } from "../env";
-
-// export default function Index() {
-//   if (APP_VERSION === "admin") {
-//     return <Redirect href="/admin" />;
-//   } else {
-//     return <Redirect href="/client" />;
-//   }
-// }
-
-// import { Redirect } from "expo-router";
-
-// export default function Index() {
-//   return <Redirect href="./cliente" />; //Tem que alterar para client ou admin
-// }
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import Colors from "@/constants/Colors";
 
 export default function Index() {
-  const handleRedirect = (userType: 'client' | 'admin') => {
-    router.replace(`/${userType}`); // Isso vai para /client ou /admin
+  const handleRedirect = (userType) => {
+    router.replace(`/${userType}`); // Vai para /client ou /admin
   };
 
   return (

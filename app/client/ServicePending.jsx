@@ -1,3 +1,8 @@
+/**
+ * Tela de serviços pendentes para o CLIENTE
+ * Essa tela só exibe os serviços pendentes relacionados aos veículos do cliente
+*/
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -6,20 +11,19 @@ import {
   StyleSheet,
   ImageBackground,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
-import { SafeAreaView } from "react-native-safe-area-context";
+// COMPONENTES 
 import PageHeader from "@/components/PageHeader";
+import ServiceCard from "@/components/ServiceCard";
+
+// MOCKS
+import mockServices from "@/assets/mocks/pendenciasMock.json"; 
+
+// CORES
 import Colors from "@/constants/Colors";
 
-import ServiceCard from "@/components/ServiceCard"; //componente de card de serviços pendentes
-import mockServices from "@/assets/mocks/pendenciasMock.json"; // Mock de serviços pendentes
-
-/**
- * Tela de serviços pendentes para o CLIENTE
- * Essa tela só exibe os serviços pendentes relacionados aos veículos do cliente
- */
-
-const ServicePending = () => {
+const servicePending = () => {
   const [services, setServices] = useState([]);
 
   // ID do cliente atual (em uma aplicação real, viria do contexto de autenticação)
@@ -114,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ServicePending;
+export default servicePending;

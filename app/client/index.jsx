@@ -1,3 +1,5 @@
+// Página inicial do cliente
+
 import {
   Text,
   View,
@@ -6,20 +8,18 @@ import {
   ImageBackground,
   Image,
 } from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
-import Colors from "@/constants/Colors";
-// Ícones
+// COMPONENTES
+import Card from "@/components/Card";
+import CardWork from "@/components/client/CardWork";
+
+// ÍCONES
 import Entypo from "@expo/vector-icons/Entypo";
 
-// Componentes
-
-import Card from "@/components/Card";
-import ClientList from "@/components/ClientList";
-
-import CardWork from "@/components/CardWork";
+// CORES
+import Colors from "@/constants/Colors";
 
 // IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
 import BackToHomeButton from "@/components/BackToHomeButton";
@@ -28,19 +28,19 @@ export default function Index() {
   const router = useRouter();
 
   const navigateToServiceStatus = () => {
-    router.push("/client/ServiceStatus");
+    router.push("/client/serviceStatus");
   };
 
   const navigateToServicePending = () => {
-    router.push("/client/ServicePending");
+    router.push("/client/servicePending");
   };
 
   const navigateToHistoryScreen = () => {
-    router.push("/client/HistoryScreen");
+    router.push("/client/serviceHistory");
   };
 
   const navigateToServiceRequestForm = () => {
-    router.push("/client/ServiceRequestForm");
+    router.push("/client/serviceRequestForm");
   };
 
   return (

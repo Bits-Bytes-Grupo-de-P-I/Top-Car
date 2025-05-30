@@ -9,7 +9,7 @@ import {
 import React, { useState } from "react";
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
-import Badge from "./Badge";
+import Badge from "../Badge";
 
 const ClientServiceCard = ({ item, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);

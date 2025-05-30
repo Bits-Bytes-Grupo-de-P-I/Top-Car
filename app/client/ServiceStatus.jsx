@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -5,14 +6,19 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
-import { FontAwesome6 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors";
-import ClientServiceCard from "@/components/ClientServiceCard";
-import PageHeader from "@/components/PageHeader";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
-const clientServices = () => {
+// COMPONENTES
+import PageHeader from "@/components/PageHeader";
+import ClientServiceCard from "@/components/client/ClientServiceCard";
+
+// ÍCONES
+import { FontAwesome6 } from "@expo/vector-icons";
+
+// CORES
+import Colors from "@/constants/Colors";
+
+const serviceStatus = () => {
   // Dados de exemplo para o cliente
   const [meuServicos, setMeuServicos] = useState([
     {
@@ -113,7 +119,7 @@ const clientServices = () => {
   );
 };
 
-export default clientServices;
+export default serviceStatus;
 
 const styles = StyleSheet.create({
   background: {

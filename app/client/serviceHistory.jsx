@@ -1,3 +1,5 @@
+// Esse arquivo é responsável por exibir o histórico de serviços realizados nos veículos
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -6,14 +8,19 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import VehicleSelector from "@/components/VehicleSelector";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+
+// COMPONENTES
+import VehicleSelector from "@/components/client/VehicleSelector";
+import PageHeader from "@/components/PageHeader";
+
+// MOCKS
 import mockVehicles from "@/assets/mocks/mockVehicles.json";
 
-import PageHeader from "@/components/PageHeader";
+// CORES
 import Colors from "@/constants/Colors";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-const HistoryScreen = () => {
+const serviceHistory = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleData, setVehicleData] = useState([]);
   const [oilChangeData, setOilChangeData] = useState(null);
@@ -361,4 +368,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HistoryScreen;
+export default serviceHistory;

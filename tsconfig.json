@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/_layout.tsx", "app/index.tsx", "app/client/HistoryScreen.jsx"  ]
+, "app/_layout.jsx", "app/index.jsx", "app/client/serviceHistory.jsx", "app/client/_layout.jsx"  ]
 }

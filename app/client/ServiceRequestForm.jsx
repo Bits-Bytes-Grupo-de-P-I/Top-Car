@@ -13,15 +13,19 @@ import {
   ImageBackground,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import VehicleSelector from "@/components/VehicleSelector"; // Ajuste o caminho conforme sua estrutura
+// COMPONENTES
+import VehicleSelector from "@/components/client/VehicleSelector";
+import PageHeader from "@/components/PageHeader"; 
 
-import Colors from "@/constants/Colors"; // Ajuste o caminho conforme sua estrutura
-import PageHeader from "@/components/PageHeader"; // Ajuste o caminho conforme sua estrutura
+// ÍCONES
+import { MaterialIcons } from "@expo/vector-icons";
 
-const ServiceRequestForm = () => {
+// CORES
+import Colors from "@/constants/Colors";
+
+const serviceRequestForm = () => {
   const router = useRouter();
 
   // Estados para os campos do formulário
@@ -383,4 +387,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ServiceRequestForm;
+export default serviceRequestForm;
