@@ -21,7 +21,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 // CORES
 import Colors from "@/constants/Colors";
 
-// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
+// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO .
 import BackToHomeButton from "@/components/BackToHomeButton";
 
 export default function Index() {
