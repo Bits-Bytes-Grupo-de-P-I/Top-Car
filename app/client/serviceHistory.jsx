@@ -77,11 +77,7 @@ const serviceHistory = () => {
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
-      {/* <ImageBackground
-        source={require("@/assets/images/fundo.jpg")}
-        style={styles.background}
-        resizeMode="cover"
-      > */}
+
       <ScrollView style={styles.container}>
         {/* <Text style={styles.title}>Histórico de Manutenção</Text> */}
 
@@ -216,7 +212,6 @@ const serviceHistory = () => {
           </View>
         )}
       </ScrollView>
-      {/* </ImageBackground> */}
     </SafeAreaView>
   );
 };

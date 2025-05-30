@@ -45,7 +45,6 @@ export default function Index() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* SafeAreaView para concertar a tela no celular */}
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -91,7 +90,7 @@ export default function Index() {
               {/* Container dos cards */}
               <View style={styles.containerCards}>
                 <Card
-                  texto="Meus serviços"
+                  texto="Meus serviços em andamento"
                   cor={Colors.verde}
                   iconName="car"
                   onPress={navigateToServiceStatus}
@@ -172,27 +171,4 @@ const styles = StyleSheet.create({
   containerShortClientList: {
     width: "100%",
   },
-
-  // //suahsuhaushaushauhsaushauhsuahs
-
-  // container: {
-  //   flex: 1,
-  //   padding: 16,
-  // },
-  // welcomeTitle: {
-  //   fontSize: 20,
-  //   color: '#6B7280', // gray-600
-  // },
-  // appTitle: {
-  //   fontSize: 32,
-  //   fontWeight: 'bold',
-  //   color: '#1F2937', // gray-800
-  //   marginBottom: 24,
-  // },
-  // sectionTitle: {
-  //   fontSize: 18,
-  //   fontWeight: '600',
-  //   color: '#4B5563', // gray-700
-  //   marginBottom: 12,
-  // },
 });

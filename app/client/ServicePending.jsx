@@ -46,16 +46,17 @@ const servicePending = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <PageHeader
-        title="Meus Serviços Pendentes"
-        containerStyle={{ backgroundColor: Colors.azulClaro }}
-        titleStyle={{ color: "#fff" }}
-      />
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
         resizeMode="cover"
       >
+        <PageHeader
+          title="Meus Serviços Pendentes"
+          containerStyle={{ backgroundColor: Colors.azulClaro }}
+          titleStyle={{ color: "#fff" }}
+        />
+
         {services.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>

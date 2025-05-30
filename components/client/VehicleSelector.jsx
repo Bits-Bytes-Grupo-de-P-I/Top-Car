@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 
 const VehicleSelector = ({ 
   onVehicleSelect, 
   initialVehicleId = null,
-  vehicles = []
+  vehicles = [],
+  loading = false,
+  error = null
 }) => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     // Encontrar o veículo inicial se houver um ID inicial fornecido
@@ -32,11 +32,67 @@ const VehicleSelector = ({
     }
   };
 
+  const renderModalContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.messageContainer}>
+          <MaterialIcons name="hourglass-empty" size={32} color="#666" />
+          <Text style={styles.messageText}>Carregando veículos...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.messageContainer}>
+          <MaterialIcons name="error-outline" size={32} color="#d32f2f" />
+          <Text style={styles.errorText}>Erro ao carregar veículos</Text>
+          <Text style={styles.errorSubText}>{error}</Text>
+        </View>
+      );
+    }
+
+    if (vehicles.length === 0) {
+      return (
+        <View style={styles.messageContainer}>
+          <MaterialIcons name="directions-car" size={32} color="#666" />
+          <Text style={styles.messageText}>Nenhum veículo cadastrado</Text>
+        </View>
+      );
+    }
+
+    return (
+      <FlatList
+        data={vehicles}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity 
+            style={[
+              styles.vehicleItem,
+              selectedVehicle?.id === item.id && styles.selectedVehicleItem
+            ]}
+            onPress={() => handleVehicleSelect(item)}
+          >
+            <View style={styles.vehicleItemInfo}>
+              <Text style={styles.vehicleItemName}>{item.name}</Text>
+              <Text style={styles.vehicleItemPlate}>{item.plate}</Text>
+            </View>
+            {selectedVehicle?.id === item.id && (
+              <View style={styles.selectedIndicator} />
+            )}
+          </TouchableOpacity>
+        )}
+        style={styles.vehicleList}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity 
         style={styles.vehicleSelector} 
         onPress={() => setModalVisible(true)}
+        disabled={loading}
       >
         <View style={styles.vehicleInfo}>
           <MaterialIcons name="directions-car" size={24} color="#007AFF" style={styles.icon} />
@@ -47,13 +103,16 @@ const VehicleSelector = ({
               <Text style={styles.vehiclePlate}>{selectedVehicle.plate}</Text>
             </View>
           ) : (
-            <Text style={styles.placeholderText}>Selecione um veículo</Text>
+            <Text style={styles.placeholderText}>
+              {loading ? "Carregando..." : "Selecione um veículo"}
+            </Text>
           )}
         </View>
         
         <TouchableOpacity 
-          style={styles.selectButton} 
+          style={[styles.selectButton, loading && styles.selectButtonDisabled]} 
           onPress={() => setModalVisible(true)}
+          disabled={loading}
         >
           <Text style={styles.selectButtonText}>Selecionar</Text>
         </TouchableOpacity>
@@ -74,43 +133,7 @@ const VehicleSelector = ({
               </TouchableOpacity>
             </View>
 
-            {vehicles.length > 0 ? (
-              <FlatList
-                data={vehicles}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity 
-                    style={[
-                      styles.vehicleItem,
-                      selectedVehicle?.id === item.id && styles.selectedVehicleItem
-                    ]}
-                    onPress={() => handleVehicleSelect(item)}
-                  >
-                    <View style={styles.vehicleItemInfo}>
-                      <Text style={styles.vehicleItemName}>{item.name}</Text>
-                      <Text style={styles.vehicleItemPlate}>{item.plate}</Text>
-                    </View>
-                    {selectedVehicle?.id === item.id && (
-                      <View style={styles.selectedIndicator} />
-                    )}
-                  </TouchableOpacity>
-                )}
-                style={styles.vehicleList}
-              />
-            ) : (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>Nenhum veículo cadastrado</Text>
-                <TouchableOpacity 
-                  style={styles.addVehicleButton}
-                  onPress={() => {
-                    setModalVisible(false);
-                    router.push('/vehicles/new');
-                  }}
-                >
-                  <Text style={styles.addVehicleButtonText}>Cadastrar Veículo</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            {renderModalContent()}
           </View>
         </View>
       </Modal>
@@ -162,6 +185,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
+  },
+  selectButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   selectButtonText: {
     color: '#fff',
@@ -225,24 +251,29 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#007AFF',
   },
-  emptyContainer: {
-    padding: 24,
+  messageContainer: {
+    padding: 40,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  emptyText: {
+  messageText: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 16,
+    marginTop: 12,
+    textAlign: 'center',
   },
-  addVehicleButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+  errorText: {
+    fontSize: 16,
+    color: '#d32f2f',
+    marginTop: 12,
+    textAlign: 'center',
+    fontWeight: '500',
   },
-  addVehicleButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  errorSubText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 
