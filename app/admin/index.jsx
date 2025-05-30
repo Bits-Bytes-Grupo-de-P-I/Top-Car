@@ -23,6 +23,63 @@ import Colors from "@/constants/Colors";
 export default function Index() {
   const router = useRouter();
 
+  // Componentes renderizadores organizados por tipo
+  const renderComponents = {
+    title: ({ data }) => (
+      <View style={styles.containerTitulo}>
+        <Text style={styles.titulo}>{data.text}</Text>
+      </View>
+    ),
+
+    adminButton: () => (
+      <View style={styles.containerAdminButton}>
+        <Text>Página do administrador</Text>
+        <BackToHomeButton />
+      </View>
+    ),
+
+    cards: () => (
+      <View style={styles.containerCards}>
+        <Card
+          texto="Cadastrar novo cliente"
+          cor={Colors.verde}
+          iconName="user-plus"
+          onPress={() => router.push("./admin/clientSignUp")}
+        />
+        <Card
+          texto="Pedidos de serviço"
+          cor={Colors.azulClaro}
+          iconName="car"
+          onPress={() => router.push("./admin/serviceRequests")}
+        />
+        <Card
+          texto="Serviços em andamento"
+          cor={Colors.amarelo}
+          iconName="clock"
+          onPress={() => router.push("./admin/ongoingServices")}
+        />
+        <Card
+          texto="Serviços em pendência"
+          cor={Colors.laranja}
+          iconName="triangle-exclamation"
+          onPress={() => router.push("./admin/pendingServices")}
+        />
+        <Card
+          texto="Gerar nota de serviço avulsa"
+          cor={Colors.grafite}
+          iconName="table-list"
+          onPress={() => router.push("./admin/serviceBill")}
+        />
+      </View>
+    ),
+
+    ShortClientList: () => (
+      <View style={styles.containerShortClientList}>
+        <ShortClientList />
+      </View>
+    ),
+  };
+
   // Dados para o FlatList
   const sections = [
     {
@@ -47,77 +104,10 @@ export default function Index() {
     },
   ];
 
-  // Renderizar cada tipo de seção
+  // Renderizar usando o mapeamento de componentes
   const renderItem = ({ item }) => {
-    switch (item.type) {
-      case "title":
-        return (
-          <View style={styles.containerTitulo}>
-            <Text style={styles.titulo}>{item.data.text}</Text>
-          </View>
-        );
-
-      case "adminButton":
-        return (
-          <View
-            style={{
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text>Página do administrador</Text>
-            <BackToHomeButton />
-          </View>
-        );
-
-      case "cards":
-        return (
-          <View style={styles.containerCards}>
-            <Card
-              texto="Cadastrar novo cliente"
-              cor={Colors.verde}
-              iconName="user-plus"
-              onPress={() => router.push("./admin/clientSignUp")}
-            />
-            <Card
-              texto="Pedidos de serviço"
-              cor={Colors.azulClaro}
-              iconName="car"
-              onPress={() => router.push("./admin/serviceRequests")}
-            />
-            <Card
-              texto="Serviços em andamento"
-              cor={Colors.amarelo}
-              iconName="clock"
-              onPress={() => router.push("./admin/ongoingServices")}
-            />
-            <Card
-              texto="Serviços em pendência"
-              cor={Colors.laranja}
-              iconName="triangle-exclamation"
-              onPress={() => router.push("./admin/pendingServices")}
-            />
-            <Card
-              texto="Gerar nota de serviço avulsa"
-              cor={Colors.grafite}
-              iconName="table-list"
-              onPress={() => router.push("./admin/serviceBill")}
-            />
-          </View>
-        );
-
-      case "ShortClientList":
-        return (
-          <View style={styles.containerShortClientList}>
-            <ShortClientList />
-          </View>
-        );
-
-      default:
-        return null;
-    }
+    const Component = renderComponents[item.type];
+    return Component ? Component(item) : null;
   };
 
   return (
@@ -186,5 +176,11 @@ const styles = StyleSheet.create({
   },
   containerShortClientList: {
     width: "100%",
+  },
+  containerAdminButton: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
   },
 });

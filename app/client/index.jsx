@@ -18,9 +18,8 @@ import CardWork from "@/components/client/CardWork";
 // ÍCONES
 import Entypo from "@expo/vector-icons/Entypo";
 
-// Componentes
-import Card from "@/components/Card";
-import CardWork from "@/components/CardWork";
+// CORES
+import Colors from "@/constants/Colors";
 
 // IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
 import BackToHomeButton from "@/components/BackToHomeButton";

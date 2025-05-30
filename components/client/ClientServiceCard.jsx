@@ -8,14 +8,14 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-// Componentes
-import Badge from "./Badge";
+// CoOMPONENTES
+import Badge from "../Badge";
 
-// ícones
+// ÍCONES
 import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 
-// Cores
-import Colors from "@/constants/Colors";
+// CORES
+import Colors from "../../constants/Colors";
 
 const ClientServiceCard = ({ item, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
