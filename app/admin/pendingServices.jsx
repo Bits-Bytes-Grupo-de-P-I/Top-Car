@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,12 +5,18 @@ import {
   StyleSheet,
   ImageBackground,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import PageHeader from "@/components/PageHeader";
-import Colors from "@/constants/Colors";
+import { useState, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
-import ServiceCard from "@/components/ServiceCard"; //componente de card de serviços pendentes
-import mockServices from "@/assets/mocks/pendenciasMock.json"; // Mock de serviços pendentes
+// Componentes
+import PageHeader from "@/components/PageHeader";
+import ServiceCard from "@/components/ServiceCard";
+
+// Dados mockados
+import mockServices from "@/assets/mocks/pendenciasMock.json";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 /**
  * Tela de serviços pendentes para o ADMINISTRADOR

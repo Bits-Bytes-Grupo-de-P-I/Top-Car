@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { Children } from "react";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+
+// Cores
 import Colors from "@/constants/Colors";
 
 const Button = (props) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,18 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import Colors from "@/constants/Colors";
-import clientes from "@/assets/mocks/clientes.json";
 import { useRouter } from "expo-router";
 
-const ClientList = () => {
+// Dados mockados
+import clientes from "@/assets/mocks/clientes.json";
+
+// Cores
+import Colors from "@/constants/Colors";
+
+const ShortClientList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
-  
+
   const getStatusStyle = (status) => {
     switch (status) {
       case "Em andamento":
@@ -25,14 +29,16 @@ const ClientList = () => {
         return { color: Colors.aluminio };
     }
   };
-  
+
   const renderStatus = (status) => {
     if (status === "Finalizado") {
       return <Text style={[styles.status, getStatusStyle(status)]}></Text>;
     }
-    return <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>;
+    return (
+      <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>
+    );
   };
-  
+
   const clientesFiltrados = clientes.filter((cliente) => {
     const termo = filtro.toLowerCase();
     return (
@@ -79,15 +85,15 @@ const ClientList = () => {
         value={filtro}
         onChangeText={setFiltro}
       />
-      
+
       {clientesFiltrados.length === 0 ? (
         <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
       ) : (
         <View style={styles.clientesContainer}>
           {renderClientes()}
-          
+
           {clientesFiltrados.length > 5 && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.verMaisBtn}
               onPress={() => router.push("./admin/allClients")}
             >
@@ -102,7 +108,7 @@ const ClientList = () => {
   );
 };
 
-export default ClientList;
+export default ShortClientList;
 
 const styles = StyleSheet.create({
   container: {
@@ -168,5 +174,5 @@ const styles = StyleSheet.create({
     color: Colors.grafite,
     fontWeight: "bold",
     fontFamily: "DM-Sans",
-  }
+  },
 });

@@ -1,7 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import { MaskedTextInput } from "react-native-mask-text";
-import Colors from "@/constants/Colors";
 
 const InputField = (props) => {
   return (

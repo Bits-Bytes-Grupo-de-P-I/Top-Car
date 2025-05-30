@@ -1,11 +1,10 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
-import Colors from "@/constants/Colors";
 
 const Badge = (props) => {
   const [estadoBadge, setEstadoBadge] = useState(true);
   return (
-    <View style={[styles.container, {backgroundColor: props.color}]}>
+    <View style={[styles.container, { backgroundColor: props.color }]}>
       <Text style={styles.text}>{props.text}</Text>
     </View>
   );
@@ -23,6 +22,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "DM-Sans",
     fontSize: 10,
-    textTransform: 'uppercase'
+    textTransform: "uppercase",
   },
 });

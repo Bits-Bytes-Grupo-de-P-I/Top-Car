@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  containerClientList: {
+  containerShortClientList: {
     width: "100%",
   },
 

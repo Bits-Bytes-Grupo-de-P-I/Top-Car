@@ -1,8 +1,10 @@
-import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+
+// Componentes
 import Badge from "@/components/Badge";
-import Colors from "@/constants/Colors";
+
+// Ícones
+import { Ionicons } from "@expo/vector-icons";
 
 /**
  * Componente de card de serviço para exibir serviços pendentes

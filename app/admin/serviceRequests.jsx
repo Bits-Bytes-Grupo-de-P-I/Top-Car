@@ -7,15 +7,20 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
-import React, { useState } from "react";
-import Colors from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { useState } from "react";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import mockData from "@/assets/mocks/serviceRequests";
 
+// Componentes
 import PageHeader from "@/components/PageHeader";
 import SeeMoreBtn from "@/components/SeeMoreBtn";
 import Button from "@/components/Button";
+
+// Dados mockados
+import mockData from "@/assets/mocks/serviceRequests";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);

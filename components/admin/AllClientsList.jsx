@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -8,14 +8,18 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import Colors from "@/constants/Colors";
-import clientes from "@/assets/mocks/clientes.json";
 import { useRouter } from "expo-router";
+
+// Dados mockados
+import clientes from "@/assets/mocks/clientes.json";
+
+// Cores
+import Colors from "@/constants/Colors";
 
 const AllClientsList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
-  
+
   const getStatusStyle = (status) => {
     switch (status) {
       case "Em andamento":
@@ -26,14 +30,16 @@ const AllClientsList = () => {
         return { color: Colors.aluminio };
     }
   };
-  
+
   const renderStatus = (status) => {
     if (status === "Finalizado") {
       return <Text style={[styles.status, getStatusStyle(status)]}></Text>;
     }
-    return <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>;
+    return (
+      <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>
+    );
   };
-  
+
   const clientesFiltrados = clientes.filter((cliente) => {
     const termo = filtro.toLowerCase();
     return (
@@ -48,7 +54,7 @@ const AllClientsList = () => {
       style={styles.item}
       onPress={() =>
         router.push({
-          pathname: "./admin/clientInfo",
+          pathname: "./clientInfo",
           params: {
             nome: item.nome,
             cpf: item.cpf,
@@ -73,7 +79,7 @@ const AllClientsList = () => {
         value={filtro}
         onChangeText={setFiltro}
       />
-      
+
       {clientesFiltrados.length === 0 ? (
         <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
       ) : (

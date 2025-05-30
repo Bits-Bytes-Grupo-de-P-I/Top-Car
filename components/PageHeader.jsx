@@ -1,11 +1,13 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+
+// Ícones
+import { FontAwesome6 } from "@expo/vector-icons";
 
 /**
  * Componente de cabeçalho de página com título e botão de voltar
- * 
+ *
  * @param {Object} props - Propriedades do componente
  * @param {string} props.title - Título a ser exibido
  * @param {function} [props.onBackPress] - Função opcional para sobrescrever o comportamento padrão de voltar
@@ -14,12 +16,12 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
  * @param {boolean} [props.hideBackButton] - Se true, esconde o botão de voltar
  */
 
-const PageHeader = ({ 
-  title, 
-  onBackPress, 
+const PageHeader = ({
+  title,
+  onBackPress,
   containerStyle,
   titleStyle,
-  hideBackButton = false
+  hideBackButton = false,
 }) => {
   const router = useRouter();
 
@@ -34,41 +36,43 @@ const PageHeader = ({
   return (
     <View style={[styles.header, containerStyle]}>
       {!hideBackButton && (
-        <TouchableOpacity 
-          onPress={handleBackPress} 
+        <TouchableOpacity
+          onPress={handleBackPress}
           style={styles.backButton}
           activeOpacity={0.7}
         >
           <FontAwesome6 name="arrow-left" size={24} color="#fff" />
         </TouchableOpacity>
       )}
-      <Text style={[styles.title, titleStyle]} numberOfLines={1}>{title}</Text>
+      <Text style={[styles.title, titleStyle]} numberOfLines={1}>
+        {title}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    position: 'relative',
+    borderBottomColor: "#e0e0e0",
+    position: "relative",
   },
   backButton: {
     padding: 8,
-    position: 'absolute',
+    position: "absolute",
     left: 8,
     zIndex: 10,
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
