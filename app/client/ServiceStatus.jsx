@@ -71,7 +71,7 @@ const serviceStatus = () => {
         resizeMode="cover"
       >
         <PageHeader
-          title="Meus Serviços"
+          title="Meus Serviços em andamento"
           containerStyle={{ backgroundColor: Colors.azulClaro }}
           titleStyle={{ color: "#fff" }}
         />
