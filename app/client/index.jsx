@@ -16,7 +16,12 @@ import Card from "@/components/Card";
 import CardWork from "@/components/client/CardWork";
 
 // ÍCONES
-import Entypo from "@expo/vector-icons/Entypo";
+import {
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome,
+  FontAwesome6,
+} from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
@@ -93,32 +98,59 @@ export default function Index() {
                 <Card
                   texto="Meus serviços"
                   cor={Colors.verde}
-                  iconName="car"
                   onPress={navigateToServiceStatus}
-                />
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="car" // tem o ícone "car-on" também
+                    size={30}
+                    color={Colors.verde}
+                  />
+                </Card>
+
                 <Card
                   texto="Serviços pendentes"
                   cor={Colors.laranja}
-                  iconName="triangle-exclamation"
                   onPress={navigateToServicePending}
-                />
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="triangle-exclamation"
+                    size={30}
+                    color={Colors.laranja}
+                  />
+                </Card>
+
                 <Card
                   texto="Solicitar pedido de atendimento"
                   cor={Colors.amarelo}
-                  iconName="pen-to-square"
                   onPress={navigateToServiceRequestForm}
-                />
-                {/* <Card
-                  texto="Dúvidas frequentes"
-                  cor={Colors.azul}
-                  iconName="circle-question"
-                /> */}
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="pen-to-square"
+                    size={30}
+                    color={Colors.amarelo}
+                  />
+                </Card>
+
                 <Card
                   texto="Serviços realizados"
                   cor={Colors.verdeEscuro}
-                  iconName="gear"
                   onPress={navigateToHistoryScreen}
-                />
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="gear"
+                    size={30}
+                    color={Colors.verdeEscuro}
+                  />
+                </Card>
+                {/* <Card
+                    texto="Dúvidas frequentes"
+                    cor={Colors.azul}
+                    iconName="circle-question"
+                  /> */}
               </View>
               {/* Fim Container dos cards */}
 

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const SeeMoreBtn = (props) => {

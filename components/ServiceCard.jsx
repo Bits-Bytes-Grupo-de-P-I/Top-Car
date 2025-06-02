@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 
-// Componentes
-import Badge from "@/components/Badge";
+// COMPONENTES
+import Button from "@/components/Button";
 
-// Ícones
+// ÍCONES
 import { Ionicons } from "@expo/vector-icons";
+
+// CORES
+import Colors from "@/constants/Colors";
 
 /**
  * Componente de card de serviço para exibir serviços pendentes
@@ -43,7 +46,6 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
         <View style={styles.row}>
           <Text style={styles.label}>Veículo:</Text>
           <Text style={styles.value}>{service.vehicle}</Text>
-          {/* {service.isAccepted && <Badge color={Colors.verde} text="ACEITO"/> } */}
         </View>
 
         <View style={styles.row}>
@@ -59,21 +61,27 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
         {/* Botões de ação apenas para a visão de administrador */}
         {isAdminView && (
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.editButton]}
-              onPress={handleEdit}
-            >
-              <Ionicons name="pencil" size={18} color="#FFF" />
-              <Text style={styles.actionText}>Editar</Text>
-            </TouchableOpacity>
+            <Button texto="Editar" cor={Colors.azul} onPress={handleEdit}>
+              <Ionicons
+                name="pencil"
+                size={18}
+                color="#FFF"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
 
-            <TouchableOpacity
-              style={[styles.actionButton, styles.deleteButton]}
+            <Button
+              texto="Excluir"
+              cor={Colors.vermelho}
               onPress={handleDelete}
             >
-              <Ionicons name="trash" size={18} color="#FFF" />
-              <Text style={styles.actionText}>Excluir</Text>
-            </TouchableOpacity>
+              <Ionicons
+                name="trash"
+                size={18}
+                color="#FFF"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
         )}
       </View>

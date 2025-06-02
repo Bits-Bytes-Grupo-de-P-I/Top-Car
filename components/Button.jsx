@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const Button = (props) => {
@@ -23,6 +23,7 @@ export default Button;
 
 const styles = StyleSheet.create({
   btn: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,

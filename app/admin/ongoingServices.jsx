@@ -1,3 +1,5 @@
+// Tela para visualização dos serviços em andamento
+
 import {
   StyleSheet,
   Text,
@@ -9,11 +11,11 @@ import { SafeAreaView } from "react-native-safe-area-context"; // Esse import pr
 import { useState } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";
 
-// Componentes
+// COMPONENTES
 import OngoingServiceCard from "@/components/admin/OngoingServiceCard";
 import PageHeader from "@/components/PageHeader";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const ongoingServices = () => {

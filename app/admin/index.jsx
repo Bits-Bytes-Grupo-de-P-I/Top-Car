@@ -1,114 +1,33 @@
+// Tela inical com os cards e lista de clientes reduzida
+
 import {
   Text,
   View,
   StyleSheet,
-  FlatList,
+  ScrollView,
   ImageBackground,
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
-// Componentes
+// COMPONENTES
 import Card from "@/components/Card";
 import ShortClientList from "@/components/admin/ShortClientList";
 import BackToHomeButton from "@/components/BackToHomeButton";
 
-// Ícones
-import {Entypo} from "@expo/vector-icons";
+// ÍCONES
+import {
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome6,
+} from "@expo/vector-icons";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 export default function Index() {
   const router = useRouter();
-
-  // Componentes renderizadores organizados por tipo
-  const renderComponents = {
-    title: ({ data }) => (
-      <View style={styles.containerTitulo}>
-        <Text style={styles.titulo}>{data.text}</Text>
-      </View>
-    ),
-
-    adminButton: () => (
-      <View style={styles.containerAdminButton}>
-        <Text>Página do administrador</Text>
-        <BackToHomeButton />
-      </View>
-    ),
-
-    cards: () => (
-      <View style={styles.containerCards}>
-        <Card
-          texto="Cadastrar novo cliente"
-          cor={Colors.verde}
-          iconName="user-plus"
-          onPress={() => router.push("./admin/clientSignUp")}
-        />
-        <Card
-          texto="Pedidos de serviço"
-          cor={Colors.azulClaro}
-          iconName="car"
-          onPress={() => router.push("./admin/serviceRequests")}
-        />
-        <Card
-          texto="Serviços em andamento"
-          cor={Colors.amarelo}
-          iconName="clock"
-          onPress={() => router.push("./admin/ongoingServices")}
-        />
-        <Card
-          texto="Serviços em pendência"
-          cor={Colors.laranja}
-          iconName="triangle-exclamation"
-          onPress={() => router.push("./admin/pendingServices")}
-        />
-        <Card
-          texto="Gerar nota de serviço avulsa"
-          cor={Colors.grafite}
-          iconName="table-list"
-          onPress={() => router.push("./admin/serviceBill")}
-        />
-      </View>
-    ),
-
-    ShortClientList: () => (
-      <View style={styles.containerShortClientList}>
-        <ShortClientList />
-      </View>
-    ),
-  };
-
-  // Dados para o FlatList
-  const sections = [
-    {
-      type: "title",
-      data: { text: "início" },
-    },
-    {
-      type: "adminButton",
-      data: {},
-    },
-    {
-      type: "cards",
-      data: {},
-    },
-    {
-      type: "title",
-      data: { text: "Clientes" },
-    },
-    {
-      type: "ShortClientList",
-      data: {},
-    },
-  ];
-
-  // Renderizar usando o mapeamento de componentes
-  const renderItem = ({ item }) => {
-    const Component = renderComponents[item.type];
-    return Component ? Component(item) : null;
-  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -117,7 +36,7 @@ export default function Index() {
         style={styles.background}
         resizeMode="cover"
       >
-        {/* Barra do topo (fora da FlatList) */}
+        {/* Barra do topo */}
         <View style={styles.barraTopo}>
           <Image
             source={require("@/assets/images/logo.png")}
@@ -127,14 +46,97 @@ export default function Index() {
           <Entypo name="login" size={24} color="white" />
         </View>
 
-        {/* Container principal - usando FlatList em vez de ScrollView */}
-        <FlatList
-          data={sections}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.listContainer}
+        {/* Container principal - usando ScrollView */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={true}
-        />
+        >
+          {/* Título Início */}
+          <View style={styles.containerTitulo}>
+            <Text style={styles.titulo}>início</Text>
+          </View>
+
+          {/* Botão Admin */}
+          <View style={styles.containerAdminButton}>
+            <Text>Página do administrador</Text>
+            <BackToHomeButton />
+          </View>
+
+          {/* Cards */}
+          <View style={styles.containerCards}>
+            <Card
+              texto="Cadastrar novo cliente"
+              cor={Colors.verde}
+              onPress={() => router.push("./admin/clientSignUp")}
+            >
+              <FontAwesome6
+                style={{ marginBottom: 4 }}
+                name="user-plus"
+                size={30}
+                color={Colors.verde}
+              />
+            </Card>
+            <Card
+              texto="Pedidos de serviço"
+              cor={Colors.azulClaro}
+              onPress={() => router.push("./admin/serviceRequests")}
+            >
+              <FontAwesome6
+                style={{ marginBottom: 4 }}
+                name="car"
+                size={30}
+                color={Colors.azulClaro}
+              />
+            </Card>
+            <Card
+              texto="Serviços em andamento"
+              cor={Colors.amarelo}
+              onPress={() => router.push("./admin/ongoingServices")}
+            >
+              <FontAwesome6
+                style={{ marginBottom: 4 }}
+                name="clock"
+                size={30}
+                color={Colors.amarelo}
+              />
+            </Card>
+            <Card
+              texto="Serviços em pendência"
+              cor={Colors.laranja}
+              onPress={() => router.push("./admin/pendingServices")}
+            >
+              <FontAwesome6
+                style={{ marginBottom: 4 }}
+                name="triangle-exclamation"
+                size={30}
+                color={Colors.laranja}
+              />
+            </Card>
+            <Card
+              texto="Gerar nota de serviço avulsa"
+              cor={Colors.grafite}
+              iconName="table-list"
+              onPress={() => router.push("./admin/serviceBill")}
+            >
+              <FontAwesome6
+                style={{ marginBottom: 4 }}
+                name="table-list"
+                size={30}
+                color={Colors.grafite}
+              />
+            </Card>
+          </View>
+
+          {/* Título Clientes */}
+          <View style={styles.containerTitulo}>
+            <Text style={styles.titulo}>Clientes</Text>
+          </View>
+
+          {/* Lista de Clientes */}
+          <View style={styles.containerShortClientList}>
+            <ShortClientList />
+          </View>
+        </ScrollView>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  listContainer: {
+  scrollContainer: {
     padding: 20,
     paddingBottom: 64,
   },

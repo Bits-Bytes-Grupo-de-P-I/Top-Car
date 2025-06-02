@@ -1,3 +1,5 @@
+// Tela para visualizar os pedidos feitos pelos clientes
+
 import {
   StyleSheet,
   Text,
@@ -11,15 +13,15 @@ import { SafeAreaView } from "react-native-safe-area-context"; // Esse import pr
 import { useState } from "react";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 
-// Componentes
+// COMPONENTES
 import PageHeader from "@/components/PageHeader";
 import SeeMoreBtn from "@/components/SeeMoreBtn";
 import Button from "@/components/Button";
 
-// Dados mockados
+// DADOS MOCKADOS
 import mockData from "@/assets/mocks/serviceRequests";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const serviceRequests = () => {
@@ -173,12 +175,26 @@ const serviceRequests = () => {
                         cor={Colors.vermelho}
                         texto="Rejeitar"
                         onPress={() => handleReject(selectedPedido.id)}
-                      ></Button>
+                      >
+                        <MaterialIcons
+                          name="cancel"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 5 }}
+                        />
+                      </Button>
                       <Button
                         cor={Colors.verde}
                         texto="Aceitar"
                         onPress={() => handleAccept(selectedPedido.id)}
-                      ></Button>
+                      >
+                        <MaterialIcons
+                          name="check-circle"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 5 }}
+                        />
+                      </Button>
                     </View>
                   </>
                 )}

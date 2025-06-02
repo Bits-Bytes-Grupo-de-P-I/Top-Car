@@ -9,35 +9,18 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-// Dados mockados
+// COMPONENTES
+import Badge from "../Badge";
+
+// MOCKS
 import clientes from "@/assets/mocks/clientes.json";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const ShortClientList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
-
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Em andamento":
-        return { color: Colors.verde };
-      case "Pendente":
-        return { color: Colors.laranja };
-      default:
-        return { color: Colors.aluminio };
-    }
-  };
-
-  const renderStatus = (status) => {
-    if (status === "Finalizado") {
-      return <Text style={[styles.status, getStatusStyle(status)]}></Text>;
-    }
-    return (
-      <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>
-    );
-  };
 
   const clientesFiltrados = clientes.filter((cliente) => {
     const termo = filtro.toLowerCase();
@@ -52,7 +35,7 @@ const ShortClientList = () => {
   const mostrarClientes = clientesFiltrados.slice(0, 5);
 
   // Renderizar cada cliente individualmente
-  const renderClientes = () => {
+  const renderClients = () => {
     return mostrarClientes.map((cliente) => (
       <TouchableOpacity
         key={cliente.id.toString()}
@@ -70,7 +53,14 @@ const ShortClientList = () => {
       >
         <View style={styles.nomeStatus}>
           <Text style={styles.nome}>{cliente.nome}</Text>
-          {renderStatus(cliente.status)}
+          {cliente.status !== "Finalizado" && (
+            <Badge
+              text={cliente.status}
+              color={
+                cliente.status === "Pendente" ? Colors.laranja : Colors.azul
+              }
+            />
+          )}
         </View>
         <Text style={styles.cpf}>CPF: {cliente.cpf}</Text>
       </TouchableOpacity>
@@ -90,7 +80,7 @@ const ShortClientList = () => {
         <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
       ) : (
         <View style={styles.clientesContainer}>
-          {renderClientes()}
+          {renderClients()}
 
           {clientesFiltrados.length > 5 && (
             <TouchableOpacity

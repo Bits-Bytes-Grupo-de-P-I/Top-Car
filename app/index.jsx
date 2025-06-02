@@ -1,5 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+
+// CORES
 import Colors from "@/constants/Colors";
 
 export default function Index() {

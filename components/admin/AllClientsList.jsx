@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
+// COMPONENTES
+import Badge from "../Badge";
+
 // Dados mockados
 import clientes from "@/assets/mocks/clientes.json";
 
@@ -20,36 +23,16 @@ const AllClientsList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Em andamento":
-        return { color: Colors.verde };
-      case "Pendente":
-        return { color: Colors.laranja };
-      default:
-        return { color: Colors.aluminio };
-    }
-  };
-
-  const renderStatus = (status) => {
-    if (status === "Finalizado") {
-      return <Text style={[styles.status, getStatusStyle(status)]}></Text>;
-    }
-    return (
-      <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>
-    );
-  };
-
-  const clientesFiltrados = clientes.filter((cliente) => {
+  const clientesFiltrados = clientes.filter((client) => {
     const termo = filtro.toLowerCase();
     return (
-      cliente.nome.toLowerCase().includes(termo) ||
-      cliente.cpf.toLowerCase().includes(termo) ||
-      cliente.status.toLowerCase().includes(termo)
+      client.nome.toLowerCase().includes(termo) ||
+      client.cpf.toLowerCase().includes(termo) ||
+      client.status.toLowerCase().includes(termo)
     );
   });
 
-  const renderItem = ({ item }) => (
+  const renderClients = ({ item }) => ( // A flatlist precisa que que os parâmetros sejam "items"
     <TouchableOpacity
       style={styles.item}
       onPress={() =>
@@ -65,7 +48,14 @@ const AllClientsList = () => {
     >
       <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
-        {renderStatus(item.status)}
+        {item.status !== "Finalizado" && (
+          <Badge
+            text={item.status}
+            color={
+              item.status === "Pendente" ? Colors.laranja : Colors.azul
+            }
+          />
+        )}
       </View>
       <Text style={styles.cpf}>CPF: {item.cpf}</Text>
     </TouchableOpacity>
@@ -85,7 +75,7 @@ const AllClientsList = () => {
       ) : (
         <FlatList
           data={clientesFiltrados}
-          renderItem={renderItem}
+          renderItem={renderClients}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.flatListContent}

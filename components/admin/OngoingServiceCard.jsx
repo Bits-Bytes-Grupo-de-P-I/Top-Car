@@ -8,14 +8,13 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-
 // Componentes
 import Badge from "../Badge";
 import ServiceStatus from "../ServiceStatus";
 import Button from "../Button";
 
 // ícones
-import { FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 // Cores
 import Colors from "@/constants/Colors";
@@ -80,7 +79,13 @@ const OngoingServiceCard = ({ item, onPress }) => {
             <Text style={styles.infoText}>{item.dataAgendada}</Text>
           </View>
         </View>
-        <View style={styles.statusContainer}>
+        <View
+          style={styles.statusContainer}
+          onStartShouldSetResponder={() => true}
+          onResponderGrant={() => {
+            // Impede que o toque seja propagado para o TouchableOpacity pai, fazendo com que abra o card ao invés do dropdown
+          }}
+        >
           <ServiceStatus />
         </View>
       </TouchableOpacity>
@@ -165,15 +170,29 @@ const OngoingServiceCard = ({ item, onPress }) => {
             {/* Ações do Modal */}
             <View style={styles.modalActions}>
               <Button
-                cor="azulClaro"
+                cor={Colors.azulClaro}
                 texto="Atualizar"
                 onPress={handleUpdateService}
-              />
+              >
+                <Ionicons
+                  name="pencil"
+                  size={18}
+                  color="#FFF"
+                  style={{ marginRight: 5 }}
+                />
+              </Button>
               <Button
-                cor="verde"
+                cor={Colors.verde}
                 texto="Finalizar"
                 onPress={handleFinishService}
-              />
+              >
+                <MaterialIcons
+                  name="check-circle"
+                  size={18}
+                  color="white"
+                  style={{ marginRight: 5 }}
+                />
+              </Button>
             </View>
           </View>
         </View>

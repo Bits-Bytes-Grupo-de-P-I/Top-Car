@@ -2,6 +2,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 
+// CORES
+import Colors from "@/constants/Colors";
+
 export default function CardOficina() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -208,11 +211,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     width: "100%",
+    marginTop: 16,
     marginBottom: 16,
     overflow: "hidden",
   },
   header: {
-    backgroundColor: "#2563EB", // blue-600
+    backgroundColor: Colors.azul, // blue-600
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: "row",
@@ -230,10 +234,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   openBadge: {
-    backgroundColor: "#10B981", // green-500
+    backgroundColor: Colors.verde // green-500
   },
   closedBadge: {
-    backgroundColor: "#EF4444", // red-500
+    backgroundColor: Colors.vermelho // red-500
   },
   statusText: {
     color: "#FFFFFF",
@@ -261,7 +265,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   scheduleButton: {
-    backgroundColor: "#3B82F6", // blue-500
+    backgroundColor: Colors.azul,
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -309,7 +313,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   serviceTagText: {
-    color: "#1E40AF", // blue-800
+    color: Colors.azul // blue-800
   },
   footer: {
     flexDirection: "row",
@@ -333,6 +337,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   mapButtonText: {
-    color: "#1D4ED8", // blue-700
+    color: Colors.azul // blue-700
   },
 });

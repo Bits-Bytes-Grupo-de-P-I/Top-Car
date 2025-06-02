@@ -1,3 +1,5 @@
+// Tela para visualização dos serviços pendentes criados pelo admin
+
 import {
   View,
   Text,
@@ -8,14 +10,14 @@ import {
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
-// Componentes
+// COMPONENTES
 import PageHeader from "@/components/PageHeader";
 import ServiceCard from "@/components/ServiceCard";
 
-// Dados mockados
+// MOCKS
 import mockServices from "@/assets/mocks/pendenciasMock.json";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 /**

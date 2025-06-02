@@ -1,12 +1,13 @@
+// Tela para a visualização da lista de todos os clientes cadastrados
+
 import { View, StyleSheet, ImageBackground } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-// Componentes
+// COMPONENTES
 import PageHeader from "@/components/PageHeader";
 import AllClientsList from "@/components/admin/AllClientsList";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 export default function AllClients() {
@@ -21,7 +22,7 @@ export default function AllClients() {
         <PageHeader
           title="Todos os Clientes"
           containerStyle={{ backgroundColor: Colors.azulClaro }}
-          titleStyle={{ color: "#fff" }}
+          titleStyle={{ color: "white" }}
         />
 
         {/* Container conteudo */}

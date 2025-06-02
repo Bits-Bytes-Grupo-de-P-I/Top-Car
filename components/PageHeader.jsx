@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
-// Ícones
+// ÍCONES
 import { FontAwesome6 } from "@expo/vector-icons";
 
 /**

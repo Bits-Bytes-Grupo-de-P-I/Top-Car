@@ -6,10 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-// Ícones
-import { FontAwesome6 } from "@expo/vector-icons";
-
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const Card = (props) => {
@@ -21,12 +18,7 @@ const Card = (props) => {
         onPress={props.onPress}
       >
         <View>
-          <FontAwesome6
-            style={{ marginBottom: 4 }}
-            name={props.iconName}
-            size={30}
-            color={props.cor}
-          />
+          {props.children}
           <Text style={styles.texto}>{props.texto}</Text>
         </View>
       </TouchableOpacity>

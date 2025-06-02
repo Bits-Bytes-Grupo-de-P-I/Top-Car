@@ -1,7 +1,7 @@
 import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
 import { useState, useEffect } from "react";
 
-// Cores
+// CORES
 import Colors from "@/constants/Colors";
 
 const Slider = ({ value, onChange, onPress }) => {

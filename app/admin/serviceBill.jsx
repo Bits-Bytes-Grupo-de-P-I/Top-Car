@@ -1,3 +1,5 @@
+// Tela para visualizar as informações da nota de serviço e gerar um PDF dela
+
 import {
   StyleSheet,
   Text,
@@ -11,9 +13,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+
+// COMPONENTES
 import PageHeader from "@/components/PageHeader";
+import BillClientContent from "@/components/admin/BillClientContent";
+import Button from "@/components/Button";
+
+// ÍCONES
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
+// CORES
 import Colors from "@/constants/Colors";
+import BillVehicleContent from "../../components/admin/BillVehicleContent";
 
 const NotaServico = () => {
   // States para definir se a seção está expandida ou não
@@ -38,7 +49,7 @@ const NotaServico = () => {
     servicos: null,
   });
 
-  // Dados mockados baseados nos arquivos fornecidos
+  // MOCKS
   const [dadosNota, setDadosNota] = useState({
     cliente: {
       nome: "João Silva",
@@ -102,6 +113,7 @@ const NotaServico = () => {
   // Estados temporários para edição/adição
   const [tempData, setTempData] = useState({});
 
+  // FUNÇÃO PARA EXPANDIR SEÇÃO
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
@@ -109,6 +121,7 @@ const NotaServico = () => {
     }));
   };
 
+  // FUNÇÃO PARA ABRIR MODAL
   const openModal = (section, index = null) => {
     if ((section === "produtos" || section === "servicos") && index !== null) {
       // Editing existing item
@@ -153,6 +166,7 @@ const NotaServico = () => {
     }));
   };
 
+  // FUNÇÃO PARA FECHAR MODAL
   const closeModal = (section) => {
     setModalsVisible((prev) => ({
       ...prev,
@@ -162,12 +176,13 @@ const NotaServico = () => {
     setEditingIndex((prev) => ({ ...prev, [section]: null }));
   };
 
+  // FUNÇÃO PARA SALVAR AS MUDANÇAS
   const saveChanges = (section) => {
     if (section === "produtos") {
       setDadosNota((prev) => {
         const updatedProdutos = [...prev.produtos];
         if (editingIndex.produtos === -1) {
-          // Adding new
+          // ADICIONAR NOVO PRODUTO
           const newProduto = {
             ...tempData,
             quantidade: Number(tempData.quantidade),
@@ -177,7 +192,7 @@ const NotaServico = () => {
           };
           updatedProdutos.push(newProduto);
         } else {
-          // Editing
+          // EDITANDO
           const index = editingIndex.produtos;
           const updatedProduto = {
             ...tempData,
@@ -221,6 +236,7 @@ const NotaServico = () => {
     Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
   };
 
+  // FUNÇÃO PARA DELETAR ITEM
   const deleteItem = (section, index) => {
     Alert.alert(
       "Confirmar exclusão",
@@ -251,6 +267,7 @@ const NotaServico = () => {
     );
   };
 
+  // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DOS SERVIÇOS
   const calcularTotalProdutos = () => {
     return dadosNota.produtos.reduce(
       (total, produto) => total + produto.valorTotal,
@@ -258,6 +275,7 @@ const NotaServico = () => {
     );
   };
 
+  // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DOS SERVIÇOS
   const calcularTotalServicos = () => {
     return dadosNota.servicos.reduce(
       (total, servico) => total + servico.valorMaoDeObra,
@@ -265,10 +283,12 @@ const NotaServico = () => {
     );
   };
 
+  // FUNÇÃO PARA CALCUÇAR O PREÇO TOTAL DE TUDO
   const calcularTotalGeral = () => {
     return calcularTotalProdutos() + calcularTotalServicos();
   };
 
+  // FUNÇÃO PARA GERAR PDF
   const gerarPDF = () => {
     Alert.alert(
       "Gerar PDF",
@@ -276,12 +296,14 @@ const NotaServico = () => {
     );
   };
 
+  // FUNÇÃO PARA RENDERIZAR CADA SEÇÃO
   const renderSection = (title, sectionKey, content, addButton) => {
     const isExpanded = expandedSections[sectionKey];
 
     return (
       <View
         style={[
+          // Esse estilo serve para arredondar as bordas exteriores dos cards das bordas
           styles.sectionContainer,
           title === "CLIENTE" && {
             borderTopLeftRadius: 10,
@@ -300,6 +322,7 @@ const NotaServico = () => {
           <Text style={styles.sectionTitle}>{title}</Text>
           <View style={styles.headerIcons}>
             {title === "CLIENTE" || title === "VEÍCULO" ? (
+              // os botões de editar vão aparecer apenas nos cards CLIENTE e VEÍCULO
               <TouchableOpacity
                 style={styles.editIcon}
                 onPress={() => openModal(sectionKey)}
@@ -325,62 +348,13 @@ const NotaServico = () => {
     );
   };
 
-  const renderClienteContent = () => (
-    <View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Nome:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.nome}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Documento:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.documento}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Telefone:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.telefone}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Endereço:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.endereco}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Cidade:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.cidade}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>CEP:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.cep}</Text>
-      </View>
-    </View>
-  );
+  // CONTEÚDO DO CLIENTE
+  const renderClienteContent = () => <BillClientContent />;
 
-  const renderVeiculoContent = () => (
-    <View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Marca/Modelo:</Text>
-        <Text style={styles.value}>
-          {dadosNota.veiculo.marca} {dadosNota.veiculo.modelo}
-        </Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Ano:</Text>
-        <Text style={styles.value}>{dadosNota.veiculo.ano}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Cor:</Text>
-        <Text style={styles.value}>{dadosNota.veiculo.cor}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Placa:</Text>
-        <Text style={styles.value}>{dadosNota.veiculo.placa}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.label}>Quilometragem:</Text>
-        <Text style={styles.value}>{dadosNota.veiculo.km}</Text>
-      </View>
-    </View>
-  );
+  // CONTEÚDO DO VEÍCULO
+  const renderVeiculoContent = () => <BillVehicleContent />;
 
+  // CONTEÚDO DOS PRODUTOS
   const renderProdutosContent = () => (
     <View>
       {dadosNota.produtos.map((produto, index) => (
@@ -397,7 +371,7 @@ const NotaServico = () => {
               style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
             >
               <TouchableOpacity onPress={() => openModal("produtos", index)}>
-                <Ionicons name="pencil" size={15} color={Colors.azul} />
+                <Ionicons name="pencil" size={18} color={Colors.azul} style={{marginRight: 5}}/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteItem("produtos", index)}>
                 <Ionicons name="trash" size={18} color={Colors.vermelho} />
@@ -425,6 +399,7 @@ const NotaServico = () => {
     </View>
   );
 
+  // CONTEÚDO DOS SERVIÇOS
   const renderServicosContent = () => (
     <View>
       {dadosNota.servicos.map((servico, index) => (
@@ -441,7 +416,7 @@ const NotaServico = () => {
               style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
             >
               <TouchableOpacity onPress={() => openModal("servicos", index)}>
-                <Ionicons name="pencil" size={15} color={Colors.azul} />
+                <Ionicons name="pencil" size={18} color={Colors.azul} style={{marginRight: 2}}/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteItem("servicos", index)}>
                 <Ionicons name="trash" size={18} color={Colors.vermelho} />
@@ -464,6 +439,7 @@ const NotaServico = () => {
     </View>
   );
 
+  // BOTÃO DE ADICIONAR
   const renderAddButton = (section) => (
     <TouchableOpacity
       style={styles.addButton}
@@ -476,7 +452,7 @@ const NotaServico = () => {
     </TouchableOpacity>
   );
 
-  // Modais de edição
+  // MODAL DO CLIENTE
   const renderClienteModal = () => (
     <Modal
       visible={modalsVisible.cliente}
@@ -572,25 +548,38 @@ const NotaServico = () => {
           </ScrollView>
 
           <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Button
+              texto="Cancelar"
+              cor={Colors.vermelho}
               onPress={() => closeModal("cliente")}
             >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="cancel"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
 
-            <TouchableOpacity
-              style={styles.saveButton}
+            <Button
+              texto="Salvar"
+              cor={Colors.verde}
               onPress={() => saveChanges("cliente")}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="check-circle"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
         </View>
       </View>
     </Modal>
   );
 
+  // MODAL DO VEÍCULO
   const renderVeiculoModal = () => (
     <Modal
       visible={modalsVisible.veiculo}
@@ -686,25 +675,38 @@ const NotaServico = () => {
           </ScrollView>
 
           <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Button
+              texto="Cancelar"
+              cor={Colors.vermelho}
               onPress={() => closeModal("veiculo")}
             >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="cancel"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
 
-            <TouchableOpacity
-              style={styles.saveButton}
+            <Button
+              texto="Salvar"
+              cor={Colors.verde}
               onPress={() => saveChanges("veiculo")}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="check-circle"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
         </View>
       </View>
     </Modal>
   );
 
+  // MODAL DOS PRODUTOS
   const renderProdutosModal = () => (
     <Modal
       visible={modalsVisible.produtos}
@@ -784,24 +786,38 @@ const NotaServico = () => {
             </View>
           </ScrollView>
           <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Button
+              texto="Cancelar"
+              cor={Colors.vermelho}
               onPress={() => closeModal("produtos")}
             >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
+              <MaterialIcons
+                name="cancel"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
+
+            <Button
+              texto="Salvar"
+              cor={Colors.verde}
               onPress={() => saveChanges("produtos")}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="check-circle"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
         </View>
       </View>
     </Modal>
   );
 
+  // MODAL DOS SERVIÇOS
   const renderServicosModal = () => (
     <Modal
       visible={modalsVisible.servicos}
@@ -865,18 +881,31 @@ const NotaServico = () => {
             </View>
           </ScrollView>
           <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={styles.cancelButton}
+            <Button
+              texto="Cancelar"
+              cor={Colors.vermelho}
               onPress={() => closeModal("servicos")}
             >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.saveButton}
+              <MaterialIcons
+                name="cancel"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
+
+            <Button
+              texto="Salvar"
+              cor={Colors.verde}
               onPress={() => saveChanges("servicos")}
             >
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
+              <MaterialIcons
+                name="check-circle"
+                size={18}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
         </View>
       </View>
@@ -933,10 +962,14 @@ const NotaServico = () => {
 
           {/* Botões */}
           <View style={styles.botoesContainer}>
-            <TouchableOpacity style={styles.botaoPrimario} onPress={gerarPDF}>
-              <Ionicons name="document-text" size={20} color="white" />
-              <Text style={styles.textoBotaoPrimario}>Gerar PDF</Text>
-            </TouchableOpacity>
+            <Button texto="Gerar PDF" cor={Colors.azul} onPress={gerarPDF}>
+              <Ionicons
+                name="document-text"
+                size={20}
+                color="white"
+                style={{ marginRight: 5 }}
+              />
+            </Button>
           </View>
 
           {/* Modais */}
@@ -988,7 +1021,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderStyle: "dashed",
-    borderBottomColor: Colors.aluminio,
+    borderBottomColor: "#666",
   },
   headerIcons: {
     flexDirection: "row",
@@ -1009,6 +1042,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     marginBottom: 12,
+    justifyContent: "space-between",
     alignItems: "flex-start",
   },
   label: {
@@ -1024,7 +1058,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemContainer: {
-    backgroundColor: Colors.cinzaClaro,
+    backgroundColor: "#e9e9e9",
     padding: 12,
     borderRadius: 10,
     marginBottom: 8,
