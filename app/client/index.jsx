@@ -1,49 +1,55 @@
+// Página inicial do cliente
+
 import {
   Text,
   View,
   StyleSheet,
   ScrollView,
   ImageBackground,
+  Image,
 } from "react-native";
-
-import { SafeAreaView } from "react-native-safe-area-context"; //import para concertar a tela no celular
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 
+// COMPONENTES
+import Card from "@/components/Card";
+import CardWork from "@/components/client/CardWork";
+
+// ÍCONES
+import {
+  Entypo,
+  MaterialCommunityIcons,
+  FontAwesome,
+  FontAwesome6,
+} from "@expo/vector-icons";
+
+// CORES
 import Colors from "@/constants/Colors";
-// Ícones
-import Entypo from "@expo/vector-icons/Entypo";
 
-// Componentes
-import Button from "@/components/ui/Button";
-import Slider from "@/components/ui/Slider";
-import InputField from "@/components/ui/InputField";
-import Emergency from "@/components/ui/Emergency";
-import StatusDeServico from "@/components/ui/StatusDeServico";
-import Card from "@/components/ui/Card";
-import SeeMoreBtn from "@/components/ui/SeeMoreBtn";
-import StandardServices from "@/components/ui/StandardServices";
-import ClientList from "@/components/ui/ClientList";
-
-import CardWork from "@/components/ui/CardWork";
-
-// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO
-import BackToHomeButton from "@/components/ui/BackToHomeButton";
+// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO .
+import BackToHomeButton from "@/components/BackToHomeButton";
 
 export default function Index() {
   const router = useRouter();
 
+  const navigateToServiceStatus = () => {
+    router.push("/client/serviceStatus");
+  };
+
   const navigateToServicePending = () => {
-    router.push("/client/ServicePending");
+    router.push("/client/servicePending");
   };
 
   const navigateToHistoryScreen = () => {
-    router.push("/client/HistoryScreen");
+    router.push("/client/serviceHistory");
+  };
+
+  const navigateToServiceRequestForm = () => {
+    router.push("/client/serviceRequestForm");
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {" "}
-      {/* SafeAreaView para concertar a tela no celular */}
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -57,17 +63,10 @@ export default function Index() {
           <View>
             {/* Barra do topo */}
             <View style={styles.barraTopo}>
-              <Text
-                style={{
-                  fontFamily: "DM-Sans",
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  fontStyle: "italic",
-                  color: "white",
-                }}
-              >
-                Top Car
-              </Text>
+              <Image
+                source={require("@/assets/images/logo.png")}
+                style={{ width: 120, height: 120 }}
+              />
               <Entypo name="login" size={24} color="white" />
             </View>
             {/* Fim Barra do topo */}
@@ -96,32 +95,61 @@ export default function Index() {
               {/* Container dos cards */}
               <View style={styles.containerCards}>
                 <Card
-                  texto="Status do serviço"
+                  texto="Meus serviços em andamento"
                   cor={Colors.verde}
-                  iconName="car"
-                />
+                  onPress={navigateToServiceStatus}
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="car" // tem o ícone "car-on" também
+                    size={30}
+                    color={Colors.verde}
+                  />
+                </Card>
+
                 <Card
                   texto="Serviços pendentes"
                   cor={Colors.laranja}
-                  iconName="triangle-exclamation"
                   onPress={navigateToServicePending}
-                />
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="triangle-exclamation"
+                    size={30}
+                    color={Colors.laranja}
+                  />
+                </Card>
+
                 <Card
-                  texto="Gerar pedido de atendimento"
+                  texto="Solicitar pedido de atendimento"
                   cor={Colors.amarelo}
-                  iconName="pen-to-square"
-                />
-                {/* <Card
-                  texto="Dúvidas frequentes"
-                  cor={Colors.azul}
-                  iconName="circle-question"
-                /> */}
+                  onPress={navigateToServiceRequestForm}
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="pen-to-square"
+                    size={30}
+                    color={Colors.amarelo}
+                  />
+                </Card>
+
                 <Card
                   texto="Serviços realizados"
                   cor={Colors.verdeEscuro}
-                  iconName="gear"
                   onPress={navigateToHistoryScreen}
-                />
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="gear"
+                    size={30}
+                    color={Colors.verdeEscuro}
+                  />
+                </Card>
+                {/* <Card
+                    texto="Dúvidas frequentes"
+                    cor={Colors.azul}
+                    iconName="circle-question"
+                  /> */}
               </View>
               {/* Fim Container dos cards */}
 
@@ -172,30 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  containerClientList: {
+  containerShortClientList: {
     width: "100%",
   },
-
-  // //suahsuhaushaushauhsaushauhsuahs
-
-  // container: {
-  //   flex: 1,
-  //   padding: 16,
-  // },
-  // welcomeTitle: {
-  //   fontSize: 20,
-  //   color: '#6B7280', // gray-600
-  // },
-  // appTitle: {
-  //   fontSize: 32,
-  //   fontWeight: 'bold',
-  //   color: '#1F2937', // gray-800
-  //   marginBottom: 24,
-  // },
-  // sectionTitle: {
-  //   fontSize: 18,
-  //   fontWeight: '600',
-  //   color: '#4B5563', // gray-700
-  //   marginBottom: 12,
-  // },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -8,60 +8,54 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import Colors from "@/constants/Colors";
+import { useRouter } from "expo-router";
+
+// COMPONENTES
+import Badge from "../Badge";
+
+// Dados mockados
 import clientes from "@/assets/mocks/clientes.json";
 
-import { useRouter } from "expo-router";
-const router = useRouter();
+// Cores
+import Colors from "@/constants/Colors";
 
-const getStatusStyle = (status) => {
-  switch (status) {
-    case "Em andamento":
-      return { color: Colors.verde };
-    case "Pendente":
-      return { color: Colors.laranja };
-    default:
-      return { color: Colors.aluminio };
-  }
-};
-
-const renderStatus = (status) => {
-  if (status === "Finalizado") {
-    return <Text style={[styles.status, getStatusStyle(status)]}></Text>;
-  }
-  return <Text style={[styles.status, getStatusStyle(status)]}>{status}</Text>;
-};
-
-const ClientList = () => {
+const AllClientsList = () => {
+  const router = useRouter();
   const [filtro, setFiltro] = useState("");
 
-  const clientesFiltrados = clientes.filter((cliente) => {
+  const clientesFiltrados = clientes.filter((client) => {
     const termo = filtro.toLowerCase();
     return (
-      cliente.nome.toLowerCase().includes(termo) ||
-      cliente.cpf.toLowerCase().includes(termo) ||
-      cliente.status.toLowerCase().includes(termo)
+      client.nome.toLowerCase().includes(termo) ||
+      client.cpf.toLowerCase().includes(termo) ||
+      client.status.toLowerCase().includes(termo)
     );
   });
 
-  const renderItem = ({ item }) => (
+  const renderClients = ({ item }) => ( // A flatlist precisa que que os parâmetros sejam "items"
     <TouchableOpacity
       style={styles.item}
       onPress={() =>
         router.push({
-          pathname: "./admin/clientInfo",
+          pathname: "./clientInfo",
           params: {
             nome: item.nome,
             cpf: item.cpf,
             status: item.status,
-            // passe outros dados conforme necessário
           },
         })
       }
     >
       <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
-        {renderStatus(item.status)}
+        {item.status !== "Finalizado" && (
+          <Badge
+            text={item.status}
+            color={
+              item.status === "Pendente" ? Colors.laranja : Colors.azul
+            }
+          />
+        )}
       </View>
       <Text style={styles.cpf}>CPF: {item.cpf}</Text>
     </TouchableOpacity>
@@ -75,15 +69,14 @@ const ClientList = () => {
         value={filtro}
         onChangeText={setFiltro}
       />
+
       {clientesFiltrados.length === 0 ? (
         <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
       ) : (
         <FlatList
           data={clientesFiltrados}
+          renderItem={renderClients}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          nestedScrollEnabled={true}
-          scrollEnabled={true}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.flatListContent}
         />
@@ -92,16 +85,15 @@ const ClientList = () => {
   );
 };
 
-export default ClientList;
+export default AllClientsList;
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     borderRadius: 10,
     padding: 16,
     backgroundColor: Colors.azulClaro,
-    margin: 0,
     width: "100%",
-    height: 400, // altura fixa em vez de maxHeight
   },
   flatListContent: {
     paddingBottom: 8,

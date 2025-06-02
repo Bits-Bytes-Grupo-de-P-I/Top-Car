@@ -1,25 +1,26 @@
-import { StyleSheet, View, TouchableHighlight, Animated } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
 import { useState, useEffect } from "react";
+
+// CORES
 import Colors from "@/constants/Colors";
 
-const Slider = ({value, onChange}) => {
+const Slider = ({ value, onChange, onPress }) => {
   const [state, setState] = useState(value || false);
   const [sliderPosition, setSliderPosition] = useState("flex-start");
-
   // Criar uma variável animada para a posição do slider
   const position = useState(new Animated.Value(0))[0]; // Começa em 0 (flex-start)
 
   useEffect(() => {
     Animated.timing(position, {
-      toValue: sliderPosition === "flex-end" ? 30 : 0, // 40px
+      toValue: sliderPosition === "flex-end" ? 30 : 0, // 30px
       duration: 150,
       useNativeDriver: false,
     }).start();
   }, [sliderPosition]); // O efeito é disparado sempre que sliderPosition mudar
 
   return (
-     <View>
-      <TouchableHighlight
+    <View>
+      <TouchableOpacity
         underlayColor={Colors.aluminio}
         style={[
           styles.container,
@@ -29,13 +30,17 @@ const Slider = ({value, onChange}) => {
         onPress={() => {
           const newState = !state;
           const newPosition = newState ? "flex-end" : "flex-start";
-          
           setSliderPosition(newPosition);
           setState(newState);
-          
+
           // Notificar o componente pai sobre a mudança
           if (onChange) {
             onChange(newState);
+          }
+
+          // Executar a função onPress adicional se fornecida
+          if (onPress) {
+            onPress();
           }
         }}
       >
@@ -48,7 +53,7 @@ const Slider = ({value, onChange}) => {
             },
           ]}
         ></Animated.View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     </View>
   );
 };

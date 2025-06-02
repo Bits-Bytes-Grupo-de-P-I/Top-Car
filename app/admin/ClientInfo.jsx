@@ -1,27 +1,34 @@
-import React, { useState, useEffect } from "react";
+// Tela para visualizar as informações de um cliente específico
+
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Switch,
   TouchableOpacity,
   Modal,
   TextInput,
   Alert,
   ImageBackground,
 } from "react-native";
+import { useState, useEffect } from "react";
 import { router } from "expo-router";
-import { AntDesign, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+
+// COMPONENTES
+import Slider from "@/components/Slider";
+import PageHeader from "@/components/PageHeader";
+import Button from "@/components/Button";
+
+// DADOS MOCKADOS
 import mock from "@/assets/mocks/clientAndVehiclesInfo";
 
-import Slider from "@/components/ui/Slider";
-import PageHeader from "@/components/ui/PageHeader";
-import Button from "@/components/ui/Button";
+// ÍCONES
+import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 
+// CORES
 import Colors from "@/constants/Colors";
 
-// Saporra aqui é tudo IA com dado mockado
 const clientInfo = () => {
   const [client, setClient] = useState(mock.client);
   const [vehicles, setVehicles] = useState(mock.vehicles);
@@ -29,6 +36,9 @@ const clientInfo = () => {
   const [editClientModal, setEditClientModal] = useState(false);
   const [editingClient, setEditingClient] = useState({});
   const [vehicleModal, setVehicleModal] = useState(false);
+  const [newVehicleModal, setNewVehicleModal] = useState(false);
+  const [addingVehicle, setAddingVehicle] = useState({});
+  // const [addingVehicleIndex, setAddingVehicleIndex] = useState(-1);
   const [editingVehicle, setEditingVehicle] = useState({});
   const [editingVehicleIndex, setEditingVehicleIndex] = useState(-1);
   useEffect(() => {
@@ -66,9 +76,71 @@ const clientInfo = () => {
     Alert.alert("Sucesso", "Informações do veículo atualizadas com sucesso!");
   };
 
+  // Função para abrir o modal de adicionar veículo
+  const openAddVehicleModal = () => {
+    // Limpar o estado do veículo sendo adicionado
+    setAddingVehicle({
+      veiculo: "",
+      modelo: "",
+      ano: "",
+      cor: "",
+      km: "",
+      placa: "",
+    });
+    setNewVehicleModal(true);
+  };
+
+  // Função para cancelar adição (limpa os dados e fecha modal)
+  const cancelAddVehicle = () => {
+    setAddingVehicle({});
+    setNewVehicleModal(false);
+  };
+
+  // Função para salvar novo veículo
+  const saveNewVehicle = () => {
+    // Validação básica
+    if (!addingVehicle.veiculo || !addingVehicle.modelo || !addingVehicle.ano) {
+      Alert.alert(
+        "Erro",
+        "Por favor, preencha pelo menos Veículo, Modelo e Ano."
+      );
+      return;
+    }
+
+    // Criar um novo veículo com ID único
+    const newVehicle = {
+      id: Date.now(), // ou use uma função de geração de ID mais robusta
+      veiculo: addingVehicle.veiculo,
+      modelo: addingVehicle.modelo,
+      ano: addingVehicle.ano,
+      cor: addingVehicle.cor || "",
+      km: addingVehicle.km || "0",
+      placa: addingVehicle.placa || "",
+      clientId: client.id, // assumindo que você quer associar ao cliente atual
+    };
+
+    // Adicionar o novo veículo à lista
+    const updatedVehicles = [...vehicles, newVehicle];
+    setVehicles(updatedVehicles);
+
+    // Limpar estados e fechar modal
+    setAddingVehicle({});
+    setNewVehicleModal(false);
+
+    Alert.alert("Sucesso", "Veículo adicionado com sucesso!");
+  };
+
   const toggleInShop = () => {
     setInShop(!inShop);
   };
+
+  // BOTÃO DE ADICIONAR
+  const renderAddButton = (section) => (
+    <TouchableOpacity style={styles.addButton} onPress={openAddVehicleModal}>
+      <Ionicons name="add-circle-outline" size={24} color={Colors.verde} />
+      <Text style={styles.addButtonText}>Adicionar Veículo</Text>
+    </TouchableOpacity>
+  );
 
   const createServicePending = () => {
     Alert.alert(
@@ -89,340 +161,477 @@ const clientInfo = () => {
       { text: "Cancelar" },
       {
         text: "Confirmar",
-        onPress: () => router.push("/create-service-note"),
+        onPress: () => router.push("./serviceBill"),
       },
     ]);
   };
-  // Saporra aqui é tudo IA com dado mockado
 
   return (
-    <ImageBackground
-      source={require("@/assets/images/fundo.jpg")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <PageHeader
-        title="Serviços Pendentes da Oficina"
-        containerStyle={{ backgroundColor: Colors.azulClaro }}
-        titleStyle={{ color: "#fff" }}
-      />
-      <ScrollView style={styles.container}>
-        {/* Informações do Cliente */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Dados Pessoais</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <PageHeader
+          title="Informações do Cliente"
+          containerStyle={{ backgroundColor: Colors.azulClaro }}
+          titleStyle={{ color: "white" }}
+        />
+        <ScrollView style={styles.container}>
+          {/* Informações do Cliente */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Dados Pessoais</Text>
+              <TouchableOpacity
+                onPress={handleEditClient}
+                style={styles.editButton}
+              >
+                <MaterialIcons name="edit" size={20} color={Colors.azul} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.infoContainer}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Nome:</Text>
+                <Text style={styles.infoValue}>{client.nome}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>
+                  {client.tipoPessoa === "fisica" ? "CPF:" : "CNPJ:"}
+                </Text>
+                <Text style={styles.infoValue}>{client.documento}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Telefone:</Text>
+                <Text style={styles.infoValue}>{client.telefone}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>CEP:</Text>
+                <Text style={styles.infoValue}>{client.cep}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Endereço:</Text>
+                <Text style={styles.infoValue}>
+                  {client.endereco}, {client.numero}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Bairro:</Text>
+                <Text style={styles.infoValue}>{client.bairro}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Cidade/Estado:</Text>
+                <Text style={styles.infoValue}>
+                  {client.cidade}/{client.estado}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Status da Oficina */}
+          <View style={styles.shopStatusContainer}>
+            <Text style={styles.shopStatusText}>
+              Cliente com veículo na oficina
+            </Text>
+            <Slider onValueChange={toggleInShop} value={inShop} />
+          </View>
+
+          {/* Veículos do Cliente */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Veículos</Text>
+
+            {vehicles.map((vehicle, index) => (
+              <View key={index} style={styles.vehicleCard}>
+                <View style={styles.vehicleHeader}>
+                  <Text style={styles.vehicleName}>
+                    {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => handleEditVehicle(vehicle, index)}
+                  >
+                    <MaterialIcons
+                      name="edit"
+                      size={20}
+                      color={Colors.azul}
+                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.vehicleInfo}>
+                  <View style={styles.vehicleInfoItem}>
+                    <Text style={styles.vehicleInfoLabel}>Cor:</Text>
+                    <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
+                  </View>
+                  <View style={styles.vehicleInfoItem}>
+                    <Text style={styles.vehicleInfoLabel}>Placa:</Text>
+                    <Text style={styles.vehicleInfoValue}>{vehicle.placa}</Text>
+                  </View>
+                  <View style={styles.vehicleInfoItem}>
+                    <Text style={styles.vehicleInfoLabel}>Quilometragem:</Text>
+                    <Text style={styles.vehicleInfoValue}>{vehicle.km} km</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+            {renderAddButton("veiculo")}
+          </View>
+
+          {/* Botões de Ação */}
+          <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
-              onPress={handleEditClient}
-              style={styles.editButton}
+              style={styles.actionButton}
+              // onPress={createServicePending}
             >
-              <MaterialIcons name="edit" size={20} color="white" />
+              <FontAwesome5 name="clipboard-list" size={18} color="#FFF" />
+              <Text style={styles.actionButtonText}>Nova Pendência</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.noteButton]}
+              onPress={createServiceNote}
+            >
+              <FontAwesome5 name="file-alt" size={18} color="#FFF" />
+              <Text style={styles.actionButtonText}>Nova Nota</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.infoContainer}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Nome:</Text>
-              <Text style={styles.infoValue}>{client.nome}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>
-                {client.tipoPessoa === "fisica" ? "CPF:" : "CNPJ:"}
-              </Text>
-              <Text style={styles.infoValue}>{client.documento}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Telefone:</Text>
-              <Text style={styles.infoValue}>{client.telefone}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>CEP:</Text>
-              <Text style={styles.infoValue}>{client.cep}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Endereço:</Text>
-              <Text style={styles.infoValue}>
-                {client.endereco}, {client.numero}
-              </Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Bairro:</Text>
-              <Text style={styles.infoValue}>{client.bairro}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Cidade/Estado:</Text>
-              <Text style={styles.infoValue}>
-                {client.cidade}/{client.estado}
-              </Text>
-            </View>
-          </View>
-        </View>
+          {/* Modal para editar informações do cliente */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={editClientModal}
+            onRequestClose={() => setEditClientModal(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Editar Cliente</Text>
 
-        {/* Status da Oficina */}
-        <View style={styles.shopStatusContainer}>
-          <Text style={styles.shopStatusText}>
-            Cliente com veículo na oficina
-          </Text>
-          <Slider onValueChange={toggleInShop} value={inShop} />
-        </View>
+                <Text style={styles.inputLabel}>Nome</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.nome}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, nome: text })
+                  }
+                />
 
-        {/* Veículos do Cliente */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Veículos</Text>
-
-          {vehicles.map((vehicle, index) => (
-            <View key={index} style={styles.vehicleCard}>
-              <View style={styles.vehicleHeader}>
-                <Text style={styles.vehicleName}>
-                  {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
+                <Text style={styles.inputLabel}>
+                  {editingClient.tipoPessoa === "fisica" ? "CPF" : "CNPJ"}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleEditVehicle(vehicle, index)}
-                >
-                  <MaterialIcons name="edit" size={20} color={Colors.verde} />
-                </TouchableOpacity>
-              </View>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.documento}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, documento: text })
+                  }
+                  keyboardType="numeric"
+                />
 
-              <View style={styles.vehicleInfo}>
-                <View style={styles.vehicleInfoItem}>
-                  <Text style={styles.vehicleInfoLabel}>Cor:</Text>
-                  <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
-                </View>
-                <View style={styles.vehicleInfoItem}>
-                  <Text style={styles.vehicleInfoLabel}>Placa:</Text>
-                  <Text style={styles.vehicleInfoValue}>{vehicle.placa}</Text>
-                </View>
-                <View style={styles.vehicleInfoItem}>
-                  <Text style={styles.vehicleInfoLabel}>Quilometragem:</Text>
-                  <Text style={styles.vehicleInfoValue}>{vehicle.km} km</Text>
+                <Text style={styles.inputLabel}>Telefone</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.telefone}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, telefone: text })
+                  }
+                  keyboardType="phone-pad"
+                />
+
+                <Text style={styles.inputLabel}>CEP</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.cep}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, cep: text })
+                  }
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Endereço</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.endereco}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, endereco: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Número</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.numero}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, numero: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Bairro</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.bairro}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, bairro: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Cidade</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.cidade}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, cidade: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Estado</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingClient.estado}
+                  onChangeText={(text) =>
+                    setEditingClient({ ...editingClient, estado: text })
+                  }
+                  maxLength={2}
+                />
+
+                <View style={styles.modalButtons}>
+                  <Button
+                    cor={Colors.vermelho}
+                    texto="Cancelar"
+                    onPress={() => setEditClientModal(false)}
+                  >
+                    <MaterialIcons
+                      name="cancel"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                  <Button
+                    cor={Colors.verde}
+                    texto="Salvar"
+                    onPress={saveClientChanges}
+                  >
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
                 </View>
               </View>
             </View>
-          ))}
-        </View>
+          </Modal>
+          {/* Fim Modal para editar informações do cliente */}
 
-        {/* Botões de Ação */}
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            // onPress={createServicePending}
+          {/* Modal para editar informações do veículo */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={vehicleModal}
+            onRequestClose={() => setVehicleModal(false)}
           >
-            <FontAwesome5 name="clipboard-list" size={20} color="#FFF" />
-            <Text style={styles.actionButtonText}>Nova Pendência</Text>
-          </TouchableOpacity>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Editar Veículo</Text>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.noteButton]}
-            // onPress={createServiceNote}
+                <Text style={styles.inputLabel}>Veículo</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingVehicle.veiculo}
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, veiculo: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Modelo</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingVehicle.modelo}
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, modelo: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Ano</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingVehicle.ano}
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, ano: text })
+                  }
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Cor</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingVehicle.cor}
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, cor: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Quilometragem (KM)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={
+                    editingVehicle.km !== undefined
+                      ? String(editingVehicle.km)
+                      : ""
+                  }
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, km: text })
+                  }
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editingVehicle.placa}
+                  onChangeText={(text) =>
+                    setEditingVehicle({ ...editingVehicle, placa: text })
+                  }
+                />
+
+                <View style={styles.modalButtons}>
+                  <Button
+                    cor={Colors.vermelho}
+                    texto="Cancelar"
+                    onPress={() => setVehicleModal(false)}
+                  >
+                    <MaterialIcons
+                      name="cancel"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                  <Button
+                    cor={Colors.verde}
+                    texto="Salvar"
+                    onPress={saveVehicleChanges}
+                  >
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          {/* Fim Modal para editar informações do veículo */}
+
+          {/* Modal para criar um carro novo para o cliente */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={newVehicleModal}
+            onRequestClose={() => setNewVehicleModal(false)}
           >
-            <FontAwesome5 name="file-alt" size={20} color="#FFF" />
-            <Text style={styles.actionButtonText}>Nova Nota</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Adicionar Novo Veículo</Text>
 
-        {/* Modal para editar informações do cliente */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={editClientModal}
-          onRequestClose={() => setEditClientModal(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Editar Cliente</Text>
-
-              <Text style={styles.inputLabel}>Nome</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.nome}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, nome: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>
-                {editingClient.tipoPessoa === "fisica" ? "CPF" : "CNPJ"}
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.documento}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, documento: text })
-                }
-                keyboardType="numeric"
-              />
-
-              <Text style={styles.inputLabel}>Telefone</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.telefone}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, telefone: text })
-                }
-                keyboardType="phone-pad"
-              />
-
-              <Text style={styles.inputLabel}>CEP</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.cep}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, cep: text })
-                }
-                keyboardType="numeric"
-              />
-
-              <Text style={styles.inputLabel}>Endereço</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.endereco}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, endereco: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Número</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.numero}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, numero: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Bairro</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.bairro}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, bairro: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Cidade</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.cidade}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, cidade: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Estado</Text>
-              <TextInput
-                style={styles.input}
-                value={editingClient.estado}
-                onChangeText={(text) =>
-                  setEditingClient({ ...editingClient, estado: text })
-                }
-                maxLength={2}
-              />
-
-              <View style={styles.modalButtons}>
-                <Button
-                  cor="vermelho"
-                  texto="Cancelar"
-                  onPress={() => setEditClientModal(false)}
+                <Text style={styles.inputLabel}>Veículo</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.veiculo || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({ ...addingVehicle, veiculo: text })
+                  }
                 />
-                <Button
-                  cor="verde"
-                  texto="Cancelar"
-                  onPress={saveClientChanges}
+
+                <Text style={styles.inputLabel}>Modelo</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.modelo || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({ ...addingVehicle, modelo: text })
+                  }
                 />
+
+                <Text style={styles.inputLabel}>Ano</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.ano || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({ ...addingVehicle, ano: text })
+                  }
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Cor</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.cor || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({ ...addingVehicle, cor: text })
+                  }
+                />
+
+                <Text style={styles.inputLabel}>Quilometragem (KM)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.km || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({ ...addingVehicle, km: text })
+                  }
+                  keyboardType="numeric"
+                />
+
+                <Text style={styles.inputLabel}>Placa</Text>
+                <TextInput
+                  style={styles.input}
+                  value={addingVehicle.placa || ""}
+                  onChangeText={(text) =>
+                    setAddingVehicle({
+                      ...addingVehicle,
+                      placa: text.toUpperCase(),
+                    })
+                  }
+                  maxLength={8}
+                />
+
+                <View style={styles.modalButtons}>
+                  <Button
+                    cor={Colors.vermelho}
+                    texto="Cancelar"
+                    onPress={cancelAddVehicle}
+                  >
+                    <MaterialIcons
+                      name="cancel"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                  <Button
+                    cor={Colors.verde}
+                    texto="Adicionar"
+                    onPress={saveNewVehicle}
+                  >
+                    <MaterialIcons
+                      name="add"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-        {/* Fim Modal para editar informações do cliente */}
-
-        {/* Modal para editar informações do veículo */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={vehicleModal}
-          onRequestClose={() => setVehicleModal(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Editar Veículo</Text>
-
-              <Text style={styles.inputLabel}>Veículo</Text>
-              <TextInput
-                style={styles.input}
-                value={editingVehicle.veiculo}
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, veiculo: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Modelo</Text>
-              <TextInput
-                style={styles.input}
-                value={editingVehicle.modelo}
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, modelo: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Ano</Text>
-              <TextInput
-                style={styles.input}
-                value={editingVehicle.ano}
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, ano: text })
-                }
-                keyboardType="numeric"
-              />
-
-              <Text style={styles.inputLabel}>Cor</Text>
-              <TextInput
-                style={styles.input}
-                value={editingVehicle.cor}
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, cor: text })
-                }
-              />
-
-              <Text style={styles.inputLabel}>Quilometragem (KM)</Text>
-              <TextInput
-                style={styles.input}
-                value={
-                  editingVehicle.km !== undefined
-                    ? String(editingVehicle.km)
-                    : ""
-                }
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, km: text })
-                }
-                keyboardType="numeric"
-              />
-
-              <Text style={styles.inputLabel}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                value={editingVehicle.placa}
-                onChangeText={(text) =>
-                  setEditingVehicle({ ...editingVehicle, placa: text })
-                }
-              />
-
-              <View style={styles.modalButtons}>
-                <Button
-                  cor="vermelho"
-                  texto="Cancelar"
-                  onPress={() => setVehicleModal(false)}
-                />
-                <Button
-                  cor="verde"
-                  texto="Cancelar"
-                  onPress={saveVehicleChanges}
-                />
-              </View>
-            </View>
-          </View>
-        </Modal>
-        {/* Fim Modal para editar informações do veículo */}
-      </ScrollView>
-    </ImageBackground>
+          </Modal>
+          {/* Fim Modal para criar um carro novo para o cliente */}
+        </ScrollView>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
@@ -438,7 +647,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   section: {
-    backgroundColor: Colors.azulClaro,
+    backgroundColor: Colors.cinzaClaro,
     marginHorizontal: 15,
     marginVertical: 10,
     borderRadius: 10,
@@ -461,9 +670,20 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "white",
+    color: Colors.grafite,
     fontFamily: "DM-Sans",
     marginBottom: 8,
+  },
+  addButton: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.verde,
   },
   editButton: {
     padding: 5,
@@ -473,26 +693,26 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   infoLabel: {
-    width: 100,
+    width: 130,
     fontSize: 15,
-    color: Colors.cinzaClaro,
+    color: Colors.grafite,
     fontWeight: "500",
     fontFamily: "DM-Sans",
   },
   infoValue: {
-    flex: 1,
     fontSize: 15,
-    color: "white",
+    color: Colors.grafite,
     fontFamily: "DM-Sans",
   },
   shopStatusContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: Colors.azulClaro,
+    backgroundColor: Colors.cinzaClaro,
     marginHorizontal: 15,
     marginVertical: 10,
     padding: 15,
@@ -508,12 +728,12 @@ const styles = StyleSheet.create({
   },
   shopStatusText: {
     fontSize: 16,
-    color: "white",
+    color: Colors.grafite,
     fontWeight: "500",
     fontFamily: "DM-Sans",
   },
   vehicleCard: {
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#e9e9e9",
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
@@ -527,7 +747,7 @@ const styles = StyleSheet.create({
   vehicleName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.grafite,
     fontFamily: "DM-Sans",
   },
   vehicleInfo: {
@@ -535,12 +755,13 @@ const styles = StyleSheet.create({
   },
   vehicleInfoItem: {
     flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 5,
   },
   vehicleInfoLabel: {
-    width: 100,
     fontSize: 14,
-    color: "#666",
+    color: "black",
+    fontWeight: "500",
     fontFamily: "DM-Sans",
   },
   vehicleInfoValue: {
@@ -632,7 +853,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   saveButton: {
-    backgroundColor: "#4285F4",
+    backgroundColor: Colors.azul,
   },
   modalButtonText: {
     fontWeight: "bold",

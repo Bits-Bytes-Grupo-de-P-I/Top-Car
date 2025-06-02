@@ -2,6 +2,7 @@
 
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import Colors from "@/constants/Colors";
 
 export default function BackToHomeButton() {
   const handleBack = () => {
@@ -25,12 +26,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#ccc',
+    backgroundColor: Colors.azulClaro,
     borderRadius: 8,
-    alignSelf: 'center',
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#333',
+    color: 'white',
     fontSize: 16,
   },
 });

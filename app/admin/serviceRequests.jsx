@@ -1,21 +1,28 @@
+// Tela para visualizar os pedidos feitos pelos clientes
+
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
   ImageBackground,
-  TouchableOpacity,
   Modal,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
-import Colors from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { useState } from "react";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+
+// COMPONENTES
+import PageHeader from "@/components/PageHeader";
+import SeeMoreBtn from "@/components/SeeMoreBtn";
+import Button from "@/components/Button";
+
+// DADOS MOCKADOS
 import mockData from "@/assets/mocks/serviceRequests";
 
-import PageHeader from "@/components/ui/PageHeader";
-import Button from "@/components/ui/Button";
-// import Titulo from '@/components/ui/Titulo'
+// CORES
+import Colors from "@/constants/Colors";
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -49,141 +56,154 @@ const serviceRequests = () => {
   };
 
   return (
-    <ImageBackground
-      source={require("@/assets/images/fundo.jpg")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <PageHeader
-        title="Serviços em Andamento"
-        containerStyle={{ backgroundColor: Colors.azulClaro }}
-        titleStyle={{ color: "#fff" }}
-      />
-      <ScrollView
-        nestedScrollEnabled={true}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("@/assets/images/fundo.jpg")}
+        style={styles.background}
+        resizeMode="cover"
       >
-        <View style={styles.container}>
-          {mockData.map((pedido) => (
-            <View key={pedido.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <View style={styles.clientInfo}>
-                  <Text style={styles.clientName}>{pedido.cliente.nome}</Text>
-                  <Text style={styles.vehicleModel}>
-                    {pedido.veiculo.modelo} ({pedido.veiculo.ano})
+        <PageHeader
+          title="Pedidos de Serviço"
+          containerStyle={{ backgroundColor: Colors.azulClaro }}
+          titleStyle={{ color: "#fff" }}
+        />
+        <ScrollView
+          nestedScrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            {mockData.map((pedido) => (
+              <View key={pedido.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.clientInfo}>
+                    <Text style={styles.clientName}>{pedido.cliente.nome}</Text>
+                    <Text style={styles.vehicleModel}>
+                      {pedido.veiculo.modelo} ({pedido.veiculo.ano})
+                    </Text>
+                  </View>
+                  <Text style={styles.date}>
+                    {formatDate(pedido.dataPedido)}
                   </Text>
                 </View>
-                <Text style={styles.date}>{formatDate(pedido.dataPedido)}</Text>
-              </View>
 
-              <View style={styles.divider} />
+                <View style={styles.divider} />
 
-              <View style={styles.cardBody}>
-                <View style={styles.resumoContainer}>
-                  <FontAwesome
-                    name="wrench"
-                    size={18}
-                    color={Colors.azulClaro}
-                    style={styles.icon}
-                  />
-                  <Text style={styles.resumoText}>{pedido.resumo}</Text>
+                <View style={styles.cardBody}>
+                  <View style={styles.resumoContainer}>
+                    <FontAwesome
+                      name="wrench"
+                      size={18}
+                      color={Colors.grafite}
+                      style={styles.icon}
+                    />
+                    <Text style={styles.resumoText}>{pedido.resumo}</Text>
+                  </View>
+
+                  <SeeMoreBtn onPress={() => handleSeeMoreBtn(pedido)} />
                 </View>
+              </View>
+            ))}
+          </View>
 
-                <TouchableOpacity
-                  style={styles.SeeMoreBtnButton}
-                  onPress={() => handleSeeMoreBtn(pedido)}
-                >
-                  <Text style={styles.SeeMoreBtnText}>Ver mais +</Text>
-                </TouchableOpacity>
+          {/* Modal de detalhes do pedido */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                {selectedPedido && (
+                  <>
+                    <View style={styles.modalHeader}>
+                      <Text style={styles.modalTitle}>Detalhes do Pedido</Text>
+                      <Pressable
+                        style={styles.closeButton}
+                        onPress={() => setModalVisible(false)}
+                      >
+                        <MaterialIcons name="close" size={24} color="black" />
+                      </Pressable>
+                    </View>
+
+                    <View style={styles.modalDivider} />
+
+                    <View style={styles.modalClientInfo}>
+                      <Text style={styles.modalClientName}>
+                        {selectedPedido.cliente.nome}
+                      </Text>
+                      <Text style={styles.modalClientPhone}>
+                        {selectedPedido.cliente.telefone}
+                      </Text>
+                    </View>
+
+                    <View style={styles.modalVehicleInfo}>
+                      <Text style={styles.modalVehicleModel}>
+                        <Text style={styles.boldText}>Veículo: </Text>
+                        {selectedPedido.veiculo.modelo} (
+                        {selectedPedido.veiculo.ano})
+                      </Text>
+                      <Text style={styles.modalVehiclePlate}>
+                        <Text style={styles.boldText}>Placa: </Text>
+                        {selectedPedido.veiculo.placa}
+                      </Text>
+                    </View>
+
+                    <View style={styles.modalContent}>
+                      <Text style={styles.modalResumoTitle}>Resumo:</Text>
+                      <Text style={styles.modalResumo}>
+                        {selectedPedido.resumo}
+                      </Text>
+
+                      <Text style={styles.modalDescricaoTitle}>
+                        Descrição detalhada:
+                      </Text>
+                      <Text style={styles.modalDescricao}>
+                        {selectedPedido.descricao}
+                      </Text>
+                    </View>
+
+                    <View style={styles.modalDate}>
+                      <Text style={styles.modalDateText}>
+                        Pedido realizado em:{" "}
+                        {formatDate(selectedPedido.dataPedido)}
+                      </Text>
+                    </View>
+
+                    <View style={styles.modalActions}>
+                      <Button
+                        cor={Colors.vermelho}
+                        texto="Rejeitar"
+                        onPress={() => handleReject(selectedPedido.id)}
+                      >
+                        <MaterialIcons
+                          name="cancel"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 5 }}
+                        />
+                      </Button>
+                      <Button
+                        cor={Colors.verde}
+                        texto="Aceitar"
+                        onPress={() => handleAccept(selectedPedido.id)}
+                      >
+                        <MaterialIcons
+                          name="check-circle"
+                          size={18}
+                          color="white"
+                          style={{ marginRight: 5 }}
+                        />
+                      </Button>
+                    </View>
+                  </>
+                )}
               </View>
             </View>
-          ))}
-        </View>
-
-        {/* Modal de detalhes do pedido */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              {selectedPedido && (
-                <>
-                  <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>Detalhes do Pedido</Text>
-                    <Pressable
-                      style={styles.closeButton}
-                      onPress={() => setModalVisible(false)}
-                    >
-                      <MaterialIcons name="close" size={24} color="black" />
-                    </Pressable>
-                  </View>
-
-                  <View style={styles.modalDivider} />
-
-                  <View style={styles.modalClientInfo}>
-                    <Text style={styles.modalClientName}>
-                      {selectedPedido.cliente.nome}
-                    </Text>
-                    <Text style={styles.modalClientPhone}>
-                      {selectedPedido.cliente.telefone}
-                    </Text>
-                  </View>
-
-                  <View style={styles.modalVehicleInfo}>
-                    <Text style={styles.modalVehicleModel}>
-                      <Text style={styles.boldText}>Veículo: </Text>
-                      {selectedPedido.veiculo.modelo} (
-                      {selectedPedido.veiculo.ano})
-                    </Text>
-                    <Text style={styles.modalVehiclePlate}>
-                      <Text style={styles.boldText}>Placa: </Text>
-                      {selectedPedido.veiculo.placa}
-                    </Text>
-                  </View>
-
-                  <View style={styles.modalContent}>
-                    <Text style={styles.modalResumoTitle}>Resumo:</Text>
-                    <Text style={styles.modalResumo}>
-                      {selectedPedido.resumo}
-                    </Text>
-
-                    <Text style={styles.modalDescricaoTitle}>
-                      Descrição detalhada:
-                    </Text>
-                    <Text style={styles.modalDescricao}>
-                      {selectedPedido.descricao}
-                    </Text>
-                  </View>
-
-                  <View style={styles.modalDate}>
-                    <Text style={styles.modalDateText}>
-                      Pedido realizado em:{" "}
-                      {formatDate(selectedPedido.dataPedido)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.modalActions}>
-                    <Button
-                      cor="vermelho"
-                      texto="Rejeitar"
-                      onPress={() => handleReject(selectedPedido.id)}
-                    />
-                    <Button
-                      cor="verde"
-                      texto="Aceitar"
-                      onPress={() => handleAccept(selectedPedido.id)}
-                    />
-                  </View>
-                </>
-              )}
-            </View>
-          </View>
-        </Modal>
-      </ScrollView>
-    </ImageBackground>
+          </Modal>
+        </ScrollView>
+      </ImageBackground>
+    </SafeAreaView>
   );
 };
 
@@ -265,13 +285,13 @@ const styles = StyleSheet.create({
   SeeMoreBtnButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.azulClaro,
     borderRadius: 20,
   },
   SeeMoreBtnText: {
-    color: Colors.azul,
+    color: "#fff",
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "bold",
     fontFamily: "DM-Sans",
   },
   // Estilos do Modal
