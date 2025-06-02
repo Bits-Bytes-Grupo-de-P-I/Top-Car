@@ -32,22 +32,6 @@ import BackToHomeButton from "@/components/BackToHomeButton";
 export default function Index() {
   const router = useRouter();
 
-  const navigateToServiceStatus = () => {
-    router.push("/client/serviceStatus");
-  };
-
-  const navigateToServicePending = () => {
-    router.push("/client/servicePending");
-  };
-
-  const navigateToHistoryScreen = () => {
-    router.push("/client/serviceHistory");
-  };
-
-  const navigateToServiceRequestForm = () => {
-    router.push("/client/serviceRequestForm");
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
@@ -97,7 +81,7 @@ export default function Index() {
                 <Card
                   texto="Meus serviços em andamento"
                   cor={Colors.verde}
-                  onPress={navigateToServiceStatus}
+                  onPress={() => router.push("./client/serviceStatus")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
@@ -110,7 +94,7 @@ export default function Index() {
                 <Card
                   texto="Serviços pendentes"
                   cor={Colors.laranja}
-                  onPress={navigateToServicePending}
+                  onPress={() => router.push("./client/servicePending")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
@@ -123,7 +107,7 @@ export default function Index() {
                 <Card
                   texto="Solicitar pedido de atendimento"
                   cor={Colors.amarelo}
-                  onPress={navigateToServiceRequestForm}
+                  onPress={() => router.push("./client/serviceRequestForm")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
@@ -136,7 +120,7 @@ export default function Index() {
                 <Card
                   texto="Serviços realizados"
                   cor={Colors.verdeEscuro}
-                  onPress={navigateToHistoryScreen}
+                  onPress={() => router.push("./client/serviceHistory")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
