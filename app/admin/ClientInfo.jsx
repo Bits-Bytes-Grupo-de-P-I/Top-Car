@@ -12,16 +12,13 @@ import {
   ImageBackground,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { router, useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // COMPONENTES
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
-
-// DADOS MOCKADOS
-import mock from "@/assets/mocks/clientAndVehiclesInfo";
 
 // ÍCONES
 import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -29,27 +26,86 @@ import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 // CORES
 import Colors from "@/constants/Colors";
 
+// Funções de formatação/máscara (que eu fui muito burro pra fazer sozinho foi mal família)
+const formatPhone = (phone) => {
+  if (!phone) return "";
+
+  // Remove tudo que não é número
+  const numbers = phone?.replace(/\D/g, "");
+
+  // Aplica a máscara baseada no tamanho
+  if (numbers.length <= 10) {
+    // Telefone fixo: (11) 1234-5678
+    return numbers.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  } else {
+    // Celular: (11) 91234-5678
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  }
+};
+
+const formatCEP = (cep) => {
+  if (!cep) return "";
+
+  // Remove tudo que não é número
+  const numbers = cep.replace(/\D/g, "");
+
+  // Aplica a máscara: 12345-678
+  return numbers.replace(/(\d{5})(\d{3})/, "$1-$2");
+};
+
+const removePhoneMask = (phone) => {
+  return phone ? phone.replace(/\D/g, "") : "";
+};
+
+const removeCEPMask = (cep) => {
+  return cep ? cep.replace(/\D/g, "") : "";
+};
+
 const clientInfo = () => {
-  const [client, setClient] = useState(mock.client);
-  const [vehicles, setVehicles] = useState(mock.vehicles);
+  // Receber os parâmetros da navegação
+  const params = useLocalSearchParams();
+
+  // Inicializar o estado do cliente com os dados recebidos
+  const [client, setClient] = useState({
+    id: Date.now(), // Gerar um ID temporário
+    nome: params.nome || "",
+    documento: params.cpf || "",
+    email: params.email || "",
+    tipoPessoa: params.tipo_pessoa || "fisica",
+    telefone: params.telefone || "",
+    cep: params.cep || "",
+    endereco: params.endereco || "",
+    numero: params.numero || "",
+    bairro: params.bairro || "",
+    cidade: params.cidade || "",
+    estado: params.estado || "",
+    funcao: params.funcao || "",
+  });
+
+  // Dados formatados
+  const telefoneFormatado = client.telefone;
+
+  // Inicializar veículos como array vazio (já que não vem nos parâmetros)
+  const [vehicles, setVehicles] = useState([]);
+
   const [inShop, setInShop] = useState(false);
   const [editClientModal, setEditClientModal] = useState(false);
   const [editingClient, setEditingClient] = useState({});
   const [vehicleModal, setVehicleModal] = useState(false);
   const [newVehicleModal, setNewVehicleModal] = useState(false);
   const [addingVehicle, setAddingVehicle] = useState({});
-  // const [addingVehicleIndex, setAddingVehicleIndex] = useState(-1);
   const [editingVehicle, setEditingVehicle] = useState({});
   const [editingVehicleIndex, setEditingVehicleIndex] = useState(-1);
+
   useEffect(() => {
     // Verificar se algum veículo está na oficina
     const checkVehiclesInShop = () => {
-      const hasVehicleInShop = mock.vehicles.some((vehicle) => vehicle.inShop);
+      const hasVehicleInShop = vehicles.some((vehicle) => vehicle.inShop);
       setInShop(hasVehicleInShop);
     };
 
     checkVehiclesInShop();
-  }, []);
+  }, [vehicles]); // Dependência alterada para vehicles
 
   const handleEditClient = () => {
     setEditingClient({ ...client });
@@ -109,14 +165,15 @@ const clientInfo = () => {
 
     // Criar um novo veículo com ID único
     const newVehicle = {
-      id: Date.now(), // ou use uma função de geração de ID mais robusta
+      id: Date.now(),
       veiculo: addingVehicle.veiculo,
       modelo: addingVehicle.modelo,
       ano: addingVehicle.ano,
       cor: addingVehicle.cor || "",
       km: addingVehicle.km || "0",
       placa: addingVehicle.placa || "",
-      clientId: client.id, // assumindo que você quer associar ao cliente atual
+      clientId: client.id,
+      inShop: false,
     };
 
     // Adicionar o novo veículo à lista
@@ -204,11 +261,13 @@ const clientInfo = () => {
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Telefone:</Text>
-                <Text style={styles.infoValue}>{client.telefone}</Text>
+                <Text style={styles.infoValue}>
+                  {formatPhone(client.telefone)}
+                </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>CEP:</Text>
-                <Text style={styles.infoValue}>{client.cep}</Text>
+                <Text style={styles.infoValue}>{formatCEP(client.cep)}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Endereço:</Text>
@@ -241,40 +300,54 @@ const clientInfo = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Veículos</Text>
 
-            {vehicles.map((vehicle, index) => (
-              <View key={index} style={styles.vehicleCard}>
-                <View style={styles.vehicleHeader}>
-                  <Text style={styles.vehicleName}>
-                    {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => handleEditVehicle(vehicle, index)}
-                  >
-                    <MaterialIcons
-                      name="edit"
-                      size={20}
-                      color={Colors.azul}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.vehicleInfo}>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Cor:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
-                  </View>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Placa:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.placa}</Text>
-                  </View>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Quilometragem:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.km} km</Text>
-                  </View>
-                </View>
+            {vehicles.length === 0 ? (
+              <View style={styles.noVehiclesContainer}>
+                <Text style={styles.noVehiclesText}>
+                  Nenhum veículo cadastrado para este cliente
+                </Text>
               </View>
-            ))}
+            ) : (
+              vehicles.map((vehicle, index) => (
+                <View key={index} style={styles.vehicleCard}>
+                  <View style={styles.vehicleHeader}>
+                    <Text style={styles.vehicleName}>
+                      {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => handleEditVehicle(vehicle, index)}
+                    >
+                      <MaterialIcons
+                        name="edit"
+                        size={20}
+                        color={Colors.azul}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.vehicleInfo}>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>Cor:</Text>
+                      <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
+                    </View>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>Placa:</Text>
+                      <Text style={styles.vehicleInfoValue}>
+                        {vehicle.placa}
+                      </Text>
+                    </View>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>
+                        Quilometragem:
+                      </Text>
+                      <Text style={styles.vehicleInfoValue}>
+                        {vehicle.km} km
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))
+            )}
             {renderAddButton("veiculo")}
           </View>
 
@@ -282,7 +355,7 @@ const clientInfo = () => {
           <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
               style={styles.actionButton}
-              // onPress={createServicePending}
+              onPress={createServicePending}
             >
               <FontAwesome5 name="clipboard-list" size={18} color="#FFF" />
               <Text style={styles.actionButtonText}>Nova Pendência</Text>
@@ -332,21 +405,30 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Telefone</Text>
                 <TextInput
                   style={styles.input}
-                  value={editingClient.telefone}
-                  onChangeText={(text) =>
-                    setEditingClient({ ...editingClient, telefone: text })
-                  }
+                  value={formatPhone(editingClient.telefone)}
+                  onChangeText={(text) => {
+                    // Remove a máscara antes de salvar
+                    const cleanPhone = removePhoneMask(text);
+                    setEditingClient({
+                      ...editingClient,
+                      telefone: cleanPhone,
+                    });
+                  }}
                   keyboardType="phone-pad"
+                  maxLength={15} // (11) 91234-5678
                 />
 
-                <Text style={styles.inputLabel}>CEP</Text>
+                 <Text style={styles.inputLabel}>CEP</Text>
                 <TextInput
                   style={styles.input}
-                  value={editingClient.cep}
-                  onChangeText={(text) =>
-                    setEditingClient({ ...editingClient, cep: text })
-                  }
+                  value={formatCEP(editingClient.cep)}
+                  onChangeText={(text) => {
+                    // Remove a máscara antes de salvar
+                    const cleanCEP = removeCEPMask(text);
+                    setEditingClient({ ...editingClient, cep: cleanCEP });
+                  }}
                   keyboardType="numeric"
+                  maxLength={9} // 12345-678
                 />
 
                 <Text style={styles.inputLabel}>Endereço</Text>
@@ -635,6 +717,8 @@ const clientInfo = () => {
   );
 };
 
+export default clientInfo;
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -861,5 +945,3 @@ const styles = StyleSheet.create({
     fontFamily: "DM-Sans",
   },
 });
-
-export default clientInfo;

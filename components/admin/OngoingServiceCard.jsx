@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Modal,
   Pressable,
+  TextInput,
 } from "react-native";
 import { useState } from "react";
 
@@ -21,6 +22,15 @@ import Colors from "@/constants/Colors";
 
 const OngoingServiceCard = ({ item, onPress }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editedService, setEditedService] = useState({
+    clienteNome: item.clienteNome,
+    veiculo: item.veiculo,
+    placa: item.placa,
+    servico: item.servico,
+    dataAgendada: item.dataAgendada,
+    urgente: item.urgente,
+  });
 
   const handleCardPress = () => {
     setModalVisible(true);
@@ -44,9 +54,22 @@ const OngoingServiceCard = ({ item, onPress }) => {
   };
 
   const handleUpdateService = () => {
-    console.log(`Serviço ${item.id} atualizado`);
+    setEditedService({
+      clienteNome: item.clienteNome,
+      veiculo: item.veiculo,
+      placa: item.placa,
+      servico: item.servico,
+      dataAgendada: item.dataAgendada,
+      urgente: item.urgente,
+    });
     setModalVisible(false);
-    // Aqui você implementaria a lógica para atualizar o serviço
+    setEditModalVisible(true);
+  };
+
+  const saveServiceChanges = () => {
+    console.log("Serviço atualizado:", editedService);
+    setEditModalVisible(false);
+    // Aqui você implementaria a lógica para salvar as alterações
   };
 
   return (
@@ -170,8 +193,8 @@ const OngoingServiceCard = ({ item, onPress }) => {
             {/* Ações do Modal */}
             <View style={styles.modalActions}>
               <Button
-                cor={Colors.azulClaro}
-                texto="Atualizar"
+                cor={Colors.azul}
+                texto="Editar"
                 onPress={handleUpdateService}
               >
                 <Ionicons
@@ -185,6 +208,151 @@ const OngoingServiceCard = ({ item, onPress }) => {
                 cor={Colors.verde}
                 texto="Finalizar"
                 onPress={handleFinishService}
+              >
+                <MaterialIcons
+                  name="check-circle"
+                  size={18}
+                  color="white"
+                  style={{ marginRight: 5 }}
+                />
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de Edição */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Editar Serviço</Text>
+              <Pressable
+                style={styles.closeButton}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <MaterialIcons name="close" size={24} color={Colors.grafite} />
+              </Pressable>
+            </View>
+
+            <View style={styles.modalDivider} />
+
+            {/* Campos de Edição */}
+            <View style={styles.editInputContainer}>
+              <Text style={styles.editInputLabel}>Cliente:</Text>
+              <TextInput
+                style={styles.editInput}
+                value={editedService.clienteNome}
+                onChangeText={(text) =>
+                  setEditedService({ ...editedService, clienteNome: text })
+                }
+                placeholder="Nome do cliente"
+              />
+            </View>
+
+            <View style={styles.editInputContainer}>
+              <Text style={styles.editInputLabel}>Veículo:</Text>
+              <TextInput
+                style={styles.editInput}
+                value={editedService.veiculo}
+                onChangeText={(text) =>
+                  setEditedService({ ...editedService, veiculo: text })
+                }
+                placeholder="Modelo do veículo"
+              />
+            </View>
+
+            <View style={styles.editInputContainer}>
+              <Text style={styles.editInputLabel}>Placa:</Text>
+              <TextInput
+                style={styles.editInput}
+                value={editedService.placa}
+                onChangeText={(text) =>
+                  setEditedService({ ...editedService, placa: text })
+                }
+                placeholder="Placa do veículo"
+              />
+            </View>
+
+            <View style={styles.editInputContainer}>
+              <Text style={styles.editInputLabel}>Serviço:</Text>
+              <TextInput
+                style={[styles.editInput, styles.textArea]}
+                value={editedService.servico}
+                onChangeText={(text) =>
+                  setEditedService({ ...editedService, servico: text })
+                }
+                placeholder="Descrição do serviço"
+                multiline={true}
+                numberOfLines={3}
+              />
+            </View>
+
+            <View style={styles.editInputContainer}>
+              <Text style={styles.editInputLabel}>Data Agendada:</Text>
+              <TextInput
+                style={styles.editInput}
+                value={editedService.dataAgendada}
+                onChangeText={(text) =>
+                  setEditedService({ ...editedService, dataAgendada: text })
+                }
+                placeholder="DD/MM/AAAA"
+              />
+            </View>
+
+            {/* Urgente Toggle */}
+            <View style={styles.urgenteContainer}>
+              <Text style={styles.editInputLabel}>Serviço Urgente:</Text>
+              <TouchableOpacity
+                style={[
+                  styles.urgenteToggle,
+                  editedService.urgente
+                    ? styles.urgenteToggleActive
+                    : styles.urgenteToggleInactive,
+                ]}
+                onPress={() =>
+                  setEditedService({
+                    ...editedService,
+                    urgente: !editedService.urgente,
+                  })
+                }
+              >
+                <Text
+                  style={[
+                    styles.urgenteToggleText,
+                    editedService.urgente
+                      ? styles.urgenteToggleTextActive
+                      : styles.urgenteToggleTextInactive,
+                  ]}
+                >
+                  {editedService.urgente ? "Sim" : "Não"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Ações do Modal de Edição */}
+            <View style={styles.modalActions}>
+              <Button
+                cor={Colors.vermelho}
+                texto="Cancelar"
+                onPress={() => setEditModalVisible(false)}
+              >
+                <MaterialIcons
+                  name="cancel"
+                  size={18}
+                  color="white"
+                  style={{ marginRight: 5 }}
+                />
+              </Button>
+              <Button
+                cor={Colors.verde}
+                texto="Salvar"
+                onPress={saveServiceChanges}
               >
                 <MaterialIcons
                   name="check-circle"
@@ -357,5 +525,57 @@ const styles = StyleSheet.create({
   modalActions: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  // Estilos do Modal de Edição
+  editInputContainer: {
+    marginBottom: 16,
+  },
+  editInputLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: Colors.grafite,
+    fontFamily: "DM-Sans",
+  },
+  editInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "#f9f9f9",
+    color: Colors.grafite,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: "top",
+  },
+  urgenteContainer: {
+    marginBottom: 20,
+  },
+  urgenteToggle: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+  urgenteToggleActive: {
+    backgroundColor: Colors.laranja,
+    borderColor: Colors.laranja,
+  },
+  urgenteToggleInactive: {
+    backgroundColor: "#f9f9f9",
+    borderColor: "#ddd",
+  },
+  urgenteToggleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  urgenteToggleTextActive: {
+    color: "white",
+  },
+  urgenteToggleTextInactive: {
+    color: Colors.grafite,
   },
 });
