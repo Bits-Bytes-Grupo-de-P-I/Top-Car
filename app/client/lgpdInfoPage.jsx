@@ -195,12 +195,12 @@ export default function lgpdInfoPage() {
 
               <View style={styles.contactInfo}>
                 <View style={styles.contactItem}>
-                  <Ionicons name="mail-outline" size={20} color="#7f8c8d" />
-                  <Text style={styles.contactText}>contato@oficina.com.br</Text>
+                  <Ionicons name="logo-instagram" size={20} color="#7f8c8d" />
+                  <Text style={styles.contactText}>topcarp.o</Text>
                 </View>
                 <View style={styles.contactItem}>
                   <Ionicons name="call-outline" size={20} color="#7f8c8d" />
-                  <Text style={styles.contactText}>(34) 9999-9999</Text>
+                  <Text style={styles.contactText}>(34) 3811-2735</Text>
                 </View>
               </View>
             </View>

@@ -35,7 +35,7 @@ const formatPhone = (phone) => {
   const numbers = phone?.replace(/\D/g, "");
 
   // Aplica a máscara baseada no tamanho
-  if (numbers.length <= 10) {
+  if (numbers?.length <= 10) {
     // Telefone fixo: (11) 1234-5678
     return numbers.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
   } else {
@@ -378,14 +378,14 @@ const clientInfo = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Veículos</Text>
 
-            {vehicles.length === 0 ? (
+            {vehicles?.length === 0 ? (
               <View style={styles.noVehiclesContainer}>
                 <Text style={styles.noVehiclesText}>
                   Nenhum veículo cadastrado para este cliente
                 </Text>
               </View>
             ) : (
-              vehicles.map((vehicle, index) => (
+              vehicles?.map((vehicle, index) => (
                 <View key={index} style={styles.vehicleCard}>
                   <View style={styles.vehicleHeader}>
                     <Text style={styles.vehicleName}>
@@ -1147,6 +1147,7 @@ const styles = StyleSheet.create({
   placeholderStyle: {
     fontSize: 16,
     color: "#999",
+    padding: 12
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -1155,6 +1156,7 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+    padding: 12
   },
   textArea: {
     height: 80,
