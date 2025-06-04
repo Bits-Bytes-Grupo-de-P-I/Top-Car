@@ -35,6 +35,8 @@ const serviceRequestForm = () => {
   const [vehicleModel, setVehicleModel] = useState("");
   const [vehicleYear, setVehicleYear] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
+  const [problemSummary, setProblemSummary] = useState("");
+  const [summaryLength, setSummaryLength] = useState(50);
   const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -100,6 +102,7 @@ const serviceRequestForm = () => {
     setVehicleModel("");
     setVehicleYear("");
     setProblemDescription("");
+    setProblemSummary("");
     setIsUrgent(false);
   };
 
@@ -119,7 +122,7 @@ const serviceRequestForm = () => {
       const serviceRequestData = {
         cliente_id: 4,
         veiculo_id: vehicle.id,
-        resumo: "Solicitação via aplicativo",
+        resumo: problemSummary,
         descricao: problemDescription,
         status: "pendente",
         dataPedido: new Date().toISOString().split("T")[0],
@@ -226,6 +229,26 @@ const serviceRequestForm = () => {
               />
             </View>
 
+            {/* Resumo do Problema */}
+            <View style={styles.formGroup}>
+              <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+                <Text style={styles.label}>Resumo do Problema</Text>
+                <Text style={styles.summaryCounter}>
+                  ({summaryLength - problemSummary.length})
+                </Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                value={problemSummary}
+                onChangeText={setProblemSummary}
+                placeholder="Escreva de forma resumida o seu problema..."
+                multiline
+                numberOfLines={2}
+                textAlignVertical="top"
+                maxLength={summaryLength}
+              />
+            </View>
+
             {/* Descrição do Problema */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Descrição do Problema</Text>
@@ -245,7 +268,7 @@ const serviceRequestForm = () => {
               <View style={styles.switchGroup}>
                 <Text style={styles.switchLabel}>Serviço Urgente</Text>
                 <Text style={styles.switchDescription}>
-                  Marque esta opção para priorizar seu atendimento
+                  Marque esta opção caso você necessite de atendimento urgentemente
                 </Text>
               </View>
               <Slider value={isUrgent} onPress={setIsUrgent} />
@@ -298,7 +321,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: Colors.azul,
   },
   title: {
     fontSize: 24,
@@ -333,6 +356,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     marginBottom: 8,
+  },
+  summaryCounter: {
+    marginLeft: 8,
+    color: "#606060"
   },
   input: {
     backgroundColor: "#fff",

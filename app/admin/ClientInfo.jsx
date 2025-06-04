@@ -11,6 +11,7 @@ import {
   Alert,
   ImageBackground,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { useState, useEffect } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -85,17 +86,56 @@ const clientInfo = () => {
   // Dados formatados
   const telefoneFormatado = client.telefone;
 
-  // Inicializar veículos como array vazio (já que não vem nos parâmetros)
-  const [vehicles, setVehicles] = useState([]);
+  const [vehicles, setVehicles] = useState([
+    // Dados mockados para teste
+    {
+      id: 1,
+      veiculo: "Toyota",
+      modelo: "Corolla",
+      ano: "2020",
+      cor: "Prata",
+      km: "35000",
+      placa: "ABC1D23",
+      clientId: 101,
+      inShop: false,
+    },
+    {
+      id: 2,
+      veiculo: "Honda",
+      modelo: "Civic",
+      ano: "2018",
+      cor: "Preto",
+      km: "58000",
+      placa: "XYZ4E56",
+      clientId: 101,
+      inShop: true,
+    },
+    {
+      id: 3,
+      veiculo: "Volkswagen",
+      modelo: "Gol",
+      ano: "2015",
+      cor: "Branco",
+      km: "90000",
+      placa: "JKL7F89",
+      clientId: 101,
+      inShop: false,
+    },
+  ]);
 
   const [inShop, setInShop] = useState(false);
   const [editClientModal, setEditClientModal] = useState(false);
   const [editingClient, setEditingClient] = useState({});
   const [vehicleModal, setVehicleModal] = useState(false);
   const [newVehicleModal, setNewVehicleModal] = useState(false);
+  const [pendingServiceModal, setPendingServiceModal] = useState(false);
   const [addingVehicle, setAddingVehicle] = useState({});
+  const [addingService, setAddingService] = useState({});
   const [editingVehicle, setEditingVehicle] = useState({});
   const [editingVehicleIndex, setEditingVehicleIndex] = useState(-1);
+  const [isVehicleFocus, setIsVehicleFocus] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false); // state para definir carregamento de informações
 
   useEffect(() => {
     // Verificar se algum veículo está na oficina
@@ -144,6 +184,15 @@ const clientInfo = () => {
       placa: "",
     });
     setNewVehicleModal(true);
+  };
+
+  // Função do dropdown
+  const getVehicleDropdownData = () => {
+    return vehicles.map((vehicle) => ({
+      label: `${vehicle.veiculo} ${vehicle.modelo} (${vehicle.ano}) - ${vehicle.placa}`,
+      value: vehicle.id,
+      vehicle: vehicle,
+    }));
   };
 
   // Função para cancelar adição (limpa os dados e fecha modal)
@@ -199,18 +248,47 @@ const clientInfo = () => {
     </TouchableOpacity>
   );
 
+  // Modal para adicionar um serviço pendente vinculado ao cliente
   const createServicePending = () => {
-    Alert.alert(
-      "Nova Pendência",
-      "Criar nova pendência de serviço para este cliente?",
-      [
-        { text: "Cancelar" },
-        {
-          text: "Confirmar",
-          onPress: () => router.push("/create-service-pending"),
-        },
-      ]
+    setPendingServiceModal(true);
+  };
+
+  // Função para cancelar a criação do serviço
+  const cancelAddService = () => {
+    setAddingService({});
+    setIsVehicleFocus(false);
+    setPendingServiceModal(false);
+  };
+
+  // Função para salvar o novo serviço pendente
+  const saveServiceChanges = () => {
+    // Validação básica
+    if (!addingService.vehicleId || !addingService.description) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // Encontrar o veículo selecionado
+    const selectedVehicle = vehicles.find(
+      (v) => v.id === addingService.vehicleId
     );
+
+    // Aqui você pode implementar a lógica para salvar o serviço
+    const serviceData = {
+      ...addingService,
+      vehicle: selectedVehicle,
+      clientId: client.id,
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("Novo serviço pendente:", serviceData);
+
+    // Limpar estados e fechar modal
+    setAddingService({});
+    setIsVehicleFocus(false);
+    setPendingServiceModal(false);
+
+    Alert.alert("Sucesso", "Serviço pendente criado com sucesso!");
   };
 
   const createServiceNote = () => {
@@ -418,7 +496,7 @@ const clientInfo = () => {
                   maxLength={15} // (11) 91234-5678
                 />
 
-                 <Text style={styles.inputLabel}>CEP</Text>
+                <Text style={styles.inputLabel}>CEP</Text>
                 <TextInput
                   style={styles.input}
                   value={formatCEP(editingClient.cep)}
@@ -626,25 +704,25 @@ const clientInfo = () => {
                   style={styles.input}
                   value={addingVehicle.veiculo || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, veiculo: text })
+                    setAddingService({ ...addingService, veiculo: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Modelo</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.modelo || ""}
+                  value={addingService.modelo || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, modelo: text })
+                    setAddingService({ ...addingService, modelo: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Ano</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.ano || ""}
+                  value={addingService.ano || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, ano: text })
+                    setAddingService({ ...addingService, ano: text })
                   }
                   keyboardType="numeric"
                 />
@@ -652,18 +730,18 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Cor</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.cor || ""}
+                  value={addingService.cor || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, cor: text })
+                    setAddingService({ ...addingService, cor: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Quilometragem (KM)</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.km || ""}
+                  value={addingService.km || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, km: text })
+                    setAddingService({ ...addingService, km: text })
                   }
                   keyboardType="numeric"
                 />
@@ -671,10 +749,10 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Placa</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.placa || ""}
+                  value={addingService.placa || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({
-                      ...addingVehicle,
+                    setAddingService({
+                      ...addingService,
                       placa: text.toUpperCase(),
                     })
                   }
@@ -711,6 +789,103 @@ const clientInfo = () => {
             </View>
           </Modal>
           {/* Fim Modal para criar um carro novo para o cliente */}
+
+          {/* Modal para adicionar um serviço pendente */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={pendingServiceModal}
+            onRequestClose={() => setPendingServiceModal(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Criar Serviço Pendente</Text>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Selecionar Veículo:</Text>
+                  <Dropdown
+                    style={[
+                      styles.dropdown,
+                      isVehicleFocus && { borderColor: Colors.azul },
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={getVehicleDropdownData()}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={
+                      !isVehicleFocus ? "Selecione um veículo" : "..."
+                    }
+                    value={addingService.vehicleId}
+                    onFocus={() => setIsVehicleFocus(true)}
+                    onBlur={() => setIsVehicleFocus(false)}
+                    onChange={(item) => {
+                      setAddingService({
+                        ...addingService,
+                        vehicleId: item.value,
+                        licensePlate: item.vehicle.placa,
+                      });
+                      setIsVehicleFocus(false);
+                    }}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Placa:</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: "#f5f5f5" }]}
+                    value={addingService.licensePlate || ""}
+                    placeholder="Placa será preenchida automaticamente"
+                    editable={false}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Descrição:</Text>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    value={addingService.description || ""}
+                    onChangeText={(text) =>
+                      setAddingService({ ...addingService, description: text })
+                    }
+                    placeholder="Digite a descrição do serviço"
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                </View>
+
+                <View style={styles.modalButtons}>
+                  <Button
+                    cor={Colors.vermelho}
+                    texto="Cancelar"
+                    onPress={cancelAddService}
+                  >
+                    <MaterialIcons
+                      name="cancel"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                  <Button
+                    cor={Colors.verde}
+                    texto="Salvar"
+                    onPress={saveServiceChanges}
+                  >
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          {/* Fim Modal para adicionar um serviço pendente */}
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
@@ -881,45 +1056,61 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "DM-Sans",
   },
+  // Estilos do Modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "#FFF",
-    margin: 20,
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    width: "90%",
+    maxWidth: 400,
     elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: "center",
+    color: "#333",
     fontFamily: "DM-Sans",
   },
+  inputContainer: {
+    marginBottom: 16,
+    flexDirection: "column",
+  },
   inputLabel: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#333",
     fontFamily: "DM-Sans",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 15,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "#f9f9f9",
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    gap: 12,
   },
   modalButtons: {
     flexDirection: "row",
@@ -943,5 +1134,33 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     fontFamily: "DM-Sans",
+  },
+  // Estilos do dropdown
+  dropdown: {
+    height: 50,
+    borderColor: "gray",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    backgroundColor: "white",
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: "#999",
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: "top",
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
 });

@@ -17,11 +17,7 @@ import ShortClientList from "@/components/admin/ShortClientList";
 import BackToHomeButton from "@/components/BackToHomeButton";
 
 // ÍCONES
-import {
-  Entypo,
-  MaterialCommunityIcons,
-  FontAwesome6,
-} from "@expo/vector-icons";
+import { Entypo, FontAwesome6 } from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
