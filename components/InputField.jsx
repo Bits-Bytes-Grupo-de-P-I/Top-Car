@@ -8,6 +8,7 @@ const InputField = (props) => {
       <MaskedTextInput
         style={styles.input}
         keyboardType={props.keyboardType}
+        maxLength={props.maxLength}
         mask={props.mascara}
         onChangeText={props.onChangeText || (() => {})}
         value={props.valor}
@@ -32,6 +33,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     marginBottom: 8,
+    fontFamily: "DM-Sans"
   },
   input: {
     backgroundColor: "#fff",
@@ -42,5 +44,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: "100%",
     color: "#333",
+    fontFamily: "DM-Sans"
   },
 });
