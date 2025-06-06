@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Switch,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
@@ -16,8 +15,9 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // COMPONENTES
+import Slider from "@/components/Slider";
 import VehicleSelector from "@/components/client/VehicleSelector";
-import PageHeader from "@/components/PageHeader"; 
+import PageHeader from "@/components/PageHeader";
 
 // ÍCONES
 import { MaterialIcons } from "@expo/vector-icons";
@@ -29,32 +29,61 @@ const serviceRequestForm = () => {
   const router = useRouter();
 
   // Estados para os campos do formulário
+  const [vehicles, setVehicles] = useState([]); // Lista de todos os carros
   const [vehicle, setVehicle] = useState(null);
   const [vehicleName, setVehicleName] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
   const [vehicleYear, setVehicleYear] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
+  const [problemSummary, setProblemSummary] = useState("");
+  const [summaryLength, setSummaryLength] = useState(50);
   const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Lista simulada de veículos (substituir pela chamada à sua API/banco de dados)
-  const [vehicles, setVehicles] = useState([
-    {
-      id: "1",
-      name: "Honda Civic",
-      plate: "ABC1234",
-      model: "Civic",
-      year: "2020",
-    },
-    {
-      id: "2",
-      name: "Toyota Corolla",
-      plate: "DEF5678",
-      model: "Corolla",
-      year: "2019",
-    },
-    { id: "3", name: "Fiat Uno", plate: "GHI9012", model: "Uno", year: "2018" },
-  ]);
+  // Token de autorização
+  const authToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs"; // PRECISA ARMAZENAR ESSA PORRA DE MODO SEGURO!!!
+
+  // Função para buscar veículos
+  const fetchVehicles = async () => {
+    try {
+      const response = await fetch(
+        "https://topcar-back-end.onrender.com/veiculos",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      // Formato original do mock:
+      const transformedData = data.map((vehicle) => ({
+        id: vehicle.id.toString(),
+        name: `${vehicle.marca} ${vehicle.modelo}`,
+        plate: vehicle.placa,
+        model: vehicle.modelo,
+        year: vehicle.ano.toString(),
+      }));
+
+      setVehicles(transformedData);
+    } catch (error) {
+      console.error("Erro ao buscar veículos:", error);
+    }
+  };
+
+  // Chama a função quando o componente carregar
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
 
   // Atualiza os campos do formulário quando um veículo é selecionado
   const handleVehicleSelect = (selectedVehicle) => {
@@ -73,16 +102,16 @@ const serviceRequestForm = () => {
     setVehicleModel("");
     setVehicleYear("");
     setProblemDescription("");
+    setProblemSummary("");
     setIsUrgent(false);
   };
 
   // Envia o formulário
   const handleSubmit = async () => {
-    // Validação básica
-    if (!vehicleName || !vehicleModel || !vehicleYear || !problemDescription) {
+    if (!vehicle || !problemDescription) {
       Alert.alert(
         "Campos obrigatórios",
-        "Por favor, preencha todos os campos do formulário."
+        "Selecione um veículo e descreva o problema."
       );
       return;
     }
@@ -90,36 +119,42 @@ const serviceRequestForm = () => {
     setIsLoading(true);
 
     try {
-      // Preparar dados para envio
       const serviceRequestData = {
-        vehicleName,
-        vehicleModel,
-        vehicleYear,
-        problemDescription,
-        isUrgent,
-        vehicleId: vehicle?.id || null,
-        plate: vehicle?.plate || null,
-        requestDate: new Date().toISOString(),
+        cliente_id: 4,
+        veiculo_id: vehicle.id,
+        resumo: problemSummary,
+        descricao: problemDescription,
+        status: "pendente",
+        dataPedido: new Date().toISOString().split("T")[0],
       };
 
-      // Simulação de envio para API
-      console.log("Enviando dados:", serviceRequestData);
+      const response = await fetch(
+        "https://topcar-back-end.onrender.com/pedidos",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(serviceRequestData),
+        }
+      );
 
-      // Aqui você faria sua chamada para a API
-      // await api.post('/service-requests', serviceRequestData);
-
-      // Simulando um tempo de processamento
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log("Erro na requisição:", errorData);
+        throw new Error(errorData.message || "Erro ao enviar solicitação");
+      }
 
       Alert.alert(
         "Pedido Enviado",
-        "Seu pedido de atendimento foi enviado com sucesso! Um mecânico entrará em contato em breve.",
+        "Seu pedido de atendimento foi enviado com sucesso!",
         [
           {
             text: "OK",
             onPress: () => {
               handleClearForm();
-              router.back(); // Usar router.back() ou router.replace('/index')
+              router.back();
             },
           },
         ]
@@ -128,7 +163,7 @@ const serviceRequestForm = () => {
       console.error("Erro ao enviar pedido:", error);
       Alert.alert(
         "Erro",
-        "Não foi possível enviar seu pedido. Por favor, tente novamente."
+        "Não foi possível enviar seu pedido. Tente novamente."
       );
     } finally {
       setIsLoading(false);
@@ -194,6 +229,26 @@ const serviceRequestForm = () => {
               />
             </View>
 
+            {/* Resumo do Problema */}
+            <View style={styles.formGroup}>
+              <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
+                <Text style={styles.label}>Resumo do Problema</Text>
+                <Text style={styles.summaryCounter}>
+                  ({summaryLength - problemSummary.length})
+                </Text>
+              </View>
+              <TextInput
+                style={styles.input}
+                value={problemSummary}
+                onChangeText={setProblemSummary}
+                placeholder="Escreva de forma resumida o seu problema..."
+                multiline
+                numberOfLines={2}
+                textAlignVertical="top"
+                maxLength={summaryLength}
+              />
+            </View>
+
             {/* Descrição do Problema */}
             <View style={styles.formGroup}>
               <Text style={styles.label}>Descrição do Problema</Text>
@@ -213,15 +268,10 @@ const serviceRequestForm = () => {
               <View style={styles.switchGroup}>
                 <Text style={styles.switchLabel}>Serviço Urgente</Text>
                 <Text style={styles.switchDescription}>
-                  Marque esta opção para priorizar seu atendimento
+                  Marque esta opção caso você necessite de atendimento urgentemente
                 </Text>
               </View>
-              <Switch
-                value={isUrgent}
-                onValueChange={setIsUrgent}
-                trackColor={{ false: "#d1d1d1", true: "#b3e0ff" }}
-                thumbColor={isUrgent ? "#007AFF" : "#f4f3f4"}
-              />
+              <Slider value={isUrgent} onPress={setIsUrgent} />
             </View>
 
             {/* Botões de Ação */}
@@ -271,7 +321,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: Colors.azul,
   },
   title: {
     fontSize: 24,
@@ -306,6 +356,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     marginBottom: 8,
+  },
+  summaryCounter: {
+    marginLeft: 8,
+    color: "#606060"
   },
   input: {
     backgroundColor: "#fff",

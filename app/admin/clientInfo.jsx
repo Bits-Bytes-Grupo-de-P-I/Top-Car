@@ -11,17 +11,15 @@ import {
   Alert,
   ImageBackground,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { useState, useEffect } from "react";
-import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { router, useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // COMPONENTES
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
-
-// DADOS MOCKADOS
-import mock from "@/assets/mocks/clientAndVehiclesInfo";
 
 // ÍCONES
 import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -29,27 +27,125 @@ import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 // CORES
 import Colors from "@/constants/Colors";
 
+// Funções de formatação/máscara (que eu fui muito burro pra fazer sozinho foi mal família)
+const formatPhone = (phone) => {
+  if (!phone) return "";
+
+  // Remove tudo que não é número
+  const numbers = phone?.replace(/\D/g, "");
+
+  // Aplica a máscara baseada no tamanho
+  if (numbers?.length <= 10) {
+    // Telefone fixo: (11) 1234-5678
+    return numbers.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  } else {
+    // Celular: (11) 91234-5678
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  }
+};
+
+const formatCEP = (cep) => {
+  if (!cep) return "";
+
+  // Remove tudo que não é número
+  const numbers = cep.replace(/\D/g, "");
+
+  // Aplica a máscara: 12345-678
+  return numbers.replace(/(\d{5})(\d{3})/, "$1-$2");
+};
+
+const removePhoneMask = (phone) => {
+  return phone ? phone.replace(/\D/g, "") : "";
+};
+
+const removeCEPMask = (cep) => {
+  return cep ? cep.replace(/\D/g, "") : "";
+};
+
 const clientInfo = () => {
-  const [client, setClient] = useState(mock.client);
-  const [vehicles, setVehicles] = useState(mock.vehicles);
+  // Receber os parâmetros da navegação
+  const params = useLocalSearchParams();
+
+  // Inicializar o estado do cliente com os dados recebidos
+  const [client, setClient] = useState({
+    id: Date.now(), // Gerar um ID temporário
+    nome: params.nome || "",
+    documento: params.cpf || "",
+    email: params.email || "",
+    tipoPessoa: params.tipo_pessoa || "fisica",
+    telefone: params.telefone || "",
+    cep: params.cep || "",
+    endereco: params.endereco || "",
+    numero: params.numero || "",
+    bairro: params.bairro || "",
+    cidade: params.cidade || "",
+    estado: params.estado || "",
+    funcao: params.funcao || "",
+  });
+
+  // Dados formatados
+  const telefoneFormatado = client.telefone;
+
+  const [vehicles, setVehicles] = useState([
+    // Dados mockados para teste
+    {
+      id: 1,
+      veiculo: "Toyota",
+      modelo: "Corolla",
+      ano: "2020",
+      cor: "Prata",
+      km: "35000",
+      placa: "ABC1D23",
+      clientId: 101,
+      inShop: false,
+    },
+    {
+      id: 2,
+      veiculo: "Honda",
+      modelo: "Civic",
+      ano: "2018",
+      cor: "Preto",
+      km: "58000",
+      placa: "XYZ4E56",
+      clientId: 101,
+      inShop: true,
+    },
+    {
+      id: 3,
+      veiculo: "Volkswagen",
+      modelo: "Gol",
+      ano: "2015",
+      cor: "Branco",
+      km: "90000",
+      placa: "JKL7F89",
+      clientId: 101,
+      inShop: false,
+    },
+  ]);
+
   const [inShop, setInShop] = useState(false);
   const [editClientModal, setEditClientModal] = useState(false);
   const [editingClient, setEditingClient] = useState({});
   const [vehicleModal, setVehicleModal] = useState(false);
   const [newVehicleModal, setNewVehicleModal] = useState(false);
+  const [pendingServiceModal, setPendingServiceModal] = useState(false);
   const [addingVehicle, setAddingVehicle] = useState({});
-  // const [addingVehicleIndex, setAddingVehicleIndex] = useState(-1);
+  const [addingService, setAddingService] = useState({});
   const [editingVehicle, setEditingVehicle] = useState({});
   const [editingVehicleIndex, setEditingVehicleIndex] = useState(-1);
+  const [isVehicleFocus, setIsVehicleFocus] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false); // state para definir carregamento de informações
+
   useEffect(() => {
     // Verificar se algum veículo está na oficina
     const checkVehiclesInShop = () => {
-      const hasVehicleInShop = mock.vehicles.some((vehicle) => vehicle.inShop);
+      const hasVehicleInShop = vehicles.some((vehicle) => vehicle.inShop);
       setInShop(hasVehicleInShop);
     };
 
     checkVehiclesInShop();
-  }, []);
+  }, [vehicles]); // Dependência alterada para vehicles
 
   const handleEditClient = () => {
     setEditingClient({ ...client });
@@ -90,6 +186,15 @@ const clientInfo = () => {
     setNewVehicleModal(true);
   };
 
+  // Função do dropdown
+  const getVehicleDropdownData = () => {
+    return vehicles.map((vehicle) => ({
+      label: `${vehicle.veiculo} ${vehicle.modelo} (${vehicle.ano}) - ${vehicle.placa}`,
+      value: vehicle.id,
+      vehicle: vehicle,
+    }));
+  };
+
   // Função para cancelar adição (limpa os dados e fecha modal)
   const cancelAddVehicle = () => {
     setAddingVehicle({});
@@ -109,14 +214,15 @@ const clientInfo = () => {
 
     // Criar um novo veículo com ID único
     const newVehicle = {
-      id: Date.now(), // ou use uma função de geração de ID mais robusta
+      id: Date.now(),
       veiculo: addingVehicle.veiculo,
       modelo: addingVehicle.modelo,
       ano: addingVehicle.ano,
       cor: addingVehicle.cor || "",
       km: addingVehicle.km || "0",
       placa: addingVehicle.placa || "",
-      clientId: client.id, // assumindo que você quer associar ao cliente atual
+      clientId: client.id,
+      inShop: false,
     };
 
     // Adicionar o novo veículo à lista
@@ -142,18 +248,47 @@ const clientInfo = () => {
     </TouchableOpacity>
   );
 
+  // Modal para adicionar um serviço pendente vinculado ao cliente
   const createServicePending = () => {
-    Alert.alert(
-      "Nova Pendência",
-      "Criar nova pendência de serviço para este cliente?",
-      [
-        { text: "Cancelar" },
-        {
-          text: "Confirmar",
-          onPress: () => router.push("/create-service-pending"),
-        },
-      ]
+    setPendingServiceModal(true);
+  };
+
+  // Função para cancelar a criação do serviço
+  const cancelAddService = () => {
+    setAddingService({});
+    setIsVehicleFocus(false);
+    setPendingServiceModal(false);
+  };
+
+  // Função para salvar o novo serviço pendente
+  const saveServiceChanges = () => {
+    // Validação básica
+    if (!addingService.vehicleId || !addingService.description) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // Encontrar o veículo selecionado
+    const selectedVehicle = vehicles.find(
+      (v) => v.id === addingService.vehicleId
     );
+
+    // Aqui você pode implementar a lógica para salvar o serviço
+    const serviceData = {
+      ...addingService,
+      vehicle: selectedVehicle,
+      clientId: client.id,
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log("Novo serviço pendente:", serviceData);
+
+    // Limpar estados e fechar modal
+    setAddingService({});
+    setIsVehicleFocus(false);
+    setPendingServiceModal(false);
+
+    Alert.alert("Sucesso", "Serviço pendente criado com sucesso!");
   };
 
   const createServiceNote = () => {
@@ -204,11 +339,13 @@ const clientInfo = () => {
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Telefone:</Text>
-                <Text style={styles.infoValue}>{client.telefone}</Text>
+                <Text style={styles.infoValue}>
+                  {formatPhone(client.telefone)}
+                </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>CEP:</Text>
-                <Text style={styles.infoValue}>{client.cep}</Text>
+                <Text style={styles.infoValue}>{formatCEP(client.cep)}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Endereço:</Text>
@@ -241,40 +378,54 @@ const clientInfo = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Veículos</Text>
 
-            {vehicles.map((vehicle, index) => (
-              <View key={index} style={styles.vehicleCard}>
-                <View style={styles.vehicleHeader}>
-                  <Text style={styles.vehicleName}>
-                    {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => handleEditVehicle(vehicle, index)}
-                  >
-                    <MaterialIcons
-                      name="edit"
-                      size={20}
-                      color={Colors.azul}
-                      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.vehicleInfo}>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Cor:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
-                  </View>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Placa:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.placa}</Text>
-                  </View>
-                  <View style={styles.vehicleInfoItem}>
-                    <Text style={styles.vehicleInfoLabel}>Quilometragem:</Text>
-                    <Text style={styles.vehicleInfoValue}>{vehicle.km} km</Text>
-                  </View>
-                </View>
+            {vehicles?.length === 0 ? (
+              <View style={styles.noVehiclesContainer}>
+                <Text style={styles.noVehiclesText}>
+                  Nenhum veículo cadastrado para este cliente
+                </Text>
               </View>
-            ))}
+            ) : (
+              vehicles?.map((vehicle, index) => (
+                <View key={index} style={styles.vehicleCard}>
+                  <View style={styles.vehicleHeader}>
+                    <Text style={styles.vehicleName}>
+                      {vehicle.veiculo} {vehicle.modelo} ({vehicle.ano})
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => handleEditVehicle(vehicle, index)}
+                    >
+                      <MaterialIcons
+                        name="edit"
+                        size={20}
+                        color={Colors.azul}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.vehicleInfo}>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>Cor:</Text>
+                      <Text style={styles.vehicleInfoValue}>{vehicle.cor}</Text>
+                    </View>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>Placa:</Text>
+                      <Text style={styles.vehicleInfoValue}>
+                        {vehicle.placa}
+                      </Text>
+                    </View>
+                    <View style={styles.vehicleInfoItem}>
+                      <Text style={styles.vehicleInfoLabel}>
+                        Quilometragem:
+                      </Text>
+                      <Text style={styles.vehicleInfoValue}>
+                        {vehicle.km} km
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))
+            )}
             {renderAddButton("veiculo")}
           </View>
 
@@ -282,7 +433,7 @@ const clientInfo = () => {
           <View style={styles.actionButtonsContainer}>
             <TouchableOpacity
               style={styles.actionButton}
-              // onPress={createServicePending}
+              onPress={createServicePending}
             >
               <FontAwesome5 name="clipboard-list" size={18} color="#FFF" />
               <Text style={styles.actionButtonText}>Nova Pendência</Text>
@@ -332,21 +483,30 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Telefone</Text>
                 <TextInput
                   style={styles.input}
-                  value={editingClient.telefone}
-                  onChangeText={(text) =>
-                    setEditingClient({ ...editingClient, telefone: text })
-                  }
+                  value={formatPhone(editingClient.telefone)}
+                  onChangeText={(text) => {
+                    // Remove a máscara antes de salvar
+                    const cleanPhone = removePhoneMask(text);
+                    setEditingClient({
+                      ...editingClient,
+                      telefone: cleanPhone,
+                    });
+                  }}
                   keyboardType="phone-pad"
+                  maxLength={15} // (11) 91234-5678
                 />
 
                 <Text style={styles.inputLabel}>CEP</Text>
                 <TextInput
                   style={styles.input}
-                  value={editingClient.cep}
-                  onChangeText={(text) =>
-                    setEditingClient({ ...editingClient, cep: text })
-                  }
+                  value={formatCEP(editingClient.cep)}
+                  onChangeText={(text) => {
+                    // Remove a máscara antes de salvar
+                    const cleanCEP = removeCEPMask(text);
+                    setEditingClient({ ...editingClient, cep: cleanCEP });
+                  }}
                   keyboardType="numeric"
+                  maxLength={9} // 12345-678
                 />
 
                 <Text style={styles.inputLabel}>Endereço</Text>
@@ -544,25 +704,25 @@ const clientInfo = () => {
                   style={styles.input}
                   value={addingVehicle.veiculo || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, veiculo: text })
+                    setAddingService({ ...addingService, veiculo: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Modelo</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.modelo || ""}
+                  value={addingService.modelo || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, modelo: text })
+                    setAddingService({ ...addingService, modelo: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Ano</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.ano || ""}
+                  value={addingService.ano || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, ano: text })
+                    setAddingService({ ...addingService, ano: text })
                   }
                   keyboardType="numeric"
                 />
@@ -570,18 +730,18 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Cor</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.cor || ""}
+                  value={addingService.cor || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, cor: text })
+                    setAddingService({ ...addingService, cor: text })
                   }
                 />
 
                 <Text style={styles.inputLabel}>Quilometragem (KM)</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.km || ""}
+                  value={addingService.km || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({ ...addingVehicle, km: text })
+                    setAddingService({ ...addingService, km: text })
                   }
                   keyboardType="numeric"
                 />
@@ -589,10 +749,10 @@ const clientInfo = () => {
                 <Text style={styles.inputLabel}>Placa</Text>
                 <TextInput
                   style={styles.input}
-                  value={addingVehicle.placa || ""}
+                  value={addingService.placa || ""}
                   onChangeText={(text) =>
-                    setAddingVehicle({
-                      ...addingVehicle,
+                    setAddingService({
+                      ...addingService,
                       placa: text.toUpperCase(),
                     })
                   }
@@ -629,11 +789,110 @@ const clientInfo = () => {
             </View>
           </Modal>
           {/* Fim Modal para criar um carro novo para o cliente */}
+
+          {/* Modal para adicionar um serviço pendente */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={pendingServiceModal}
+            onRequestClose={() => setPendingServiceModal(false)}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Criar Serviço Pendente</Text>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Selecionar Veículo:</Text>
+                  <Dropdown
+                    style={[
+                      styles.dropdown,
+                      isVehicleFocus && { borderColor: Colors.azul },
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={getVehicleDropdownData()}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={
+                      !isVehicleFocus ? "Selecione um veículo" : "..."
+                    }
+                    value={addingService.vehicleId}
+                    onFocus={() => setIsVehicleFocus(true)}
+                    onBlur={() => setIsVehicleFocus(false)}
+                    onChange={(item) => {
+                      setAddingService({
+                        ...addingService,
+                        vehicleId: item.value,
+                        licensePlate: item.vehicle.placa,
+                      });
+                      setIsVehicleFocus(false);
+                    }}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Placa:</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: "#f5f5f5" }]}
+                    value={addingService.licensePlate || ""}
+                    placeholder="Placa será preenchida automaticamente"
+                    editable={false}
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Descrição:</Text>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    value={addingService.description || ""}
+                    onChangeText={(text) =>
+                      setAddingService({ ...addingService, description: text })
+                    }
+                    placeholder="Digite a descrição do serviço"
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                </View>
+
+                <View style={styles.modalButtons}>
+                  <Button
+                    cor={Colors.vermelho}
+                    texto="Cancelar"
+                    onPress={cancelAddService}
+                  >
+                    <MaterialIcons
+                      name="cancel"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                  <Button
+                    cor={Colors.verde}
+                    texto="Salvar"
+                    onPress={saveServiceChanges}
+                  >
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="white"
+                      style={{ marginRight: 5 }}
+                    />
+                  </Button>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          {/* Fim Modal para adicionar um serviço pendente */}
         </ScrollView>
       </ImageBackground>
     </SafeAreaView>
   );
 };
+
+export default clientInfo;
 
 const styles = StyleSheet.create({
   background: {
@@ -797,45 +1056,61 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: "DM-Sans",
   },
+  // Estilos do Modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "#FFF",
-    margin: 20,
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    width: "90%",
+    maxWidth: 400,
     elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: "center",
+    color: "#333",
     fontFamily: "DM-Sans",
   },
+  inputContainer: {
+    marginBottom: 16,
+    flexDirection: "column",
+  },
   inputLabel: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#333",
     fontFamily: "DM-Sans",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 15,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: "#f9f9f9",
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    gap: 12,
   },
   modalButtons: {
     flexDirection: "row",
@@ -860,6 +1135,34 @@ const styles = StyleSheet.create({
     color: "#333",
     fontFamily: "DM-Sans",
   },
+  // Estilos do dropdown
+  dropdown: {
+    height: 50,
+    borderColor: "gray",
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    backgroundColor: "white",
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    color: "#999",
+    padding: 12
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+    padding: 12
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: "top",
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
 });
-
-export default clientInfo;

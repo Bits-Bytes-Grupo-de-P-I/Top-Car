@@ -190,7 +190,7 @@ export default function CardOficina() {
         <View style={styles.footer}>
           <View>
             <Text style={styles.addressTitle}>Endereço:</Text>
-            <Text style={styles.addressText}>Rua das Oficinas, 123</Text>
+            <Text style={styles.addressText}>Av. Eng. Eli Pinheiro, 1065 - Pres. Olegário, MG</Text>
           </View>
           <TouchableOpacity style={styles.mapButton} onPress={navigateToMapa}>
             <Text style={styles.mapButtonText}>Ver no mapa</Text>

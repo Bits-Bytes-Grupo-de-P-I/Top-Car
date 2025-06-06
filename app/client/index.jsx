@@ -129,6 +129,22 @@ export default function Index() {
                     color={Colors.verdeEscuro}
                   />
                 </Card>
+
+                {/* APAGAR ESSE CARD */}
+                <Card
+                  texto="Meus serviços em andamento"
+                  cor={Colors.verde}
+                  onPress={() => router.push("./client/lgpdInfoPage")}
+                >
+                  <FontAwesome6
+                    style={{ marginBottom: 4 }}
+                    name="car" // tem o ícone "car-on" também
+                    size={30}
+                    color={Colors.verde}
+                  />
+                </Card>
+                {/* APAGAR ESSE CARD */}
+
                 {/* <Card
                     texto="Dúvidas frequentes"
                     cor={Colors.azul}

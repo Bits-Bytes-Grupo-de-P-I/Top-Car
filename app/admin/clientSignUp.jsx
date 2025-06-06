@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  TextInput,
   ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,13 +18,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import InputField from "@/components/InputField";
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
+import { CpfCnpjInput, PhoneInput } from "@/components/MaskedInputs";
 
 // CORES
 import Colors from "@/constants/Colors";
 
 const ClientSignUp = () => {
   // Estados para os dados do cliente
-  const [cpf, setCpf] = useState("");
+  const [documento, setDocumento] = useState("");
+  const [maskedValue, setMaskedValue] = useState("");
   const [telefone, setTelefone] = useState("");
   const [nome, setNome] = useState("");
   const [cep, setCep] = useState("");
@@ -48,7 +51,7 @@ const ClientSignUp = () => {
   // Limpa o formulário
   const handleClearForm = () => {
     setNome("");
-    setCpf("");
+    setDocumento("");
     setCep("");
     setCidade("");
     setEndereco("");
@@ -69,7 +72,7 @@ const ClientSignUp = () => {
   // Função para cadastrar cliente
   const handleSubmit = async () => {
     // Validação básica
-    if (!nome || !cpf || !telefone || !endereco) {
+    if (!nome || !documento || !telefone || !endereco) {
       Alert.alert(
         "Campos obrigatórios",
         "Por favor, preencha todos os campos obrigatórios."
@@ -83,7 +86,7 @@ const ClientSignUp = () => {
       // Preparar dados para envio
       const clientData = {
         nome,
-        cpf,
+        documento, // Talvez tenha que mudar depois
         cep,
         cidade,
         endereco,
@@ -104,10 +107,7 @@ const ClientSignUp = () => {
       };
 
       // Simulação de envio para API
-      console.log("Enviando dados:", clientData);
-
-      // Aqui você faria sua chamada para a API
-      // await api.post('/clients', clientData);
+      // console.log("Enviando dados:", clientData);
 
       // Simulando um tempo de processamento
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -130,6 +130,39 @@ const ClientSignUp = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Formatações de CPF e CNPJ (não deu pra usar o componente de inputField pois a mascara dele não aceita valores condicionais)
+  const applyMask = (text) => {
+    // Remove tudo que não for caracter numérico
+    const cleaned = text.replace(/\D/g, "");
+
+    if (cleaned.length <= 11) {
+      // Máscara de CPF: 000.000.000-00
+      return cleaned
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+        .replace(/(-\d{2})\d+?$/, "$1");
+    } else {
+      // Máscara de CNPJ: 00.000.000/0000-00
+      return cleaned
+        .replace(/(\d{2})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1/$2")
+        .replace(/(\d{4})(\d{1,2})/, "$1-$2")
+        .replace(/(-\d{2})\d+?$/, "$1");
+    }
+  };
+
+  // Função para lidar com mudanças no texto:
+  const handleTextChange = (text) => {
+    const masked = applyMask(text);
+    setMaskedValue(masked);
+
+    // Salvar apenas os números no documento (sem os . e /)
+    const numbersOnly = text.replace(/\D/g, "");
+    setDocumento(numbersOnly);
   };
 
   return (
@@ -162,24 +195,18 @@ const ClientSignUp = () => {
           </View>
 
           <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="CPF/CNPJ"
-              keyboardType="number-pad"
-              mascara="999.999.999-99"
-              valor={cpf}
-              onChangeText={setCpf}
-              placeholder="000.000.000-00 ou 00.000.000/0000-00"
+            <CpfCnpjInput
+              label="CPF/CNPJ"
+              placeholder="Digite seu CPF ou CNPJ"
+              onChangeText={(value) => console.log("Números:", value)}
             />
           </View>
 
           <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="Telefone"
-              keyboardType="phone-pad"
-              valor={telefone}
-              onChangeText={setTelefone}
-              mascara="(99) 99999-9999"
-              placeholder="(00) 00000-0000"
+            <PhoneInput
+              label="Telefone"
+              placeholder="Digite seu telefone"
+              onChangeText={(value) => console.log("Números:", value)}
             />
           </View>
 
