@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { StatusBar } from 'expo-status-bar';
 
 // COMPONENTES
 import Card from "@/components/Card";
@@ -27,6 +28,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar style="dark" /> {/* Define o estilo da barra de status */}
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
