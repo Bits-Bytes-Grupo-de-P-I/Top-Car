@@ -20,6 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "@/components/Slider";
 import PageHeader from "@/components/PageHeader";
 import Button from "@/components/Button";
+import GeneratePdfBtn from "@/components/admin/GeneratePdfBtn";
 
 // ÍCONES
 import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
@@ -439,13 +440,15 @@ const clientInfo = () => {
               <Text style={styles.actionButtonText}>Nova Pendência</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            <GeneratePdfBtn/>
+
+            {/* <TouchableOpacity
               style={[styles.actionButton, styles.noteButton]}
               onPress={createServiceNote}
             >
               <FontAwesome5 name="file-alt" size={18} color="#FFF" />
               <Text style={styles.actionButtonText}>Nova Nota</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* Modal para editar informações do cliente */}

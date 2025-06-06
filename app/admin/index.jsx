@@ -123,7 +123,7 @@ export default function Index() {
                 color={Colors.grafite}
               />
             </Card>
-            <Card
+            {/* <Card
               texto="Gerar nota de serviço avulsa"
               cor={Colors.grafite}
               iconName="table-list"
@@ -135,7 +135,7 @@ export default function Index() {
                 size={30}
                 color={Colors.grafite}
               />
-            </Card>
+            </Card> */}
           </View>
 
           {/* Título Clientes */}
