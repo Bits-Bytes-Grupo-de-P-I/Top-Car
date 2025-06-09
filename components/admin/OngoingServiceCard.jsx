@@ -97,10 +97,12 @@ const OngoingServiceCard = ({ item, onPress }) => {
             <FontAwesome6 name="wrench" size={14} color={Colors.azulClaro} />
             <Text style={styles.infoText}>{item.servico}</Text>
           </View>
-          <View style={styles.infoRow}>
-            <FontAwesome6 name="calendar" size={14} color={Colors.laranja} />
-            <Text style={styles.infoText}>{item.dataAgendada}</Text>
-          </View>
+          {item.dataAgendada && (
+            <View style={styles.infoRow}>
+              <FontAwesome6 name="calendar" size={14} color={Colors.laranja} />
+              <Text style={styles.infoText}>{item.dataAgendada}</Text>
+            </View>
+          )}
         </View>
         <View
           style={styles.statusContainer}

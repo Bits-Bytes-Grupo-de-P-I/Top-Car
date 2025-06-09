@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from "expo-status-bar";
 
 // COMPONENTES
 import Card from "@/components/Card";
@@ -28,7 +28,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar style="dark" /> {/* Define o estilo da barra de status */}
+      <StatusBar style="dark" />
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -123,19 +123,19 @@ export default function Index() {
                 color={Colors.grafite}
               />
             </Card>
-            {/* <Card
-              texto="Gerar nota de serviço avulsa"
-              cor={Colors.grafite}
+            <Card
+              texto="Teste de notificação"
+              cor={Colors.azul}
               iconName="table-list"
-              onPress={() => router.push("./admin/testePdf")}
+              onPress={() => router.push("./admin/testeNotif")}
             >
               <FontAwesome6
                 style={{ marginBottom: 4 }}
-                name="table-list"
+                name="atom"
                 size={30}
-                color={Colors.grafite}
+                color={Colors.azul}
               />
-            </Card> */}
+            </Card>
           </View>
 
           {/* Título Clientes */}

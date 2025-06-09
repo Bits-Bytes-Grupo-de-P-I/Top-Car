@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from "expo-status-bar";
 
 // COMPONENTES
 import Card from "@/components/Card";
@@ -19,9 +19,8 @@ import CardWork from "@/components/client/CardWork";
 // ÍCONES
 import {
   Entypo,
-  MaterialCommunityIcons,
-  FontAwesome,
   FontAwesome6,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 
 // CORES
@@ -35,7 +34,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar style="dark"/> {/* Define o estilo da barra de status */}
+      <StatusBar style="dark" />
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -82,14 +81,14 @@ export default function Index() {
               <View style={styles.containerCards}>
                 <Card
                   texto="Meus serviços em andamento"
-                  cor={Colors.verde}
+                  cor={Colors.azulClaro}
                   onPress={() => router.push("./client/serviceStatus")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
                     name="car" // tem o ícone "car-on" também
                     size={30}
-                    color={Colors.verde}
+                    color={Colors.azulClaro}
                   />
                 </Card>
 
@@ -121,37 +120,30 @@ export default function Index() {
 
                 <Card
                   texto="Serviços realizados"
-                  cor={Colors.verdeEscuro}
+                  cor={Colors.verde}
                   onPress={() => router.push("./client/serviceHistory")}
                 >
                   <FontAwesome6
                     style={{ marginBottom: 4 }}
                     name="gear"
                     size={30}
-                    color={Colors.verdeEscuro}
+                    color={Colors.verde}
                   />
                 </Card>
 
                 {/* APAGAR ESSE CARD */}
                 <Card
-                  texto="Meus serviços em andamento"
-                  cor={Colors.verde}
+                  texto="Sobre o App"
+                  cor={Colors.azul}
                   onPress={() => router.push("./client/lgpdInfoPage")}
                 >
-                  <FontAwesome6
+                  <MaterialCommunityIcons
                     style={{ marginBottom: 4 }}
-                    name="car" // tem o ícone "car-on" também
+                    name="card-text"
                     size={30}
-                    color={Colors.verde}
+                    color={Colors.azul}
                   />
                 </Card>
-                {/* APAGAR ESSE CARD */}
-
-                {/* <Card
-                    texto="Dúvidas frequentes"
-                    cor={Colors.azul}
-                    iconName="circle-question"
-                  /> */}
               </View>
               {/* Fim Container dos cards */}
 

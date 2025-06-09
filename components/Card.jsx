@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     backgroundColor: Colors.cinzaClaro,
     borderRadius: 10,
-    padding: 8,
+    padding: 10,
     marginBottom: 16,
     boxShadow: "3px 4px 4px rgba(0, 0, 0, 0.25)",
   },

@@ -2,10 +2,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 
+// ÍCONES
+import { FontAwesome6} from "@expo/vector-icons";
+
 // CORES
 import Colors from "@/constants/Colors";
 
-export default function CardOficina() {
+export default function CardWork() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const router = useRouter();
@@ -115,7 +118,7 @@ export default function CardOficina() {
 
   // Navegar para a tela de mapa
   const navigateToMapa = () => {
-    router.push("/mapa");
+    router.push("https://maps.app.goo.gl/ZzPbWoqrMC9DzqxU9");
   };
 
   return (
@@ -190,9 +193,10 @@ export default function CardOficina() {
         <View style={styles.footer}>
           <View>
             <Text style={styles.addressTitle}>Endereço:</Text>
-            <Text style={styles.addressText}>Av. Eng. Eli Pinheiro, 1065 - Pres. Olegário, MG</Text>
+            <Text style={styles.addressText}>Av. Eng. Eli Pinheiro, 1065</Text>
           </View>
           <TouchableOpacity style={styles.mapButton} onPress={navigateToMapa}>
+            <FontAwesome6 name="location-dot" size={18} color={Colors.azul} style={{marginRight: 8}}/>
             <Text style={styles.mapButtonText}>Ver no mapa</Text>
           </TouchableOpacity>
         </View>
@@ -331,12 +335,13 @@ const styles = StyleSheet.create({
     color: "#6B7280", // gray-600
   },
   mapButton: {
+    flexDirection: 'row',
     backgroundColor: "#EFF6FF", // blue-50
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
   mapButtonText: {
-    color: Colors.azul // blue-700
+    color: Colors.azul
   },
 });

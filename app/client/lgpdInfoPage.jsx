@@ -195,12 +195,16 @@ export default function lgpdInfoPage() {
 
               <View style={styles.contactInfo}>
                 <View style={styles.contactItem}>
-                  <Ionicons name="logo-instagram" size={20} color="#7f8c8d" />
-                  <Text style={styles.contactText}>topcarp.o</Text>
+                  <Ionicons name="mail-outline" size={20} color="#7f8c8d" />
+                  <Text style={styles.contactText}>topcarpo@hotmail.com</Text>
                 </View>
                 <View style={styles.contactItem}>
                   <Ionicons name="call-outline" size={20} color="#7f8c8d" />
                   <Text style={styles.contactText}>(34) 3811-2735</Text>
+                </View>
+                <View style={styles.contactItem}>
+                  <Ionicons name="logo-instagram" size={20} color="#7f8c8d" />
+                  <Text style={styles.contactText}>topcarp.o</Text>
                 </View>
               </View>
             </View>
@@ -231,7 +235,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   section: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Adicionei transparência
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -278,7 +282,7 @@ const styles = StyleSheet.create({
   },
   featureCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(248, 249, 250, 0.8)', // Adicionei transparência
+    backgroundColor: 'rgba(248, 249, 250, 0.8)',
     borderRadius: 10,
     padding: 15,
     marginBottom: 12,
@@ -311,7 +315,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contactInfo: {
-    backgroundColor: 'rgba(248, 249, 250, 0.8)', // Adicionei transparência
+    backgroundColor: 'rgba(248, 249, 250, 0.8)',
     borderRadius: 8,
     padding: 15,
   },

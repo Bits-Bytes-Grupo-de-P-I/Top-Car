@@ -423,7 +423,7 @@ const NotaServico = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.itemDetails}>
+          <View style={[styles.itemDetails, {flexDirection: 'row'}]}>
             <Text style={styles.itemInfo}>Tempo: {servico.tempo}</Text>
             <Text style={styles.itemTotal}>
               Mão de obra: R$ {servico.valorMaoDeObra.toFixed(2)}

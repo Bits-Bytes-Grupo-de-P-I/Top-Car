@@ -9,8 +9,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+
 // COMPONENTES
 import Badge from "../Badge";
+
 // Cores
 import Colors from "@/constants/Colors";
 

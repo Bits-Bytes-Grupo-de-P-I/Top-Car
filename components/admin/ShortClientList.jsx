@@ -61,7 +61,6 @@ const ShortClientList = () => {
       }));
 
       setClients(transformedData);
-      
     } catch (error) {
       console.error(error);
     } finally {
@@ -124,62 +123,14 @@ const ShortClientList = () => {
   const agendamentoDesejado = service.length > 2 ? service[1] : null; // altere o índice para testar outro
 
   // Só tenta logar se agendamentoDesejado não for null
-  useEffect(() => {
-    if (agendamentoDesejado) {
-      console.log(
-        "Status do agendamento escolhido:",
-        agendamentoDesejado.status
-      );
-    }
-  }, [agendamentoDesejado]);
-
-  // Função de renderização de cada cliente
-  const renderClients = () => {
-    return mostrarClientes?.map((client) => (
-      <TouchableOpacity
-        key={client.id.toString()}
-        style={styles.item}
-        onPress={() =>
-          router.push({
-            pathname: "./admin/clientInfo",
-            params: {
-              nome: client.nome,
-              cpf: client.cpfFormatado,
-              email: client.email,
-              senha: client.senha,
-              tipo_pessoa: client.tipo_pessoa,
-              cep: client.cep,
-              cidade: client.cidade,
-              endereco: client.endereco,
-              numero: client.numero,
-              bairro: client.bairro,
-              estado: client.estado,
-              telefone: client.telefone,
-              funcao: client.funcao,
-            },
-          })
-        }
-      >
-        <View style={styles.nomeStatus}>
-          <Text style={styles.nome}>{client.nome}</Text>
-
-          {agendamentoDesejado &&
-            agendamentoDesejado.status !== "Finalizado" && (
-              <Badge
-                text={agendamentoDesejado.status}
-                color={
-                  agendamentoDesejado.status === "Pendente"
-                    ? Colors.laranja
-                    : Colors.azul
-                }
-              />
-            )}
-        </View>
-
-        <Text style={styles.cpf}>CPF: {client.cpfFormatado}</Text>
-      </TouchableOpacity>
-    ));
-  };
+  // useEffect(() => {
+  //   if (agendamentoDesejado) {
+  //     console.log(
+  //       "Status do agendamento escolhido:",
+  //       agendamentoDesejado.status
+  //     );
+  //   }
+  // }, [agendamentoDesejado]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -202,7 +153,50 @@ const ShortClientList = () => {
         } else {
           return (
             <View style={styles.clientesContainer}>
-              {renderClients()}
+              {mostrarClientes?.map((client) => (
+                <TouchableOpacity
+                  key={client.id.toString()}
+                  style={styles.item}
+                  onPress={() =>
+                    router.push({
+                      pathname: "./admin/clientInfo",
+                      params: {
+                        nome: client.nome,
+                        cpf: client.cpfFormatado,
+                        email: client.email,
+                        senha: client.senha,
+                        tipo_pessoa: client.tipo_pessoa,
+                        cep: client.cep,
+                        cidade: client.cidade,
+                        endereco: client.endereco,
+                        numero: client.numero,
+                        bairro: client.bairro,
+                        estado: client.estado,
+                        telefone: client.telefone,
+                        funcao: client.funcao,
+                      },
+                    })
+                  }
+                >
+                  <View style={styles.nomeStatus}>
+                    <Text style={styles.nome}>{client.nome}</Text>
+
+                    {agendamentoDesejado &&
+                      agendamentoDesejado.status !== "Finalizado" && (
+                        <Badge
+                          text={agendamentoDesejado.status}
+                          color={
+                            agendamentoDesejado.status === "Pendente"
+                              ? Colors.laranja
+                              : Colors.azul
+                          }
+                        />
+                      )}
+                  </View>
+
+                  <Text style={styles.cpf}>CPF: {client.cpfFormatado}</Text>
+                </TouchableOpacity>
+              ))}
 
               {clientesFiltrados.length > 5 && (
                 <TouchableOpacity
