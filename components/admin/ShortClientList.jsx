@@ -29,7 +29,7 @@ const ShortClientList = () => {
 
   function formatCPF(cpfString) {
     const apenasDigitos = cpfString.replace(/\D/g, "");
-    if (apenasDigitos.length !== 11) {
+    if (apenasDigitos?.length !== 11) {
       return cpfString;
     }
     return apenasDigitos.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
@@ -120,7 +120,7 @@ const ShortClientList = () => {
   }, []);
 
   // Calcula de forma segura: só pega service[2] se existir
-  const agendamentoDesejado = service.length > 2 ? service[1] : null; // altere o índice para testar outro
+  const agendamentoDesejado = service?.length > 2 ? service[1] : null; // altere o índice para testar outro
 
   // Só tenta logar se agendamentoDesejado não for null
   // useEffect(() => {
@@ -146,7 +146,7 @@ const ShortClientList = () => {
           return (
             <Text style={styles.naoEncontrado}>Carregando clientes...</Text>
           );
-        } else if (clientesFiltrados.length === 0) {
+        } else if (clientesFiltrados?.length === 0) {
           return (
             <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
           );
@@ -198,13 +198,13 @@ const ShortClientList = () => {
                 </TouchableOpacity>
               ))}
 
-              {clientesFiltrados.length > 5 && (
+              {clientesFiltrados?.length > 5 && (
                 <TouchableOpacity
                   style={styles.verMaisBtn}
                   onPress={() => router.push("./admin/allClients")}
                 >
                   <Text style={styles.verMaisTxt}>
-                    Ver todos os clientes ({clientesFiltrados.length})
+                    Ver todos os clientes ({clientesFiltrados?.length})
                   </Text>
                 </TouchableOpacity>
               )}

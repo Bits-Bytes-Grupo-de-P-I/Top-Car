@@ -3,7 +3,7 @@
     "name": "Top-Car",
     "slug": "Top-Car",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -53,10 +53,11 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
+          "icon": "./assets/images/logo.png",
           "color": "#ffffff"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

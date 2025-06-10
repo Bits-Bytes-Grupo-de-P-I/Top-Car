@@ -75,7 +75,7 @@ const ongoingServices = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.listaContainer}>
-            {servicos.length > 0 ? (
+            {servicos?.length > 0 ? (
               servicos.map((item) => (
                 <OngoingServiceCard
                   key={item.id}

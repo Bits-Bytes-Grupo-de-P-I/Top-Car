@@ -73,7 +73,7 @@ const pendingServices = () => {
         style={styles.background}
         resizeMode="cover"
       >
-        {services.length === 0 ? (
+        {services?.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
               Não há serviços pendentes cadastrados.

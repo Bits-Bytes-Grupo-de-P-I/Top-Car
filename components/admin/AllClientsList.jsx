@@ -28,7 +28,7 @@ const AllClientsList = () => {
 
   function formatCPF(cpfString) {
     const apenasDigitos = cpfString.replace(/\D/g, "");
-    if (apenasDigitos.length !== 11) {
+    if (apenasDigitos?.length !== 11) {
       return cpfString;
     }
     return apenasDigitos.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
@@ -135,7 +135,7 @@ const AllClientsList = () => {
           return (
             <Text style={styles.naoEncontrado}>Carregando clientes...</Text>
           );
-        } else if (clientesFiltrados.length === 0) {
+        } else if (clientesFiltrados?.length === 0) {
           return (
             <Text style={styles.naoEncontrado}>Cliente não encontrado!</Text>
           );

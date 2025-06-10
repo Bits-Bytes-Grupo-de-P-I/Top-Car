@@ -57,7 +57,7 @@ const servicePending = () => {
           titleStyle={{ color: "#fff" }}
         />
 
-        {services.length === 0 ? (
+        {services?.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
               Você não possui serviços pendentes no momento.

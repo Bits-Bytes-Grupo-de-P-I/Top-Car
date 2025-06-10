@@ -137,7 +137,7 @@ const ClientSignUp = () => {
     // Remove tudo que não for caracter numérico
     const cleaned = text.replace(/\D/g, "");
 
-    if (cleaned.length <= 11) {
+    if (cleaned?.length <= 11) {
       // Máscara de CPF: 000.000.000-00
       return cleaned
         .replace(/(\d{3})(\d)/, "$1.$2")

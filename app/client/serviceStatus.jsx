@@ -91,7 +91,7 @@ const serviceStatus = () => {
               </Text>
             </View>
 
-            {meuServicos.length > 0 ? (
+            {meuServicos?.length > 0 ? (
               meuServicos.map((item) => (
                 <ClientServiceCard
                   key={item.id}

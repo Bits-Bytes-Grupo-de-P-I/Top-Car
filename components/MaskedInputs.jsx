@@ -8,7 +8,7 @@ const CpfCnpjInput = ({ label, value, onChangeText, placeholder, ...props }) => 
   const applyMask = (text) => {
     const cleaned = text.replace(/\D/g, '');
     
-    if (cleaned.length <= 11) {
+    if (cleaned?.length <= 11) {
       // Máscara de CPF: 000.000.000-00
       return cleaned
         .replace(/(\d{3})(\d)/, '$1.$2')
@@ -58,7 +58,7 @@ const PhoneInput = ({ label, value, onChangeText, placeholder, ...props }) => {
   const applyMask = (text) => {
     const cleaned = text.replace(/\D/g, '');
     
-    if (cleaned.length <= 10) {
+    if (cleaned?.length <= 10) {
       // Máscara de telefone fixo: (00) 0000-0000
       return cleaned
         .replace(/(\d{2})(\d)/, '($1) $2')

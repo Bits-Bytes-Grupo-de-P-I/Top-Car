@@ -14,7 +14,7 @@ const VehicleSelector = ({
 
   useEffect(() => {
     // Encontrar o veículo inicial se houver um ID inicial fornecido
-    if (initialVehicleId && vehicles.length > 0) {
+    if (initialVehicleId && vehicles?.length > 0) {
       const initialVehicle = vehicles.find(vehicle => vehicle.id === initialVehicleId);
       if (initialVehicle) {
         setSelectedVehicle(initialVehicle);
@@ -52,7 +52,7 @@ const VehicleSelector = ({
       );
     }
 
-    if (vehicles.length === 0) {
+    if (vehicles?.length === 0) {
       return (
         <View style={styles.messageContainer}>
           <MaterialIcons name="directions-car" size={32} color="#666" />

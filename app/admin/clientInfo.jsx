@@ -241,6 +241,59 @@ const clientInfo = () => {
     setInShop(!inShop);
   };
 
+  const dadosOS = {
+    // Dados do cliente
+    nomeCliente: "João Silva",
+    documentoCliente: "123.456.789-00",
+    telefoneCliente: "(11) 98765-4321",
+    enderecoCliente: "Rua das Flores, 123 - Centro",
+    cidadeCliente: "São Paulo - SP",
+    cepCliente: "12345-678",
+    
+    // Dados do veículo
+    marcaVeiculo: "RENAULT",
+    modeloVeiculo: "KWID ZEN",
+    anoVeiculo: "2022",
+    corVeiculo: "BRANCA",
+    placaVeiculo: "ABC1D23",
+    quilometragem: "15.000",
+    
+    // Dados da OS
+    numeroOS: "1839",
+    produtos: [
+      {
+        codigo: "7193",
+        referencia: "51907364",
+        quantidade: 1,
+        unidade: "UN",
+        descricao: "FILTRO DE ÓLEO",
+        valorUnitario: 25.00,
+        valorTotal: 25.00
+      },
+    ],
+    servicos: [
+      {
+        codigo: "001",
+        quantidade: 1,
+        descricao: "TROCA DE ÓLEO E FILTRO",
+        valorUnitario: 80.00,
+        valorTotal: 80.00
+      },
+    ],
+    totalProdutos: 175.00,
+    totalServicos: 120.00,
+    totalGeral: 295.00,
+    
+    // Dados da empresa
+    empresaNome: "AUTO MECÂNICA TOPCAR LTDA",
+    empresaCNPJ: "39.344.879/0001-24",
+    empresaEndereco: "AV ENG. ELI PINHEIRO, 1059 - BAIRRO PRETO - PRESIDENTE OLEGÁRIO/MG - 38.750-000",
+    empresaTelefone: "",
+    empresaEmail: "topcarpo@hotmail.com",
+    
+    profissionalResponsavel: "DIEGO WALLANS RIBEIRO"
+  };
+
   // BOTÃO DE ADICIONAR
   const renderAddButton = (section) => (
     <TouchableOpacity style={styles.addButton} onPress={openAddVehicleModal}>
@@ -440,7 +493,7 @@ const clientInfo = () => {
               <Text style={styles.actionButtonText}>Nova Pendência</Text>
             </TouchableOpacity>
 
-            <GeneratePdfBtn/>
+            <GeneratePdfBtn dadosOrdemServico={dadosOS}/>
 
             {/* <TouchableOpacity
               style={[styles.actionButton, styles.noteButton]}
