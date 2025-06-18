@@ -15,6 +15,7 @@ import { StatusBar } from "expo-status-bar";
 // COMPONENTES
 import Card from "@/components/Card";
 import CardWork from "@/components/client/CardWork";
+import FloatingActionButton from "../../components/client/FloatingActionButton";
 
 // ÍCONES
 import {
@@ -131,19 +132,6 @@ export default function Index() {
                   />
                 </Card>
 
-                {/* APAGAR ESSE CARD */}
-                <Card
-                  texto="Sobre o App"
-                  cor={Colors.azul}
-                  onPress={() => router.push("./client/lgpdInfoPage")}
-                >
-                  <MaterialCommunityIcons
-                    style={{ marginBottom: 4 }}
-                    name="card-text"
-                    size={30}
-                    color={Colors.azul}
-                  />
-                </Card>
               </View>
               {/* Fim Container dos cards */}
 
@@ -152,6 +140,7 @@ export default function Index() {
             {/* Fim Container conteudo */}
           </View>
         </ScrollView>
+        <FloatingActionButton />
         {/* Fim Container principal */}
       </ImageBackground>
     </SafeAreaView>
