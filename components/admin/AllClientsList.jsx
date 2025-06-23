@@ -20,9 +20,9 @@ const AllClientsList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
   const [clients, setClients] = useState([]);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Token de autorização (só para exemplo; armazene de forma segura na prática)
   const authToken =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
@@ -67,12 +67,39 @@ const AllClientsList = () => {
     }
   };
 
-  // ✅ CORREÇÃO: Remover 'clients' das dependências para evitar loop infinito
   useEffect(() => {
     fetchClients();
   }, []); // Array vazio - executa apenas uma vez
 
-  // ✅ CORREÇÃO: Usar propriedades corretas dos dados da API
+  // Função para buscar a lista de serviços (ou agendamentos)
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(
+        "https://topcar-back-end.onrender.com/agendamentos",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar agendamentos: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setServices(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
   const clientesFiltrados = clients.filter((client) => {
     const termo = filtro.toLowerCase();
     return (
@@ -83,14 +110,15 @@ const AllClientsList = () => {
     );
   });
 
-  // ✅ CORREÇÃO: Usar 'item' ao invés de 'client' (padrão do FlatList)
   const renderClients = ({ item }) => (
     <TouchableOpacity
       style={styles.item}
+      key={item.id.toString()}
       onPress={() =>
         router.push({
           pathname: "./clientInfo",
           params: {
+            id: item.id,
             nome: item.nome,
             cpf: item.cpfFormatado,
             email: item.email,
@@ -110,12 +138,23 @@ const AllClientsList = () => {
     >
       <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
-        {/* {item.status !== "Finalizado" && (
-          <Badge
-            text={item.status}
-            color={item.status === "Pendente" ? Colors.laranja : Colors.azul}
-          />
-        )} */}
+        {services &&
+          services
+            .filter((service) => service.cliente === item.nome)
+            .map(
+              (service) =>
+                service.status !== "Concluído" && (
+                  <Badge
+                    key={service.id}
+                    text={service.status}
+                    color={
+                      service.status === "Pendente"
+                        ? Colors.laranja
+                        : Colors.azul
+                    }
+                  />
+                )
+            )}
       </View>
       <Text style={styles.cpf}>CPF: {item.cpfFormatado}</Text>
       <Text style={styles.email}>Email: {item.email}</Text>

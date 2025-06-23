@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TextInput } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 
 const InputField = (props) => {
+  const InputComponent = props.mascara ? MaskedTextInput : TextInput;
   return (
     <View style={[styles.container, { width: props.largura || "100%" }]}>
       <Text style={styles.label}>{props.tipoDeInfo}</Text>
-      <MaskedTextInput
+      <InputComponent
         style={styles.input}
-        keyboardType={props.keyboardType}
+        keyboardType={props.keyboardType || 'default'}
         maxLength={props.maxLength}
-        mask={props.mascara}
+        mask={props.mascara} // Só usado se for MaskedTextInput
         onChangeText={props.onChangeText || (() => {})}
         value={props.valor}
         autoCapitalize={props.autoCapitalize}

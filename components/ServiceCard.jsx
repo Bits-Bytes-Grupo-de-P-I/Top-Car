@@ -13,31 +13,23 @@ import Colors from "@/constants/Colors";
  * @param {Object} props
  * @param {Object} props.service - Dados do serviço pendente
  * @param {boolean} props.isAdminView - Define se o card está sendo usado na visão de administrador
- * @param {boolean} props.isAccepted - Define se o serviço foi aceito ou não
  * @param {Function} props.onEdit - Função para editar o serviço (apenas admin)
  * @param {Function} props.onDelete - Função para excluir o serviço (apenas admin)
  */
 const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editedService, setEditedService] = useState({
-    vehicle: service.vehicle,
-    licensePlate: service.licensePlate,
-    description: service.description,
-  });
+  const [editedDescription, setEditedDescription] = useState(service.description || service.descricao || "");
 
   const handleEdit = () => {
-    setEditedService({
-      vehicle: service.vehicle,
-      licensePlate: service.licensePlate,
-      description: service.description,
-    });
+    setEditedDescription(service.description || service.descricao || "");
     setEditModalVisible(true);
   };
 
   const handleDelete = () => {
+    const vehicleName = service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}`;
     Alert.alert(
       "Confirmar exclusão",
-      `Deseja realmente excluir o serviço pendente para o veículo ${service.vehicle}?`,
+      `Deseja realmente excluir o serviço pendente para o veículo ${vehicleName}?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -50,28 +42,81 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
   };
 
   const saveServiceChanges = () => {
-    if (onEdit) {
-      onEdit(service.id, editedService);
+    // Validação básica
+    if (!editedDescription.trim()) {
+      Alert.alert("Erro", "O campo descrição é obrigatório.");
+      return;
     }
+
+    // Chama a função de edição passada como prop
+    if (onEdit) {
+      onEdit(service.id, {
+        description: editedDescription.trim(),
+      });
+    }
+    
     setEditModalVisible(false);
+  };
+
+  const cancelEdit = () => {
+    // Restaura o valor original
+    setEditedDescription(service.description || service.descricao || "");
+    setEditModalVisible(false);
+  };
+
+  // Função para formatar a data
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR');
+    } catch (error) {
+      return "Data inválida";
+    }
   };
 
   return (
     <>
       <View style={styles.card}>
         <View style={styles.cardContent}>
+          {/* Informações do Cliente */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Cliente:</Text>
+            <Text style={styles.value}>
+              {service.clienteName || service.cliente_nome || service.cliente || "N/A"}
+            </Text>
+          </View>
+          
+          {/* Informações do Veículo */}
           <View style={styles.row}>
             <Text style={styles.label}>Veículo:</Text>
-            <Text style={styles.value}>{service.vehicle}</Text>
+            <Text style={styles.value}>
+              {service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}` || "N/A"}
+            </Text>
           </View>
+          
           <View style={styles.row}>
             <Text style={styles.label}>Placa:</Text>
-            <Text style={styles.value}>{service.licensePlate}</Text>
+            <Text style={styles.value}>
+              {service.licensePlate || service.placa || "N/A"}
+            </Text>
           </View>
+          
+          {/* Data de registro */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Data:</Text>
+            <Text style={styles.value}>
+              {formatDate(service.data_registro)}
+            </Text>
+          </View>
+          
           <View style={styles.descriptionContainer}>
             <Text style={styles.label}>Descrição:</Text>
-            <Text style={styles.description}>{service.description}</Text>
+            <Text style={styles.description}>
+              {service.description || service.descricao || "Sem descrição"}
+            </Text>
           </View>
+          
           {/* Botões de ação apenas para a visão de administrador */}
           {isAdminView && (
             <View style={styles.actions}>
@@ -100,60 +145,45 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
         </View>
       </View>
 
-      {/* Modal de Edição */}
+      {/* Modal de Edição - Simplificado para editar apenas a descrição */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={editModalVisible}
-        onRequestClose={() => setEditModalVisible(false)}
+        onRequestClose={cancelEdit}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar Serviço</Text>
+            <Text style={styles.modalTitle}>Editar Descrição do Serviço</Text>
             
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Veículo:</Text>
-              <TextInput
-                style={styles.input}
-                value={editedService.vehicle}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, vehicle: text })
-                }
-                placeholder="Digite o veículo"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Placa:</Text>
-              <TextInput
-                style={styles.input}
-                value={editedService.licensePlate}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, licensePlate: text })
-                }
-                placeholder="Digite a placa"
-              />
+            {/* Mostra informações do serviço (somente leitura) */}
+            <View style={styles.readOnlyInfo}>
+              <Text style={styles.readOnlyLabel}>Cliente: {service.clienteName || service.cliente_nome || service.cliente}</Text>
+              <Text style={styles.readOnlyLabel}>Veículo: {service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}`}</Text>
+              <Text style={styles.readOnlyLabel}>Placa: {service.licensePlate || service.placa}</Text>
             </View>
 
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Descrição:</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                value={editedService.description}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, description: text })
-                }
+                value={editedDescription}
+                onChangeText={setEditedDescription}
                 placeholder="Digite a descrição"
                 multiline={true}
                 numberOfLines={4}
+                maxLength={500}
               />
+              <Text style={styles.characterCount}>
+                {editedDescription?.length}/500 caracteres
+              </Text>
             </View>
 
             <View style={styles.modalActions}>
               <Button
                 cor={Colors.vermelho}
                 texto="Cancelar"
-                onPress={() => setEditModalVisible(false)}
+                onPress={cancelEdit}
               >
                 <MaterialIcons
                   name="cancel"
@@ -182,17 +212,21 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
   );
 };
 
+export default ServiceCard;
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 8,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   cardContent: {
     padding: 16,
@@ -200,63 +234,33 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     marginBottom: 8,
+    alignItems: "center",
   },
   label: {
-    fontWeight: "bold",
     fontSize: 14,
-    marginRight: 8,
-    color: "#333",
+    fontWeight: "600",
+    color: Colors.cinzaEscuro,
+    minWidth: 60,
   },
   value: {
     fontSize: 14,
-    color: "#444",
+    color: Colors.preto,
     flex: 1,
   },
   descriptionContainer: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   description: {
     fontSize: 14,
-    color: "#444",
+    color: Colors.preto,
     marginTop: 4,
+    lineHeight: 20,
   },
   actions: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 12,
   },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  editButton: {
-    borderWidth: 1,
-    borderColor: Colors.azul,
-    backgroundColor: Colors.azul,
-  },
-  deleteButton: {
-    borderWidth: 1,
-    borderColor: Colors.vermelho,
-    backgroundColor: Colors.vermelho,
-  },
-  actionText: {
-    color: "#FFF",
-    fontSize: 12,
-    fontWeight: "bold",
-    marginLeft: 4,
-  },
-  modalUrgenteBadge: {
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    borderRadius: 12,
-  },
-  // Estilos do Modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -265,39 +269,34 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 20,
     width: "90%",
     maxWidth: 400,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: "#333",
+    color: Colors.preto,
   },
   inputContainer: {
     marginBottom: 16,
   },
   inputLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.cinzaEscuro,
     marginBottom: 8,
-    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: Colors.cinzaClaro,
     borderRadius: 8,
     padding: 12,
-    fontSize: 16,
-    backgroundColor: "#f9f9f9",
+    fontSize: 14,
+    backgroundColor: "#fff",
   },
   textArea: {
     height: 100,
@@ -307,8 +306,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
-    gap: 12,
   },
 });
-
-export default ServiceCard;

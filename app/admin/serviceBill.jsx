@@ -13,20 +13,26 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
 import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
 
 // COMPONENTES
 import PageHeader from "@/components/PageHeader";
+import BillVehicleDropdown from "@/components/admin/BillVehicleDropdown";
 import BillClientContent from "@/components/admin/BillClientContent";
 import Button from "@/components/Button";
+import GeneratePdfBtn from "@/components/admin/GeneratePdfBtn";
 
 // ÍCONES
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
-import BillVehicleContent from "../../components/admin/BillVehicleContent";
-
 const NotaServico = () => {
+  // Recupera os parametros passados na tela anterior
+  const params = useLocalSearchParams();
+  const clientParam = params.client ? JSON.parse(params.client) : null;
+  const vehiclesParam = params.vehicles ? JSON.parse(params.vehicles) : [];
+
   // States para definir se a seção está expandida ou não
   const [expandedSections, setExpandedSections] = useState({
     cliente: false,
@@ -49,65 +55,66 @@ const NotaServico = () => {
     servicos: null,
   });
 
-  // MOCKS
-  const [dadosNota, setDadosNota] = useState({
-    cliente: {
-      nome: "João Silva",
-      tipoPessoa: "física",
-      documento: "123.456.789-00",
-      telefone: "(11) 98765-4321",
-      endereco: "Rua das Flores, 123 - Centro",
-      cidade: "São Paulo - SP",
-      cep: "12345-678",
-    },
-    veiculo: {
-      marca: "Renault",
-      modelo: "Kwid Zen",
-      ano: "2022",
-      cor: "Branco",
-      placa: "ABC1D23",
-      km: "15.000 km",
-    },
+  const dadosOS = {
+    // Dados do cliente
+    nomeCliente: "João Silva",
+    documentoCliente: "123.456.789-00",
+    telefoneCliente: "(11) 98765-4321",
+    enderecoCliente: "Rua das Flores, 123 - Centro",
+    cidadeCliente: "São Paulo - SP",
+    cepCliente: "12345-678",
+
+    // Dados do veículo
+    marcaVeiculo: "RENAULT",
+    modeloVeiculo: "KWID ZEN",
+    anoVeiculo: "2022",
+    corVeiculo: "BRANCA",
+    placaVeiculo: "ABC1D23",
+    quilometragem: "15.000",
+
+    // Dados da OS
+    numeroOS: "1839",
     produtos: [
       {
-        id: 1,
-        nome: "Óleo Motor 5W30",
-        quantidade: 4,
-        unidade: "litros",
-        valorUnitario: 25.5,
-        valorTotal: 102.0,
-      },
-      {
-        id: 2,
-        nome: "Filtro de Óleo",
+        codigo: "7193",
+        referencia: "51907364",
         quantidade: 1,
-        unidade: "unidade",
-        valorUnitario: 35.0,
-        valorTotal: 35.0,
-      },
-      {
-        id: 3,
-        nome: "Pastilhas de Freio Dianteira",
-        quantidade: 1,
-        unidade: "jogo",
-        valorUnitario: 120.0,
-        valorTotal: 120.0,
+        unidade: "UN",
+        descricao: "FILTRO DE ÓLEO",
+        valorUnitario: 25.0,
+        valorTotal: 25.0,
       },
     ],
     servicos: [
       {
-        id: 1,
-        descricao: "Troca de óleo e filtro",
-        valorMaoDeObra: 80.0,
-        tempo: "1h 30min",
-      },
-      {
-        id: 2,
-        descricao: "Substituição de pastilhas de freio",
-        valorMaoDeObra: 150.0,
-        tempo: "2h 00min",
+        codigo: "001",
+        quantidade: 1,
+        descricao: "TROCA DE ÓLEO E FILTRO",
+        valorUnitario: 80.0,
+        valorTotal: 80.0,
       },
     ],
+    totalProdutos: 175.0,
+    totalServicos: 120.0,
+    totalGeral: 295.0,
+
+    // Dados da empresa
+    empresaNome: "AUTO MECÂNICA TOPCAR LTDA",
+    empresaCNPJ: "39.344.879/0001-24",
+    empresaEndereco:
+      "AV ENG. ELI PINHEIRO, 1059 - BAIRRO PRETO - PRESIDENTE OLEGÁRIO/MG - 38.750-000",
+    empresaTelefone: "",
+    empresaEmail: "topcarpo@hotmail.com",
+
+    profissionalResponsavel: "DIEGO WALLANS RIBEIRO",
+  };
+
+  // MOCKS
+  const [dadosNota, setDadosNota] = useState({
+    cliente: clientParam || {},
+    veiculo: vehiclesParam[0] || null,
+    produtos: [],
+    servicos: [],
   });
 
   // Estados temporários para edição/adição
@@ -288,14 +295,6 @@ const NotaServico = () => {
     return calcularTotalProdutos() + calcularTotalServicos();
   };
 
-  // FUNÇÃO PARA GERAR PDF
-  const gerarPDF = () => {
-    Alert.alert(
-      "Gerar PDF",
-      "Funcionalidade de geração de PDF será implementada em breve."
-    );
-  };
-
   // FUNÇÃO PARA RENDERIZAR CADA SEÇÃO
   const renderSection = (title, sectionKey, content, addButton) => {
     const isExpanded = expandedSections[sectionKey];
@@ -349,10 +348,9 @@ const NotaServico = () => {
   };
 
   // CONTEÚDO DO CLIENTE
-  const renderClienteContent = () => <BillClientContent />;
-
-  // CONTEÚDO DO VEÍCULO
-  const renderVeiculoContent = () => <BillVehicleContent />;
+  const renderClienteContent = () => (
+    <BillClientContent data={dadosNota.cliente} />
+  );
 
   // CONTEÚDO DOS PRODUTOS
   const renderProdutosContent = () => (
@@ -370,11 +368,16 @@ const NotaServico = () => {
             <View
               style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
             >
-              <TouchableOpacity onPress={() => openModal("produtos", index)}>
-                <Ionicons name="pencil" size={18} color={Colors.azul} style={{marginRight: 5}}/>
-              </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteItem("produtos", index)}>
                 <Ionicons name="trash" size={18} color={Colors.vermelho} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => openModal("produtos", index)}>
+                <Ionicons
+                  name="pencil"
+                  size={18}
+                  color={Colors.azul}
+                  style={{ marginRight: 5 }}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -415,15 +418,20 @@ const NotaServico = () => {
             <View
               style={{ flexDirection: "row", gap: 12, alignItems: "center" }}
             >
-              <TouchableOpacity onPress={() => openModal("servicos", index)}>
-                <Ionicons name="pencil" size={18} color={Colors.azul} style={{marginRight: 2}}/>
-              </TouchableOpacity>
               <TouchableOpacity onPress={() => deleteItem("servicos", index)}>
                 <Ionicons name="trash" size={18} color={Colors.vermelho} />
               </TouchableOpacity>
+              <TouchableOpacity onPress={() => openModal("servicos", index)}>
+                <Ionicons
+                  name="pencil"
+                  size={18}
+                  color={Colors.azul}
+                  style={{ marginRight: 2 }}
+                />
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={[styles.itemDetails, {flexDirection: 'row'}]}>
+          <View style={[styles.itemDetails, { flexDirection: "row" }]}>
             <Text style={styles.itemInfo}>Tempo: {servico.tempo}</Text>
             <Text style={styles.itemTotal}>
               Mão de obra: R$ {servico.valorMaoDeObra.toFixed(2)}
@@ -931,7 +939,19 @@ const NotaServico = () => {
         >
           {/* Seções Expansíveis */}
           {renderSection("CLIENTE", "cliente", renderClienteContent())}
-          {renderSection("VEÍCULO", "veiculo", renderVeiculoContent())}
+          {renderSection(
+            "VEÍCULO",
+            "veiculo",
+            // conteúdo:
+            <BillVehicleDropdown
+              vehicles={vehiclesParam}
+              selectedVehicleId={dadosNota.veiculo?.id}
+              onVehicleChange={(veh) =>
+                setDadosNota((prev) => ({ ...prev, veiculo: veh }))
+              }
+            />,
+            null // sem botão de adicionar aqui
+          )}
           {renderSection(
             "PRODUTOS",
             "produtos",
@@ -961,16 +981,7 @@ const NotaServico = () => {
           </View>
 
           {/* Botões */}
-          <View style={styles.botoesContainer}>
-            <Button texto="Gerar PDF" cor={Colors.azul} onPress={gerarPDF}>
-              <Ionicons
-                name="document-text"
-                size={20}
-                color="white"
-                style={{ marginRight: 5 }}
-              />
-            </Button>
-          </View>
+          <GeneratePdfBtn dadosOrdemServico={dadosNota} />
 
           {/* Modais */}
           {renderClienteModal()}

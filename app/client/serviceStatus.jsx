@@ -20,43 +20,7 @@ import Colors from "@/constants/Colors";
 
 const serviceStatus = () => {
   // Dados de exemplo para o cliente
-  const [meuServicos, setMeuServicos] = useState([
-    {
-      id: "1",
-      clienteNome: "Meu Veículo", // Para o cliente, pode ser "Meu Veículo" ou o nome do próprio cliente
-      veiculo: "Honda Civic",
-      placa: "ABC1234",
-      servico: "Troca de óleo",
-      dataAgendada: "16/05/2025",
-      status: "Finalizado",
-      urgente: false,
-      observacoes:
-        "Serviço realizado com sucesso. Próxima troca recomendada em 10.000 km.",
-    },
-    {
-      id: "2",
-      clienteNome: "Meu Veículo",
-      veiculo: "Toyota Corolla",
-      placa: "XYZ5678",
-      servico: "Revisão completa",
-      dataAgendada: "17/05/2025",
-      status: "Aguardando peça",
-      urgente: true,
-      observacoes:
-        "Aguardando chegada da peça de reposição. Previsão: 2-3 dias úteis.",
-    },
-    {
-      id: "3",
-      clienteNome: "Meu Veículo",
-      veiculo: "Volkswagen Golf",
-      placa: "DEF9012",
-      servico: "Troca de pastilhas de freio",
-      dataAgendada: "18/05/2025",
-      status: "Andamento",
-      urgente: true,
-      observacoes: "Serviço em andamento. Será finalizado ainda hoje.",
-    },
-  ]);
+  const [meuServicos, setMeuServicos] = useState([]);
 
   const handleServicoPress = (item) => {
     console.log("Serviço visualizado:", item);

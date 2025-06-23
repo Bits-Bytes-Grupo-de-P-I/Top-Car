@@ -138,7 +138,7 @@ android {
     // `[] - ""` is essentially `[""].filter(Boolean)` removing all empty strings.
     options -= ""
 
-    if (options.length > 0) {
+    if (options?.length > 0) {
         println "android.packagingOptions.$prop += $options ($options.length)"
         // Ex: android.packagingOptions.pickFirsts += '**/SCCS/**'
         options.each {

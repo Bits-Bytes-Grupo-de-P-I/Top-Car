@@ -6,6 +6,8 @@ import {
   Modal,
   Pressable,
   TextInput,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
 
@@ -20,9 +22,16 @@ import { FontAwesome6, MaterialIcons, Ionicons } from "@expo/vector-icons";
 // Cores
 import Colors from "@/constants/Colors";
 
-const OngoingServiceCard = ({ item, onPress }) => {
+const OngoingServiceCard = ({
+  item,
+  onPress,
+  onUpdate,
+  onFinish,
+  fetchServicos,
+}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [editedService, setEditedService] = useState({
     clienteNome: item.clienteNome,
     veiculo: item.veiculo,
@@ -32,25 +41,133 @@ const OngoingServiceCard = ({ item, onPress }) => {
     urgente: item.urgente,
   });
 
-  const handleCardPress = () => {
-    setModalVisible(true);
-    if (onPress) onPress(item);
-  };
+  // Constantes da API
+  const API_BASE_URL = "https://topcar-back-end.onrender.com";
+  const AUTH_TOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
-  const formatDate = (dateString) => {
-    // Se já estiver no formato brasileiro, retorna como está
-    if (dateString.includes("/")) {
-      return dateString;
+  // Função para fazer requisições HTTP
+  const makeRequest = async (url, options = {}) => {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      throw error;
     }
-    // Caso contrário, formata a data
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
 
-  const handleFinishService = () => {
-    console.log(`Serviço ${item.id} finalizado`);
-    setModalVisible(false);
-    // Aqui você implementaria a lógica para finalizar o serviço
+  // Função para atualizar um pedido
+  const updatePedido = async (pedidoId, pedidoData) => {
+    try {
+      const data = await makeRequest(`${API_BASE_URL}/pedidos/${pedidoId}`, {
+        method: "PUT",
+        body: JSON.stringify(pedidoData),
+      });
+      await fetchServicos();
+      return data;
+    } catch (error) {
+      console.error("Erro ao atualizar pedido:", error);
+      throw error;
+    }
+  };
+
+  // Função para finalizar um serviço (alterar status)
+  const finalizarServico = async (pedidoId) => {
+    try {
+      const data = await makeRequest(`${API_BASE_URL}/pedidos/${pedidoId}`, {
+        method: "PUT",
+        body: JSON.stringify({ status: "concluido" }),
+      });
+      return data;
+    } catch (error) {
+      console.error("Erro ao finalizar serviço:", error);
+      throw error;
+    }
+  };
+
+  // Função para formatar data do formato brasileiro para ISO
+  const formatDateToISO = (dateString) => {
+    if (!dateString) return null;
+
+    try {
+      // Se já estiver no formato ISO (YYYY-MM-DD), retorna como está
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
+
+      // Se estiver no formato brasileiro (DD/MM/YYYY)
+      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateString.split("/");
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      }
+
+      // Tentar converter outras possibilidades
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        throw new Error("Data inválida");
+      }
+
+      return date.toISOString().split("T")[0]; // Retorna apenas YYYY-MM-DD
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return null;
+    }
+  };
+
+  const handleFinishService = async () => {
+    try {
+      Alert.alert(
+        "Confirmar Finalização",
+        "Tem certeza que deseja finalizar este serviço?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
+          },
+          {
+            text: "Finalizar",
+            onPress: async () => {
+              try {
+                setLoading(true);
+                await finalizarServico(item.id);
+                setModalVisible(false);
+
+                // Chama callback para atualizar a lista
+                if (onFinish) {
+                  onFinish(item.id);
+                }
+
+                Alert.alert("Sucesso", "Serviço finalizado com sucesso!");
+              } catch (error) {
+                Alert.alert(
+                  "Erro",
+                  "Não foi possível finalizar o serviço. Tente novamente."
+                );
+                console.error("Erro ao finalizar serviço:", error);
+              } finally {
+                setLoading(false);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
+      console.error("Erro inesperado:", error);
+    }
   };
 
   const handleUpdateService = () => {
@@ -62,21 +179,104 @@ const OngoingServiceCard = ({ item, onPress }) => {
       dataAgendada: item.dataAgendada,
       urgente: item.urgente,
     });
+    fetchServicos();
     setModalVisible(false);
     setEditModalVisible(true);
   };
 
-  const saveServiceChanges = () => {
-    console.log("Serviço atualizado:", editedService);
+  const validateServiceData = () => {
+    if (!editedService.servico.trim()) {
+      Alert.alert("Erro", "O campo 'Serviço' é obrigatório.");
+      return false;
+    }
+
+    if (!editedService.dataAgendada.trim()) {
+      Alert.alert("Erro", "O campo 'Data Agendada' é obrigatório.");
+      return false;
+    }
+
+    // Validação básica de formato de data (DD/MM/AAAA)
+    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dateRegex.test(editedService.dataAgendada)) {
+      Alert.alert("Erro", "Por favor, insira a data no formato DD/MM/AAAA.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const saveServiceChanges = async () => {
+    if (!validateServiceData()) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Primeiro, buscar os dados atuais do pedido para obter cliente_id e veiculo_id
+      const currentPedido = await makeRequest(
+        `${API_BASE_URL}/pedidos/${item.id}`,
+        {
+          method: "GET",
+        }
+      );
+
+      // Dados para atualizar - incluindo todos os campos obrigatórios
+      const updateData = {
+        cliente_id: currentPedido.cliente_id, // Mantém o cliente_id atual
+        veiculo_id: currentPedido.veiculo_id, // Mantém o veiculo_id atual
+        resumo: editedService.servico,
+        descricao: editedService.servico,
+        status: editedService.status || item.status,
+        dataPedido: formatDateToISO(editedService.dataAgendada),
+      };
+
+      console.log("Dados sendo enviados para atualização:", updateData); // Para debug
+
+      await updatePedido(item.id, updateData);
+
+      setEditModalVisible(false);
+
+      // Chama callback para atualizar a lista
+      if (onUpdate) {
+        onUpdate(item.id, {
+          ...item,
+          servico: editedService.servico,
+          dataAgendada: editedService.dataAgendada,
+          urgente: editedService.urgente,
+        });
+      }
+
+      Alert.alert("Sucesso", "Serviço atualizado com sucesso!");
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível atualizar o serviço. Tente novamente."
+      );
+      console.error("Erro ao atualizar serviço:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelEdit = () => {
     setEditModalVisible(false);
-    // Aqui você implementaria a lógica para salvar as alterações
+    setEditedService({
+      clienteNome: item.clienteNome,
+      veiculo: item.veiculo,
+      placa: item.placa,
+      servico: item.servico,
+      dataAgendada: item.dataAgendada,
+      urgente: item.urgente,
+    });
   };
 
   return (
     <>
       <TouchableOpacity
         style={[styles.servicoItem, item.urgente ? styles.servicoUrgente : {}]}
-        onPress={handleCardPress}
+        onPress={() => setEditModalVisible(true)}
+        disabled={loading}
       >
         <View style={styles.servicoHeader}>
           <Text style={styles.clienteNome}>{item.clienteNome}</Text>
@@ -108,11 +308,23 @@ const OngoingServiceCard = ({ item, onPress }) => {
           style={styles.statusContainer}
           onStartShouldSetResponder={() => true}
           onResponderGrant={() => {
-            // Impede que o toque seja propagado para o TouchableOpacity pai, fazendo com que abra o card ao invés do dropdown
+            // Impede que o toque seja propagado para o TouchableOpacity pai
           }}
         >
-          <ServiceStatus />
+          <ServiceStatus
+            item={item}
+            fetchServicos={fetchServicos}
+            onStatusUpdate={(updatedPedido) => {
+              console.log("Status atualizado:", updatedPedido);
+            }}
+          />
         </View>
+
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color={Colors.azul} />
+          </View>
+        )}
       </TouchableOpacity>
 
       {/* Modal de detalhes do serviço */}
@@ -129,6 +341,7 @@ const OngoingServiceCard = ({ item, onPress }) => {
               <Pressable
                 style={styles.closeButton}
                 onPress={() => setModalVisible(false)}
+                disabled={loading}
               >
                 <MaterialIcons name="close" size={24} color={Colors.grafite} />
               </Pressable>
@@ -187,7 +400,7 @@ const OngoingServiceCard = ({ item, onPress }) => {
                 />
                 <Text style={styles.modalInfoText}>
                   <Text style={styles.boldText}>Data Agendada: </Text>
-                  {formatDate(item.dataAgendada)}
+                  {formatDateToISO(item.dataAgendada)}
                 </Text>
               </View>
             </View>
@@ -198,6 +411,7 @@ const OngoingServiceCard = ({ item, onPress }) => {
                 cor={Colors.azul}
                 texto="Editar"
                 onPress={handleUpdateService}
+                disabled={loading}
               >
                 <Ionicons
                   name="pencil"
@@ -208,15 +422,24 @@ const OngoingServiceCard = ({ item, onPress }) => {
               </Button>
               <Button
                 cor={Colors.verde}
-                texto="Finalizar"
+                texto={loading ? "Finalizando..." : "Finalizar"}
                 onPress={handleFinishService}
+                disabled={loading}
               >
-                <MaterialIcons
-                  name="check-circle"
-                  size={18}
-                  color="white"
-                  style={{ marginRight: 5 }}
-                />
+                {loading ? (
+                  <ActivityIndicator
+                    size={18}
+                    color="white"
+                    style={{ marginRight: 5 }}
+                  />
+                ) : (
+                  <MaterialIcons
+                    name="check-circle"
+                    size={18}
+                    color="white"
+                    style={{ marginRight: 5 }}
+                  />
+                )}
               </Button>
             </View>
           </View>
@@ -228,7 +451,7 @@ const OngoingServiceCard = ({ item, onPress }) => {
         animationType="slide"
         transparent={true}
         visible={editModalVisible}
-        onRequestClose={() => setEditModalVisible(false)}
+        onRequestClose={cancelEdit}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -236,7 +459,8 @@ const OngoingServiceCard = ({ item, onPress }) => {
               <Text style={styles.modalTitle}>Editar Serviço</Text>
               <Pressable
                 style={styles.closeButton}
-                onPress={() => setEditModalVisible(false)}
+                onPress={cancelEdit}
+                disabled={loading}
               >
                 <MaterialIcons name="close" size={24} color={Colors.grafite} />
               </Pressable>
@@ -245,42 +469,6 @@ const OngoingServiceCard = ({ item, onPress }) => {
             <View style={styles.modalDivider} />
 
             {/* Campos de Edição */}
-            <View style={styles.editInputContainer}>
-              <Text style={styles.editInputLabel}>Cliente:</Text>
-              <TextInput
-                style={styles.editInput}
-                value={editedService.clienteNome}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, clienteNome: text })
-                }
-                placeholder="Nome do cliente"
-              />
-            </View>
-
-            <View style={styles.editInputContainer}>
-              <Text style={styles.editInputLabel}>Veículo:</Text>
-              <TextInput
-                style={styles.editInput}
-                value={editedService.veiculo}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, veiculo: text })
-                }
-                placeholder="Modelo do veículo"
-              />
-            </View>
-
-            <View style={styles.editInputContainer}>
-              <Text style={styles.editInputLabel}>Placa:</Text>
-              <TextInput
-                style={styles.editInput}
-                value={editedService.placa}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, placa: text })
-                }
-                placeholder="Placa do veículo"
-              />
-            </View>
-
             <View style={styles.editInputContainer}>
               <Text style={styles.editInputLabel}>Serviço:</Text>
               <TextInput
@@ -292,6 +480,8 @@ const OngoingServiceCard = ({ item, onPress }) => {
                 placeholder="Descrição do serviço"
                 multiline={true}
                 numberOfLines={3}
+                maxLength={200}
+                editable={!loading}
               />
             </View>
 
@@ -300,10 +490,33 @@ const OngoingServiceCard = ({ item, onPress }) => {
               <TextInput
                 style={styles.editInput}
                 value={editedService.dataAgendada}
-                onChangeText={(text) =>
-                  setEditedService({ ...editedService, dataAgendada: text })
-                }
+                onChangeText={(text) => {
+                  // Formatação automática da data enquanto digita
+                  let formattedText = text.replace(/\D/g, "");
+                  if (formattedText.length >= 2) {
+                    formattedText = formattedText.replace(
+                      /(\d{2})(\d)/,
+                      "$1/$2"
+                    );
+                  }
+                  if (formattedText.length >= 5) {
+                    formattedText = formattedText.replace(
+                      /(\d{2})\/(\d{2})(\d)/,
+                      "$1/$2/$3"
+                    );
+                  }
+                  if (formattedText.length > 10) {
+                    formattedText = formattedText.slice(0, 10);
+                  }
+                  setEditedService({
+                    ...editedService,
+                    dataAgendada: formattedText,
+                  });
+                }}
                 placeholder="DD/MM/AAAA"
+                keyboardType="numeric"
+                maxLength={10}
+                editable={!loading}
               />
             </View>
 
@@ -318,11 +531,13 @@ const OngoingServiceCard = ({ item, onPress }) => {
                     : styles.urgenteToggleInactive,
                 ]}
                 onPress={() =>
+                  !loading &&
                   setEditedService({
                     ...editedService,
                     urgente: !editedService.urgente,
                   })
                 }
+                disabled={loading}
               >
                 <Text
                   style={[
@@ -342,7 +557,8 @@ const OngoingServiceCard = ({ item, onPress }) => {
               <Button
                 cor={Colors.vermelho}
                 texto="Cancelar"
-                onPress={() => setEditModalVisible(false)}
+                onPress={cancelEdit}
+                disabled={loading}
               >
                 <MaterialIcons
                   name="cancel"
@@ -353,15 +569,24 @@ const OngoingServiceCard = ({ item, onPress }) => {
               </Button>
               <Button
                 cor={Colors.verde}
-                texto="Salvar"
+                texto={loading ? "Salvando..." : "Salvar"}
                 onPress={saveServiceChanges}
+                disabled={loading}
               >
-                <MaterialIcons
-                  name="check-circle"
-                  size={18}
-                  color="white"
-                  style={{ marginRight: 5 }}
-                />
+                {loading ? (
+                  <ActivityIndicator
+                    size={18}
+                    color="white"
+                    style={{ marginRight: 5 }}
+                  />
+                ) : (
+                  <MaterialIcons
+                    name="check-circle"
+                    size={18}
+                    color="white"
+                    style={{ marginRight: 5 }}
+                  />
+                )}
               </Button>
             </View>
           </View>
@@ -399,11 +624,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.grafite,
+    flex: 1,
   },
   urgenteBadge: {
     paddingVertical: 2,
     paddingHorizontal: 8,
     borderRadius: 12,
+    marginLeft: 8,
   },
   urgenteText: {
     color: "white",
@@ -412,16 +639,19 @@ const styles = StyleSheet.create({
   },
   servicoInfo: {
     marginBottom: 10,
+    gap: 8,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 4,
+    gap: 8,
   },
   infoText: {
     marginLeft: 8,
     fontSize: 14,
     color: Colors.cinzaEscuro,
+    flex: 1,
   },
   statusContainer: {
     flexDirection: "row",
@@ -430,6 +660,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: Colors.cinzaClaro,
+    marginTop: 12,
+    alignItems: "flex-end",
   },
   statusText: {
     fontSize: 14,
@@ -444,7 +676,6 @@ const styles = StyleSheet.create({
   statusAguardandoPeca: {
     color: Colors.laranja,
   },
-  // Estilos do Modal
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -464,11 +695,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    margin: 20,
+    maxHeight: "90%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 16,
   },
   modalTitle: {
     fontSize: 20,
@@ -483,6 +717,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#E0E0E0",
     marginVertical: 12,
+    marginBottom: 16,
   },
   modalClientInfo: {
     marginBottom: 16,
@@ -491,6 +726,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 8,
   },
   modalClientName: {
     fontSize: 18,
@@ -502,6 +738,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 8,
     borderRadius: 12,
+    marginLeft: 8,
   },
   modalVehicleInfo: {
     marginBottom: 16,
@@ -513,10 +750,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
+    alignItems: "flex-start",
+    gap: 8,
   },
   modalInfoText: {
     marginLeft: 12,
-    fontSize: 15,
+    fontSize: 16,
     color: Colors.grafite,
     fontFamily: "DM-Sans",
     flex: 1,
@@ -527,8 +766,8 @@ const styles = StyleSheet.create({
   modalActions: {
     flexDirection: "row",
     justifyContent: "space-around",
+    gap: 12,
   },
-  // Estilos do Modal de Edição
   editInputContainer: {
     marginBottom: 16,
   },
@@ -547,31 +786,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#f9f9f9",
     color: Colors.grafite,
+    borderColor: Colors.cinzaClaro,
   },
   textArea: {
     height: 80,
     textAlignVertical: "top",
+    minHeight: 80,
+  },
+  readOnlySection: {
+    backgroundColor: Colors.cinzaClaro + "20",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  readOnlyTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: Colors.grafite,
+    marginBottom: 8,
+  },
+  readOnlyText: {
+    fontSize: 14,
+    color: Colors.grafite,
+    marginBottom: 4,
   },
   urgenteContainer: {
     marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   urgenteToggle: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
     borderWidth: 1,
     alignItems: "center",
+    minWidth: 60,
   },
   urgenteToggleActive: {
     backgroundColor: Colors.laranja,
     borderColor: Colors.laranja,
   },
   urgenteToggleInactive: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: Colors.cinzaClaro,
     borderColor: "#ddd",
   },
   urgenteToggleText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
   urgenteToggleTextActive: {

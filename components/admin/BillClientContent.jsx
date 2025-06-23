@@ -1,96 +1,42 @@
 import { StyleSheet, Text, View } from "react-native";
-import { useState } from "react";
-
-// CORES
 import Colors from "@/constants/Colors";
 
-// Dados mockados
-const [dadosNota, setDadosNota] = useState({
-  cliente: {
-    nome: "João Silva",
-    tipoPessoa: "física",
-    documento: "123.456.789-00",
-    telefone: "(11) 98765-4321",
-    endereco: "Rua das Flores, 123 - Centro",
-    cidade: "São Paulo - SP",
-    cep: "12345-678",
-  },
-  veiculo: {
-    marca: "Renault",
-    modelo: "Kwid Zen",
-    ano: "2022",
-    cor: "Branco",
-    placa: "ABC1D23",
-    km: "15.000 km",
-  },
-  produtos: [
-    {
-      id: 1,
-      nome: "Óleo Motor 5W30",
-      quantidade: 4,
-      unidade: "litros",
-      valorUnitario: 25.5,
-      valorTotal: 102.0,
-    },
-    {
-      id: 2,
-      nome: "Filtro de Óleo",
-      quantidade: 1,
-      unidade: "unidade",
-      valorUnitario: 35.0,
-      valorTotal: 35.0,
-    },
-    {
-      id: 3,
-      nome: "Pastilhas de Freio Dianteira",
-      quantidade: 1,
-      unidade: "jogo",
-      valorUnitario: 120.0,
-      valorTotal: 120.0,
-    },
-  ],
-  servicos: [
-    {
-      id: 1,
-      descricao: "Troca de óleo e filtro",
-      valorMaoDeObra: 80.0,
-      tempo: "1h 30min",
-    },
-    {
-      id: 2,
-      descricao: "Substituição de pastilhas de freio",
-      valorMaoDeObra: 150.0,
-      tempo: "2h 00min",
-    },
-  ],
-});
+const BillClientContent = ({ data }) => {
+  // data é o objeto cliente que veio de props
+  const {
+    nome,
+    documento,
+    telefone,
+    endereco,
+    cidade,
+    cep,
+  } = data || {};
 
-const BillClientContent = () => {
   return (
     <View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Nome:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.nome}</Text>
+        <Text style={styles.value}>{nome || "-"}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Documento:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.documento}</Text>
+        <Text style={styles.value}>{documento || "-"}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Telefone:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.telefone}</Text>
+        <Text style={styles.value}>{telefone || "-"}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Endereço:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.endereco}</Text>
+        <Text style={styles.value}>{endereco || "-"}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>Cidade:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.cidade}</Text>
+        <Text style={styles.value}>{cidade || "-"}</Text>
       </View>
       <View style={styles.infoRow}>
         <Text style={styles.label}>CEP:</Text>
-        <Text style={styles.value}>{dadosNota.cliente.cep}</Text>
+        <Text style={styles.value}>{cep || "-"}</Text>
       </View>
     </View>
   );

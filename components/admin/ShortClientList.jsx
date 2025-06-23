@@ -19,7 +19,7 @@ const ShortClientList = () => {
   const router = useRouter();
 
   const [clients, setClients] = useState([]);
-  const [service, setService] = useState([]);
+  const [services, setServices] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -61,6 +61,7 @@ const ShortClientList = () => {
       }));
 
       setClients(transformedData);
+      // console.log(clients);
     } catch (error) {
       console.error(error);
     } finally {
@@ -72,7 +73,7 @@ const ShortClientList = () => {
     fetchClients();
   }, []);
 
-  // 5) Filtragem baseada no texto digitado em `filtro`:
+  // Filtragem baseada no texto digitado em `filtro`:
   const clientesFiltrados = clients.filter((client) => {
     const termo = filtro.toLowerCase();
 
@@ -91,7 +92,7 @@ const ShortClientList = () => {
   const mostrarClientes = clientesFiltrados.slice(0, 5);
 
   // Função para buscar a lista de serviços (ou agendamentos)
-  const fetchService = async () => {
+  const fetchServices = async () => {
     try {
       const response = await fetch(
         "https://topcar-back-end.onrender.com/agendamentos",
@@ -109,28 +110,20 @@ const ShortClientList = () => {
       }
 
       const data = await response.json();
-      setService(data);
+      setServices(data);
+      // console.log(services);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchService();
+    fetchServices();
   }, []);
 
-  // Calcula de forma segura: só pega service[2] se existir
-  const agendamentoDesejado = service?.length > 2 ? service[1] : null; // altere o índice para testar outro
-
-  // Só tenta logar se agendamentoDesejado não for null
-  // useEffect(() => {
-  //   if (agendamentoDesejado) {
-  //     console.log(
-  //       "Status do agendamento escolhido:",
-  //       agendamentoDesejado.status
-  //     );
-  //   }
-  // }, [agendamentoDesejado]);
+  // TESTE DE BADGE DE SERVIÇOS
+  let indice = clients[3];
+  const agendamentoDesejado = services?.length > 2 ? services[indice] : null; // altere o índice para testar outro
 
   return (
     <SafeAreaView style={styles.container}>
@@ -161,6 +154,7 @@ const ShortClientList = () => {
                     router.push({
                       pathname: "./admin/clientInfo",
                       params: {
+                        id: client.id,
                         nome: client.nome,
                         cpf: client.cpfFormatado,
                         email: client.email,
@@ -181,17 +175,24 @@ const ShortClientList = () => {
                   <View style={styles.nomeStatus}>
                     <Text style={styles.nome}>{client.nome}</Text>
 
-                    {agendamentoDesejado &&
-                      agendamentoDesejado.status !== "Finalizado" && (
+                    {(() => {
+                      const latestService = services
+                        ?.filter((service) => service.cliente === client.nome)
+                        ?.filter((service) => service.status !== "Concluído")
+                        ?.sort((a, b) => b.id - a.id)?.[0]; // Ordena por ID decrescente
+
+                      return latestService ? (
                         <Badge
-                          text={agendamentoDesejado.status}
+                          key={latestService.id}
+                          text={latestService.status}
                           color={
-                            agendamentoDesejado.status === "Pendente"
+                            latestService.status === "Pendente"
                               ? Colors.laranja
                               : Colors.azul
                           }
                         />
-                      )}
+                      ) : null;
+                    })()}
                   </View>
 
                   <Text style={styles.cpf}>CPF: {client.cpfFormatado}</Text>

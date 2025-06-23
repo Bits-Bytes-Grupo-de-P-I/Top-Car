@@ -13,21 +13,17 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 // COMPONENTES
 import Slider from "@/components/Slider";
 import VehicleSelector from "@/components/client/VehicleSelector";
 import PageHeader from "@/components/PageHeader";
-
 // ÍCONES
 import { MaterialIcons } from "@expo/vector-icons";
-
 // CORES
 import Colors from "@/constants/Colors";
 
 const serviceRequestForm = () => {
   const router = useRouter();
-
   // Estados para os campos do formulário
   const [vehicles, setVehicles] = useState([]); // Lista de todos os carros
   const [vehicle, setVehicle] = useState(null);
@@ -37,12 +33,12 @@ const serviceRequestForm = () => {
   const [problemDescription, setProblemDescription] = useState("");
   const [problemSummary, setProblemSummary] = useState("");
   const [summaryLength, setSummaryLength] = useState(50);
-  const [isUrgent, setIsUrgent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState("");
 
   // Token de autorização
   const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs"; // PRECISA ARMAZENAR ESSA PORRA DE MODO SEGURO!!!
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs"; // PRECISA ARMAZENAR DE MODO SEGURO!
 
   // Função para buscar veículos
   const fetchVehicles = async () => {
@@ -57,14 +53,11 @@ const serviceRequestForm = () => {
           },
         }
       );
-
       if (!response.ok) {
         throw new Error(`Erro: ${response.status}`);
       }
-
       const data = await response.json();
       console.log(data);
-
       // Formato original do mock:
       const transformedData = data.map((vehicle) => ({
         id: vehicle.id.toString(),
@@ -73,7 +66,6 @@ const serviceRequestForm = () => {
         model: vehicle.modelo,
         year: vehicle.ano.toString(),
       }));
-
       setVehicles(transformedData);
     } catch (error) {
       console.error("Erro ao buscar veículos:", error);
@@ -83,6 +75,9 @@ const serviceRequestForm = () => {
   // Chama a função quando o componente carregar
   useEffect(() => {
     fetchVehicles();
+    // Define a data padrão como hoje
+    const today = new Date().toISOString().split('T')[0];
+    setScheduledDate(today);
   }, []);
 
   // Atualiza os campos do formulário quando um veículo é selecionado
@@ -103,52 +98,58 @@ const serviceRequestForm = () => {
     setVehicleYear("");
     setProblemDescription("");
     setProblemSummary("");
-    setIsUrgent(false);
+    const today = new Date().toISOString().split('T')[0];
+    setScheduledDate(today);
   };
 
   // Envia o formulário
   const handleSubmit = async () => {
-    if (!vehicle || !problemDescription) {
+    if (!vehicle || !problemDescription || !scheduledDate) {
       Alert.alert(
         "Campos obrigatórios",
-        "Selecione um veículo e descreva o problema."
+        "Selecione um veículo, descreva o problema e informe a data desejada."
       );
       return;
     }
 
     setIsLoading(true);
-
     try {
-      const serviceRequestData = {
-        cliente_id: 4,
-        veiculo_id: vehicle.id,
-        resumo: problemSummary,
+      const agendamentoData = {
+        cliente_id: 6, // ID do cliente logado
+        veiculo_id: parseInt(vehicle.id), // Converter para número
+        servico_id: 4,
         descricao: problemDescription,
-        status: "pendente",
-        dataPedido: new Date().toISOString().split("T")[0],
+        data_agendada: scheduledDate,
+        status: "Pendente", // Precisa ter a inicial maiúscula aquui
+        urgente: false
       };
 
+      console.log("Dados que serão enviados:", agendamentoData);
+
       const response = await fetch(
-        "https://topcar-back-end.onrender.com/pedidos",
+        "https://topcar-back-end.onrender.com/agendamentos",
         {
           method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(serviceRequestData),
+          body: JSON.stringify(agendamentoData),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
         console.log("Erro na requisição:", errorData);
-        throw new Error(errorData.message || "Erro ao enviar solicitação");
+        throw new Error(errorData.error || "Erro ao criar agendamento");
       }
 
+      const result = await response.json();
+      console.log("Agendamento criado:", result);
+
       Alert.alert(
-        "Pedido Enviado",
-        "Seu pedido de atendimento foi enviado com sucesso!",
+        "Agendamento Criado",
+        "Seu agendamento foi criado com sucesso!",
         [
           {
             text: "OK",
@@ -160,10 +161,10 @@ const serviceRequestForm = () => {
         ]
       );
     } catch (error) {
-      console.error("Erro ao enviar pedido:", error);
+      console.error("Erro ao criar agendamento:", error);
       Alert.alert(
         "Erro",
-        "Não foi possível enviar seu pedido. Tente novamente."
+        "Não foi possível criar seu agendamento. Tente novamente."
       );
     } finally {
       setIsLoading(false);
@@ -173,11 +174,10 @@ const serviceRequestForm = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PageHeader
-        title="Solicitar Pedido de Atendimento"
+        title="Solicitar Agendamento"
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
-
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -189,7 +189,6 @@ const serviceRequestForm = () => {
             <Text style={styles.sectionSubtitle}>
               Selecione um veículo cadastrado ou preencha os dados manualmente
             </Text>
-
             <VehicleSelector
               onVehicleSelect={handleVehicleSelect}
               initialVehicleId={vehicle?.id}
@@ -204,6 +203,7 @@ const serviceRequestForm = () => {
                 value={vehicleName}
                 onChangeText={setVehicleName}
                 placeholder="Ex: Honda Civic"
+                editable={false} // Campo apenas para visualização
               />
             </View>
 
@@ -214,6 +214,7 @@ const serviceRequestForm = () => {
                 value={vehicleModel}
                 onChangeText={setVehicleModel}
                 placeholder="Ex: Civic LX"
+                editable={false} // Campo apenas para visualização
               />
             </View>
 
@@ -226,32 +227,25 @@ const serviceRequestForm = () => {
                 placeholder="Ex: 2020"
                 keyboardType="numeric"
                 maxLength={4}
+                editable={false} // Campo apenas para visualização
               />
             </View>
 
-            {/* Resumo do Problema */}
+            {/* Data do Agendamento */}
             <View style={styles.formGroup}>
-              <View style={{flexDirection: 'row', alignItems: 'baseline'}}>
-                <Text style={styles.label}>Resumo do Problema</Text>
-                <Text style={styles.summaryCounter}>
-                  ({summaryLength - problemSummary.length})
-                </Text>
-              </View>
+              <Text style={styles.label}>Data Desejada *</Text>
               <TextInput
                 style={styles.input}
-                value={problemSummary}
-                onChangeText={setProblemSummary}
-                placeholder="Escreva de forma resumida o seu problema..."
-                multiline
-                numberOfLines={2}
-                textAlignVertical="top"
-                maxLength={summaryLength}
+                value={scheduledDate}
+                onChangeText={setScheduledDate}
+                placeholder="YYYY-MM-DD"
+                // Você pode implementar um DatePicker aqui
               />
             </View>
 
             {/* Descrição do Problema */}
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Descrição do Problema</Text>
+              <Text style={styles.label}>Descrição do Problema *</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={problemDescription}
@@ -263,17 +257,6 @@ const serviceRequestForm = () => {
               />
             </View>
 
-            {/* Serviço Urgente */}
-            <View style={styles.switchContainer}>
-              <View style={styles.switchGroup}>
-                <Text style={styles.switchLabel}>Serviço Urgente</Text>
-                <Text style={styles.switchDescription}>
-                  Marque esta opção caso você necessite de atendimento urgentemente
-                </Text>
-              </View>
-              <Slider value={isUrgent} onPress={setIsUrgent} />
-            </View>
-
             {/* Botões de Ação */}
             <View style={styles.buttonsContainer}>
               <TouchableOpacity
@@ -283,7 +266,6 @@ const serviceRequestForm = () => {
               >
                 <Text style={styles.clearButtonText}>Limpar</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[
                   styles.submitButton,
@@ -296,7 +278,7 @@ const serviceRequestForm = () => {
                   <Text style={styles.submitButtonText}>Enviando...</Text>
                 ) : (
                   <>
-                    <Text style={styles.submitButtonText}>Enviar Pedido</Text>
+                    <Text style={styles.submitButtonText}>Criar Agendamento</Text>
                     <MaterialIcons
                       name="send"
                       size={18}
@@ -313,6 +295,8 @@ const serviceRequestForm = () => {
     </SafeAreaView>
   );
 };
+
+export default serviceRequestForm;
 
 const styles = StyleSheet.create({
   container: {
@@ -441,4 +425,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default serviceRequestForm;

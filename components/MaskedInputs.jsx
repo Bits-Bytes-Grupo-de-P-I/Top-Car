@@ -39,7 +39,7 @@ const CpfCnpjInput = ({ label, value, onChangeText, placeholder, ...props }) => 
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         style={styles.input}
-        value={maskedValue}
+        value={props.valor}
         onChangeText={handleChangeText}
         placeholder={placeholder || "CPF ou CNPJ"}
         placeholderTextColor="#999"
@@ -86,7 +86,7 @@ const PhoneInput = ({ label, value, onChangeText, placeholder, ...props }) => {
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         style={styles.input}
-        value={maskedValue}
+        value={props.valor}
         onChangeText={handleChangeText}
         placeholder={placeholder || "Telefone ou Celular"}
         placeholderTextColor="#999"

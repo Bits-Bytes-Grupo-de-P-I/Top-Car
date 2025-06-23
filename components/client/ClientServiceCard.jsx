@@ -37,7 +37,7 @@ const ClientServiceCard = ({ item, onPress }) => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "Finalizado":
+      case "Concluído":
         return styles.statusFinalizado;
       case "Andamento":
         return styles.statusAndamento;

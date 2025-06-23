@@ -158,11 +158,11 @@ export default function CardWork() {
           <Text style={styles.sectionTitle}>Horário de Funcionamento:</Text>
           <View style={styles.hourRow}>
             <Text style={styles.dayLabel}>Segunda a Sexta</Text>
-            <Text style={styles.hourValue}>08:00 - 18:00</Text>
+            <Text style={styles.hourValue}>07:00 - 18:00</Text>
           </View>
           <View style={styles.hourRow}>
             <Text style={styles.dayLabel}>Sábado</Text>
-            <Text style={styles.hourValue}>08:00 - 13:00</Text>
+            <Text style={styles.hourValue}>07:00 - 12:00</Text>
           </View>
           <View style={styles.hourRow}>
             <Text style={styles.dayLabel}>Domingo</Text>

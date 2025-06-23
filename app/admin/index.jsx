@@ -111,19 +111,6 @@ export default function Index() {
               />
             </Card>
             <Card
-              texto="Gerar nota de serviço avulsa"
-              cor={Colors.grafite}
-              iconName="table-list"
-              onPress={() => router.push("./admin/serviceBill")}
-            >
-              <FontAwesome6
-                style={{ marginBottom: 4 }}
-                name="table-list"
-                size={30}
-                color={Colors.grafite}
-              />
-            </Card>
-            <Card
               texto="Teste de notificação"
               cor={Colors.azul}
               iconName="table-list"
