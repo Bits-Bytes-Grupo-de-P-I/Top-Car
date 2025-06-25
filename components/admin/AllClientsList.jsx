@@ -59,7 +59,12 @@ const AllClientsList = () => {
         cpfFormatado: formatCPF(cliente.documento),
       }));
 
-      setClients(transformedData);
+      // Ordena em ordem alfabética crescente pelo nome
+      const alphabetical = transformedData.sort((a, b) =>
+        a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+      );
+
+      setClients(alphabetical);
     } catch (error) {
       console.error(error);
     } finally {

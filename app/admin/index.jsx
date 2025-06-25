@@ -15,10 +15,11 @@ import { StatusBar } from "expo-status-bar";
 // COMPONENTES
 import Card from "@/components/Card";
 import ShortClientList from "@/components/admin/ShortClientList";
-import BackToHomeButton from "@/components/BackToHomeButton";
+// import BackToHomeButton from "@/components/BackToHomeButton";
+import LogoutButton from "@/components/LogoutButton";
 
 // ÍCONES
-import { Entypo, FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
@@ -41,7 +42,7 @@ export default function Index() {
             style={{ width: 120, height: 120 }}
           />
 
-          <Entypo name="login" size={24} color="white" />
+          <LogoutButton />
         </View>
 
         {/* Container principal - usando ScrollView */}
@@ -52,12 +53,6 @@ export default function Index() {
           {/* Título Início */}
           <View style={styles.containerTitulo}>
             <Text style={styles.titulo}>início</Text>
-          </View>
-
-          {/* Botão Admin */}
-          <View style={styles.containerAdminButton}>
-            <Text>Página do administrador</Text>
-            <BackToHomeButton />
           </View>
 
           {/* Cards */}

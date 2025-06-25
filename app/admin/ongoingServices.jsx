@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
+import { sendImmediateNotification, requestNotificationPermissions } from "@/utils/notifications";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { FontAwesome6 } from "@expo/vector-icons";

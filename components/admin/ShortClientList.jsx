@@ -121,10 +121,6 @@ const ShortClientList = () => {
     fetchServices();
   }, []);
 
-  // TESTE DE BADGE DE SERVIÇOS
-  let indice = clients[3];
-  const agendamentoDesejado = services?.length > 2 ? services[indice] : null; // altere o índice para testar outro
-
   return (
     <SafeAreaView style={styles.container}>
       <TextInput

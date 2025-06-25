@@ -1,7 +1,9 @@
+// app/layout.js
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import { useEffect, useState } from "react";
+import { AuthProvider } from "@/hooks/useAuth";  // ajuste o caminho se necessário
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +22,9 @@ export default function Layout() {
     return null;
   }
 
-  return <Stack screenOptions={{ headerShown: false }}/>;
+  return (
+    <AuthProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AuthProvider>
+  );
 }
-

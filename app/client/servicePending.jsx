@@ -1,8 +1,7 @@
-/**
- * Tela de serviços pendentes para o CLIENTE
- * Essa tela só exibe os serviços pendentes relacionados aos veículos do cliente
- */
+// Tela de serviços pendentes para o CLIENTE
+// Essa tela só exibe os serviços pendentes relacionados aos veículos do cliente
 import React, { useState, useEffect } from "react";
+import { useAuthContext } from '@/hooks/useAuth';
 import {
   View,
   Text,
@@ -26,9 +25,7 @@ const servicePending = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
-  // Token de autenticação do cliente
-  // Em uma aplicação real, isso viria do contexto de autenticação
-  const authToken = "SEU_TOKEN_DO_CLIENTE_AQUI";
+  const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs"
   
   // ID do cliente atual (em uma aplicação real, viria do contexto de autenticação ou do token decodificado)
   const clientId = 4; // Substitua pelo ID real do cliente logado
@@ -77,14 +74,9 @@ const servicePending = () => {
     }
   };
 
-  /**
-   * Alternativa: Buscar pendências de um cliente específico
-   * (Requer criação de endpoint no backend: GET /clientes/:id/pendencias)
-   * // É AQUI QUE VOCÊ VAI MEXER DEPOIS DE CRIAR O LOGIN, BERNARDO
-   */
-  const getClientPendenciasById = async (clienteId) => {
+  const getClientPendenciasById = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/clientes/${clienteId}/pendencias`, {
+      const response = await fetch("https://topcar-back-end.onrender.com/pendencias/do-cliente", {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -142,10 +134,30 @@ const servicePending = () => {
         "Não foi possível carregar seus serviços pendentes. Tente novamente."
       );
       console.error("Erro ao carregar serviços do cliente:", error);
+      // IMPORTANTE: Mesmo com erro, definir services como array vazio
+      setServices([]);
     } finally {
       setLoading(false);
     }
   };
+
+// DADOS MOCKADOS PARA TESTE
+//   const loadClientServices = async () => {
+//   setLoading(true);
+//   // Dados de teste
+//   setServices([
+//     {
+//       id: 1,
+//       cliente: "João Silva",
+//       veiculo: "Honda",
+//       modelo: "Civic",
+//       placa: "ABC-1234",
+//       descricao: "Troca de óleo",
+//       data_registro: "2024-01-15"
+//     }
+//   ]);
+//   setLoading(false);
+// };
 
   // Função para atualizar a lista (pull to refresh)
   const onRefresh = async () => {
@@ -154,9 +166,10 @@ const servicePending = () => {
     setRefreshing(false);
   };
 
+  // Estado de loading
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
         <PageHeader
           title="Meus Serviços Pendentes"
           containerStyle={{ backgroundColor: Colors.azulClaro }}
@@ -173,7 +186,7 @@ const servicePending = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.container}>
       <ImageBackground
         source={require("@/assets/images/fundo.jpg")}
         style={styles.background}
@@ -185,7 +198,7 @@ const servicePending = () => {
           titleStyle={{ color: "#fff" }}
         />
         
-        {services?.length === 0 ? (
+        {services.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
               Você não possui serviços pendentes no momento.
@@ -194,7 +207,7 @@ const servicePending = () => {
         ) : (
           <FlatList
             data={services}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
             renderItem={({ item }) => (
               <ServiceCard
                 service={item}
@@ -205,6 +218,7 @@ const servicePending = () => {
             contentContainerStyle={styles.list}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            style={styles.flatList}
           />
         )}
       </ImageBackground>
@@ -219,24 +233,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  header: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+  background: {
+    flex: 1,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 4,
+  flatList: {
+    flex: 1,
   },
   list: {
     paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexGrow: 1,
   },
   emptyState: {
     flex: 1,

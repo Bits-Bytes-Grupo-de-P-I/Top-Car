@@ -1,13 +1,14 @@
 import { StyleSheet, View, Alert } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { useState, useEffect } from "react";
+import { sendImmediateNotification } from "@/utils/notifications";
 // CORES
 import Colors from "@/constants/Colors";
 
 const ServiceStatus = ({ item, fetchServicos, onStatusUpdate }) => {
   const data = [
     { label: "Em Andamento", value: "em andamento" },
-    { label: "Aguardando Peça", value: "aguardando_peca" },
+    { label: "Pendente", value: "pendente" },
     { label: "Concluído", value: "concluido" },
   ];
 
@@ -57,8 +58,6 @@ const ServiceStatus = ({ item, fetchServicos, onStatusUpdate }) => {
     }
   };
 
-  const ALLOWED_STATUSES = ["em andamento", "aguardando_peca", "concluido"];
-
   const updatePedidoStatus = async (newStatus) => {
     setIsLoading(true);
     try {
@@ -100,6 +99,11 @@ const ServiceStatus = ({ item, fetchServicos, onStatusUpdate }) => {
       setValue(item?.status || null);
     } finally {
       setIsLoading(false);
+      sendImmediateNotification({
+        title: "🚗 Status Atualizado",
+        body: `O status do serviço foi alterado para "${newStatus}"`,
+        data: { tipo: "status", id: item.id },
+      });
     }
   };
 
@@ -107,7 +111,7 @@ const ServiceStatus = ({ item, fetchServicos, onStatusUpdate }) => {
     switch (value) {
       case "em andamento": // Em Andamento
         return Colors.azulClaro;
-      case "aguardando_peca": // Aguardando Peça
+      case "pendente": // Pendente
         return Colors.laranja;
       case "concluido": // concluido
         return Colors.verde;

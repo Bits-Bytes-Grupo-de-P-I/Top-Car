@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuthContext } from "@/hooks/useAuth";
 import {
   View,
   Text,
@@ -9,12 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  ImageBackground,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 // COMPONENTES
-import Slider from "@/components/Slider";
 import VehicleSelector from "@/components/client/VehicleSelector";
 import PageHeader from "@/components/PageHeader";
 // ÍCONES
@@ -24,8 +23,8 @@ import Colors from "@/constants/Colors";
 
 const serviceRequestForm = () => {
   const router = useRouter();
-  // Estados para os campos do formulário
-  const [vehicles, setVehicles] = useState([]); // Lista de todos os carros
+  const { authenticatedFetch, user } = useAuthContext();
+  const [vehicles, setVehicles] = useState([]);
   const [vehicle, setVehicle] = useState(null);
   const [vehicleName, setVehicleName] = useState("");
   const [vehicleModel, setVehicleModel] = useState("");
@@ -36,51 +35,45 @@ const serviceRequestForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [scheduledDate, setScheduledDate] = useState("");
 
-  // Token de autorização
-  const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs"; // PRECISA ARMAZENAR DE MODO SEGURO!
-
-  // Função para buscar veículos
   const fetchVehicles = async () => {
-    try {
-      const response = await fetch(
-        "https://topcar-back-end.onrender.com/veiculos",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`Erro: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log(data);
-      // Formato original do mock:
-      const transformedData = data.map((vehicle) => ({
-        id: vehicle.id.toString(),
-        name: `${vehicle.marca} ${vehicle.modelo}`,
-        plate: vehicle.placa,
-        model: vehicle.modelo,
-        year: vehicle.ano.toString(),
-      }));
-      setVehicles(transformedData);
-    } catch (error) {
-      console.error("Erro ao buscar veículos:", error);
-    }
-  };
+  console.log("Usuário logado:", user.id);
 
-  // Chama a função quando o componente carregar
+  try {
+    const resp = await authenticatedFetch(
+      `https://topcar-back-end.onrender.com/veiculos?cliente_id=${user.id}`
+    );
+
+    if (!resp.ok) {
+      throw new Error(`Erro: ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    console.log("Veículos encontrados:", data);
+
+    const transformedData = data.map((vehicle) => ({
+      id: vehicle.id.toString(),
+      name: `${vehicle.marca} ${vehicle.modelo}`,
+      plate: vehicle.placa,
+      model: vehicle.modelo,
+      year: vehicle.ano.toString(),
+    }));
+
+    setVehicles(transformedData);
+  } catch (error) {
+    console.error("Erro ao buscar veículos:", error);
+  }
+};
+
   useEffect(() => {
     fetchVehicles();
-    // Define a data padrão como hoje
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     setScheduledDate(today);
   }, []);
 
-  // Atualiza os campos do formulário quando um veículo é selecionado
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, []);
+
   const handleVehicleSelect = (selectedVehicle) => {
     setVehicle(selectedVehicle);
     if (selectedVehicle) {
@@ -90,7 +83,6 @@ const serviceRequestForm = () => {
     }
   };
 
-  // Limpa o formulário
   const handleClearForm = () => {
     setVehicle(null);
     setVehicleName("");
@@ -98,11 +90,10 @@ const serviceRequestForm = () => {
     setVehicleYear("");
     setProblemDescription("");
     setProblemSummary("");
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     setScheduledDate(today);
   };
 
-  // Envia o formulário
   const handleSubmit = async () => {
     if (!vehicle || !problemDescription || !scheduledDate) {
       Alert.alert(
@@ -115,23 +106,22 @@ const serviceRequestForm = () => {
     setIsLoading(true);
     try {
       const agendamentoData = {
-        cliente_id: 6, // ID do cliente logado
-        veiculo_id: parseInt(vehicle.id), // Converter para número
+        cliente_id: user.id,
+        veiculo_id: parseInt(vehicle.id),
         servico_id: 4,
         descricao: problemDescription,
         data_agendada: scheduledDate,
-        status: "Pendente", // Precisa ter a inicial maiúscula aquui
-        urgente: false
+        status: "Pendente",
+        urgente: false,
       };
 
       console.log("Dados que serão enviados:", agendamentoData);
 
-      const response = await fetch(
+      const response = await authenticatedFetch(
         "https://topcar-back-end.onrender.com/agendamentos",
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(agendamentoData),
@@ -168,6 +158,11 @@ const serviceRequestForm = () => {
       );
     } finally {
       setIsLoading(false);
+      sendImmediateNotification({
+        title: "🚗 Agendamento Criado",
+        body: `Seu agendamento para ${scheduledDate} foi registrado!`,
+        data: { tipo: "agendamento", id: vehicle?.id },
+      });
     }
   };
 
@@ -278,7 +273,9 @@ const serviceRequestForm = () => {
                   <Text style={styles.submitButtonText}>Enviando...</Text>
                 ) : (
                   <>
-                    <Text style={styles.submitButtonText}>Criar Agendamento</Text>
+                    <Text style={styles.submitButtonText}>
+                      Criar Agendamento
+                    </Text>
                     <MaterialIcons
                       name="send"
                       size={18}
@@ -343,7 +340,7 @@ const styles = StyleSheet.create({
   },
   summaryCounter: {
     marginLeft: 8,
-    color: "#606060"
+    color: "#606060",
   },
   input: {
     backgroundColor: "#fff",
@@ -424,4 +421,3 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-

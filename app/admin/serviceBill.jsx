@@ -11,8 +11,8 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
-import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useState, useEffect } from "react";
 import { useLocalSearchParams } from "expo-router";
 
 // COMPONENTES
@@ -27,7 +27,17 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
+
 const NotaServico = () => {
+  // Token de autenticação
+  const authToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
+
+  // URLs da API
+  const API_BASE_URL = "https://topcar-back-end.onrender.com";
+  const PRODUTOS_URL = `${API_BASE_URL}/produtos`;
+  const SERVICOS_URL = `${API_BASE_URL}/servicos`;
+
   // Recupera os parametros passados na tela anterior
   const params = useLocalSearchParams();
   const clientParam = params.client ? JSON.parse(params.client) : null;
@@ -55,61 +65,6 @@ const NotaServico = () => {
     servicos: null,
   });
 
-  const dadosOS = {
-    // Dados do cliente
-    nomeCliente: "João Silva",
-    documentoCliente: "123.456.789-00",
-    telefoneCliente: "(11) 98765-4321",
-    enderecoCliente: "Rua das Flores, 123 - Centro",
-    cidadeCliente: "São Paulo - SP",
-    cepCliente: "12345-678",
-
-    // Dados do veículo
-    marcaVeiculo: "RENAULT",
-    modeloVeiculo: "KWID ZEN",
-    anoVeiculo: "2022",
-    corVeiculo: "BRANCA",
-    placaVeiculo: "ABC1D23",
-    quilometragem: "15.000",
-
-    // Dados da OS
-    numeroOS: "1839",
-    produtos: [
-      {
-        codigo: "7193",
-        referencia: "51907364",
-        quantidade: 1,
-        unidade: "UN",
-        descricao: "FILTRO DE ÓLEO",
-        valorUnitario: 25.0,
-        valorTotal: 25.0,
-      },
-    ],
-    servicos: [
-      {
-        codigo: "001",
-        quantidade: 1,
-        descricao: "TROCA DE ÓLEO E FILTRO",
-        valorUnitario: 80.0,
-        valorTotal: 80.0,
-      },
-    ],
-    totalProdutos: 175.0,
-    totalServicos: 120.0,
-    totalGeral: 295.0,
-
-    // Dados da empresa
-    empresaNome: "AUTO MECÂNICA TOPCAR LTDA",
-    empresaCNPJ: "39.344.879/0001-24",
-    empresaEndereco:
-      "AV ENG. ELI PINHEIRO, 1059 - BAIRRO PRETO - PRESIDENTE OLEGÁRIO/MG - 38.750-000",
-    empresaTelefone: "",
-    empresaEmail: "topcarpo@hotmail.com",
-
-    profissionalResponsavel: "DIEGO WALLANS RIBEIRO",
-  };
-
-  // MOCKS
   const [dadosNota, setDadosNota] = useState({
     cliente: clientParam || {},
     veiculo: vehiclesParam[0] || null,
@@ -119,6 +74,94 @@ const NotaServico = () => {
 
   // Estados temporários para edição/adição
   const [tempData, setTempData] = useState({});
+
+  // Estado para loading
+  const [loading, setLoading] = useState(false);
+
+  // FUNÇÃO makeRequest MELHORADA PARA DEBUG
+  const makeRequest = async (url, method = "GET", body = null) => {
+    console.log("Fazendo requisição:", { url, method, body });
+
+    const config = {
+      method,
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+
+    // Só adicionar Content-Type se houver body
+    if (body) {
+      config.headers["Content-Type"] = "application/json";
+      config.body = JSON.stringify(body);
+    }
+
+    try {
+      const response = await fetch(url, config);
+
+      console.log("Status da resposta:", response.status);
+      console.log("Headers da resposta:", response.headers);
+
+      if (!response.ok) {
+        // Tentar capturar mais detalhes do erro
+        let errorData;
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await response.json();
+        } else {
+          // Se não for JSON, capturar como texto
+          const errorText = await response.text();
+          errorData = { error: errorText, status: response.status };
+        }
+
+        console.error("Erro na resposta:", errorData);
+
+        throw new Error(
+          errorData.error ||
+            errorData.message ||
+            `HTTP ${response.status}: ${response.statusText}`
+        );
+      }
+
+      // Verificar se há conteúdo na resposta
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return response.json();
+      } else {
+        // Para requisições DELETE que podem retornar 204 No Content
+        return {};
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      throw error;
+    }
+  };
+
+  // Carregar produtos e serviços do backend ao inicializar
+  useEffect(() => {
+    loadProdutosEServicos();
+  }, []);
+
+  const loadProdutosEServicos = async () => {
+    setLoading(true);
+    try {
+      const [produtosResponse, servicosResponse] = await Promise.all([
+        makeRequest(PRODUTOS_URL),
+        makeRequest(SERVICOS_URL),
+      ]);
+
+      setDadosNota((prev) => ({
+        ...prev,
+        produtos: produtosResponse || [],
+        servicos: servicosResponse || [],
+      }));
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      Alert.alert("Erro", "Erro ao carregar produtos e serviços");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // FUNÇÃO PARA EXPANDIR SEÇÃO
   const toggleSection = (section) => {
@@ -145,19 +188,15 @@ const NotaServico = () => {
       // Adding new item
       if (section === "produtos") {
         setTempData({
-          id: Date.now(), // Temporary ID
           nome: "",
           quantidade: 0,
           unidade: "",
-          valorUnitario: 0,
-          valorTotal: 0,
+          valorunitario: 0,
         });
       } else {
         setTempData({
-          id: Date.now(), // Temporary ID
           descricao: "",
-          valorMaoDeObra: 0,
-          tempo: "",
+          valor_mao_de_obra: 0,
         });
       }
       setEditingIndex((prev) => ({ ...prev, [section]: -1 }));
@@ -184,66 +223,91 @@ const NotaServico = () => {
   };
 
   // FUNÇÃO PARA SALVAR AS MUDANÇAS
-  const saveChanges = (section) => {
-    if (section === "produtos") {
-      setDadosNota((prev) => {
-        const updatedProdutos = [...prev.produtos];
+  const saveChanges = async (section) => {
+    setLoading(true);
+
+    try {
+      if (section === "produtos") {
         if (editingIndex.produtos === -1) {
           // ADICIONAR NOVO PRODUTO
-          const newProduto = {
-            ...tempData,
+          const novoProduto = {
+            nome: tempData.nome,
             quantidade: Number(tempData.quantidade),
-            valorUnitario: Number(tempData.valorUnitario),
-            valorTotal:
-              Number(tempData.valorUnitario) * Number(tempData.quantidade),
+            unidade: tempData.unidade,
+            valorunitario: Number(tempData.valorunitario),
+            valorUnitario: Number(tempData.valorunitario),
           };
-          updatedProdutos.push(newProduto);
+
+          await makeRequest(PRODUTOS_URL, "POST", novoProduto);
+          Alert.alert("Sucesso", "Produto adicionado com sucesso!");
         } else {
-          // EDITANDO
-          const index = editingIndex.produtos;
-          const updatedProduto = {
-            ...tempData,
+          // EDITAR PRODUTO EXISTENTE
+          const produtoAtualizado = {
+            nome: tempData.nome,
             quantidade: Number(tempData.quantidade),
-            valorUnitario: Number(tempData.valorUnitario),
-            valorTotal:
-              Number(tempData.valorUnitario) * Number(tempData.quantidade),
+            unidade: tempData.unidade,
+            valorunitario: Number(tempData.valorunitario),
+            valorUnitario: Number(tempData.valorunitario),
           };
-          updatedProdutos[index] = updatedProduto;
+
+          const produtoId = dadosNota.produtos[editingIndex.produtos].id;
+          await makeRequest(
+            `${PRODUTOS_URL}/${produtoId}`,
+            "PUT",
+            produtoAtualizado
+          );
+          Alert.alert("Sucesso", "Produto atualizado com sucesso!");
         }
-        return { ...prev, produtos: updatedProdutos };
-      });
-    } else if (section === "servicos") {
-      setDadosNota((prev) => {
-        const updatedServicos = [...prev.servicos];
+
+        // Recarregar lista de produtos
+        await loadProdutosEServicos();
+      } else if (section === "servicos") {
         if (editingIndex.servicos === -1) {
-          // Adding new
-          const newServico = {
-            ...tempData,
-            valorMaoDeObra: Number(tempData.valorMaoDeObra),
+          // ADICIONAR NOVO SERVIÇO
+          const novoServico = {
+            descricao: tempData.descricao,
+            valor_mao_de_obra: Number(tempData.valor_mao_de_obra),
           };
-          updatedServicos.push(newServico);
+
+          await makeRequest(SERVICOS_URL, "POST", novoServico);
+          Alert.alert("Sucesso", "Serviço adicionado com sucesso!");
         } else {
-          // Editing
-          const index = editingIndex.servicos;
-          updatedServicos[index] = {
-            ...tempData,
-            valorMaoDeObra: Number(tempData.valorMaoDeObra),
+          // EDITAR SERVIÇO EXISTENTE
+          const servicoAtualizado = {
+            descricao: tempData.descricao,
+            valor_mao_de_obra: Number(tempData.valor_mao_de_obra),
           };
+
+          const servicoId = dadosNota.servicos[editingIndex.servicos].id;
+          await makeRequest(
+            `${SERVICOS_URL}/${servicoId}`,
+            "PUT",
+            servicoAtualizado
+          );
+          Alert.alert("Sucesso", "Serviço atualizado com sucesso!");
         }
-        return { ...prev, servicos: updatedServicos };
-      });
-    } else {
-      setDadosNota((prev) => ({
-        ...prev,
-        [section]: { ...tempData },
-      }));
+
+        // Recarregar lista de serviços
+        await loadProdutosEServicos();
+      } else {
+        // Para cliente e veículo (mantém local)
+        setDadosNota((prev) => ({
+          ...prev,
+          [section]: { ...tempData },
+        }));
+        Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      Alert.alert("Erro", `Erro ao salvar: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
 
     closeModal(section);
-    Alert.alert("Sucesso", "Informações atualizadas com sucesso!");
   };
 
-  // FUNÇÃO PARA DELETAR ITEM
+  // FUNÇÃO PARA DELETAR ITEM - VERSÃO CORRIGIDA COM DEBUG
   const deleteItem = (section, index) => {
     Alert.alert(
       "Confirmar exclusão",
@@ -256,41 +320,98 @@ const NotaServico = () => {
         {
           text: "Excluir",
           style: "destructive",
-          onPress: () => {
-            setDadosNota((prev) => {
+          onPress: async () => {
+            setLoading(true);
+            try {
+              let itemId;
+              let deleteUrl;
+
               if (section === "produtos") {
-                const newProdutos = prev.produtos.filter((_, i) => i !== index);
-                return { ...prev, produtos: newProdutos };
+                // Verificar se o produto existe e tem ID
+                const produto = dadosNota.produtos[index];
+                if (!produto) {
+                  throw new Error(
+                    "Produto não encontrado no índice especificado"
+                  );
+                }
+
+                itemId = produto.id;
+                if (!itemId) {
+                  throw new Error("ID do produto não encontrado");
+                }
+
+                deleteUrl = `${PRODUTOS_URL}/${itemId}`;
+                console.log("Deletando produto:", { index, itemId, produto });
               } else if (section === "servicos") {
-                const newServicos = prev.servicos.filter((_, i) => i !== index);
-                return { ...prev, servicos: newServicos };
-              } else {
-                return prev;
+                // Verificar se o serviço existe e tem ID
+                const servico = dadosNota.servicos[index];
+                if (!servico) {
+                  throw new Error(
+                    "Serviço não encontrado no índice especificado"
+                  );
+                }
+
+                itemId = servico.id;
+                if (!itemId) {
+                  throw new Error("ID do serviço não encontrado");
+                }
+
+                deleteUrl = `${SERVICOS_URL}/${itemId}`;
+                console.log("Deletando serviço:", { index, itemId, servico });
               }
-            });
+
+              // Fazer a requisição DELETE
+              console.log("URL da requisição DELETE:", deleteUrl);
+              const response = await makeRequest(deleteUrl, "DELETE");
+              console.log("Resposta da exclusão:", response);
+
+              if (section === "produtos") {
+                Alert.alert("Sucesso", "Produto removido com sucesso!");
+              } else {
+                Alert.alert("Sucesso", "Serviço removido com sucesso!");
+              }
+
+              // Recarregar lista
+              await loadProdutosEServicos();
+            } catch (error) {
+              console.error("Erro detalhado ao deletar:", {
+                message: error.message,
+                section,
+                index,
+                item:
+                  section === "produtos"
+                    ? dadosNota.produtos[index]
+                    : dadosNota.servicos[index],
+              });
+              Alert.alert("Erro", `Erro ao excluir: ${error.message}`);
+            } finally {
+              setLoading(false);
+            }
           },
         },
       ]
     );
   };
 
-  // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DOS SERVIÇOS
+  // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DOS PRODUTOS
   const calcularTotalProdutos = () => {
-    return dadosNota.produtos.reduce(
-      (total, produto) => total + produto.valorTotal,
-      0
-    );
+    return dadosNota.produtos.reduce((total, produto) => {
+      // converte valorUnitario (string ou número) para Number e usa 0 como fallback
+      const valorUnit = Number(produto.valorunitario ?? 0);
+      return total + produto.quantidade * valorUnit;
+    }, 0);
   };
 
   // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DOS SERVIÇOS
   const calcularTotalServicos = () => {
-    return dadosNota.servicos.reduce(
-      (total, servico) => total + servico.valorMaoDeObra,
-      0
-    );
+    return dadosNota.servicos.reduce((total, servico) => {
+      // converte valor_mao_de_obra para Number e usa 0 como fallback
+      const valorMao = Number(servico.valor_mao_de_obra ?? 0);
+      return total + valorMao;
+    }, 0);
   };
 
-  // FUNÇÃO PARA CALCUÇAR O PREÇO TOTAL DE TUDO
+  // FUNÇÃO PARA CALCULAR O PREÇO TOTAL DE TUDO
   const calcularTotalGeral = () => {
     return calcularTotalProdutos() + calcularTotalServicos();
   };
@@ -302,7 +423,6 @@ const NotaServico = () => {
     return (
       <View
         style={[
-          // Esse estilo serve para arredondar as bordas exteriores dos cards das bordas
           styles.sectionContainer,
           title === "CLIENTE" && {
             borderTopLeftRadius: 10,
@@ -320,15 +440,6 @@ const NotaServico = () => {
         >
           <Text style={styles.sectionTitle}>{title}</Text>
           <View style={styles.headerIcons}>
-            {title === "CLIENTE" || title === "VEÍCULO" ? (
-              // os botões de editar vão aparecer apenas nos cards CLIENTE e VEÍCULO
-              <TouchableOpacity
-                style={styles.editIcon}
-                onPress={() => openModal(sectionKey)}
-              >
-                <Ionicons name="pencil" size={20} color={Colors.azul} />
-              </TouchableOpacity>
-            ) : null}
             <Ionicons
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={24}
@@ -386,10 +497,13 @@ const NotaServico = () => {
               Qtd: {produto.quantidade} {produto.unidade}
             </Text>
             <Text style={styles.itemInfo}>
-              Unit: R$ {produto.valorUnitario.toFixed(2)}
+              Unit: R$ {Number(produto?.valorunitario || 0).toFixed(2)}
             </Text>
             <Text style={styles.itemTotal}>
-              Total: R$ {produto.valorTotal.toFixed(2)}
+              Total: R${" "}
+              {(
+                produto.quantidade * Number(produto.valorunitario || 0)
+              ).toFixed(2)}
             </Text>
           </View>
         </View>
@@ -432,9 +546,9 @@ const NotaServico = () => {
             </View>
           </View>
           <View style={[styles.itemDetails, { flexDirection: "row" }]}>
-            <Text style={styles.itemInfo}>Tempo: {servico.tempo}</Text>
             <Text style={styles.itemTotal}>
-              Mão de obra: R$ {servico.valorMaoDeObra.toFixed(2)}
+              Mão de obra: R${" "}
+              {Number(servico?.valor_mao_de_obra || 0).toFixed(2)}
             </Text>
           </View>
         </View>
@@ -452,266 +566,13 @@ const NotaServico = () => {
     <TouchableOpacity
       style={styles.addButton}
       onPress={() => openModal(section, null)}
+      disabled={loading}
     >
       <Ionicons name="add-circle-outline" size={24} color={Colors.verde} />
       <Text style={styles.addButtonText}>
         Adicionar {section === "produtos" ? "Produto" : "Serviço"}
       </Text>
     </TouchableOpacity>
-  );
-
-  // MODAL DO CLIENTE
-  const renderClienteModal = () => (
-    <Modal
-      visible={modalsVisible.cliente}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => closeModal("cliente")}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Editar Cliente</Text>
-            <TouchableOpacity onPress={() => closeModal("cliente")}>
-              <Ionicons name="close" size={24} color={Colors.grafite} />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            style={styles.modalContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nome</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.nome}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, nome: text }))
-                }
-                placeholder="Nome do cliente"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Documento</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.documento}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, documento: text }))
-                }
-                placeholder="CPF/CNPJ"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Telefone</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.telefone}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, telefone: text }))
-                }
-                placeholder="Telefone"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Endereço</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.endereco}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, endereco: text }))
-                }
-                placeholder="Endereço completo"
-                multiline
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Cidade</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.cidade}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, cidade: text }))
-                }
-                placeholder="Cidade - UF"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>CEP</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.cep}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, cep: text }))
-                }
-                placeholder="CEP"
-              />
-            </View>
-          </ScrollView>
-
-          <View style={styles.modalButtons}>
-            <Button
-              texto="Cancelar"
-              cor={Colors.vermelho}
-              onPress={() => closeModal("cliente")}
-            >
-              <MaterialIcons
-                name="cancel"
-                size={18}
-                color="white"
-                style={{ marginRight: 5 }}
-              />
-            </Button>
-
-            <Button
-              texto="Salvar"
-              cor={Colors.verde}
-              onPress={() => saveChanges("cliente")}
-            >
-              <MaterialIcons
-                name="check-circle"
-                size={18}
-                color="white"
-                style={{ marginRight: 5 }}
-              />
-            </Button>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
-  // MODAL DO VEÍCULO
-  const renderVeiculoModal = () => (
-    <Modal
-      visible={modalsVisible.veiculo}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => closeModal("veiculo")}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Editar Veículo</Text>
-            <TouchableOpacity onPress={() => closeModal("veiculo")}>
-              <Ionicons name="close" size={24} color={Colors.grafite} />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            style={styles.modalContent}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Marca</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.marca}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, marca: text }))
-                }
-                placeholder="Marca do veículo"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Modelo</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.modelo}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, modelo: text }))
-                }
-                placeholder="Modelo do veículo"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Ano</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.ano}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, ano: text }))
-                }
-                placeholder="Ano"
-                keyboardType="numeric"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Cor</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.cor}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, cor: text }))
-                }
-                placeholder="Cor do veículo"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Placa</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.placa}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, placa: text }))
-                }
-                placeholder="Placa"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Quilometragem</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.km}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, km: text }))
-                }
-                placeholder="Quilometragem atual"
-              />
-            </View>
-          </ScrollView>
-
-          <View style={styles.modalButtons}>
-            <Button
-              texto="Cancelar"
-              cor={Colors.vermelho}
-              onPress={() => closeModal("veiculo")}
-            >
-              <MaterialIcons
-                name="cancel"
-                size={18}
-                color="white"
-                style={{ marginRight: 5 }}
-              />
-            </Button>
-
-            <Button
-              texto="Salvar"
-              cor={Colors.verde}
-              onPress={() => saveChanges("veiculo")}
-            >
-              <MaterialIcons
-                name="check-circle"
-                size={18}
-                color="white"
-                style={{ marginRight: 5 }}
-              />
-            </Button>
-          </View>
-        </View>
-      </View>
-    </Modal>
   );
 
   // MODAL DOS PRODUTOS
@@ -781,12 +642,12 @@ const NotaServico = () => {
               <TextInput
                 style={styles.input}
                 value={
-                  tempData.valorUnitario !== undefined
-                    ? String(tempData.valorUnitario)
+                  tempData.valorunitario !== undefined
+                    ? String(tempData.valorunitario)
                     : ""
                 }
                 onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, valorUnitario: text }))
+                  setTempData((prev) => ({ ...prev, valorunitario: text }))
                 }
                 placeholder="valor unitário"
                 keyboardType="numeric"
@@ -798,6 +659,7 @@ const NotaServico = () => {
               texto="Cancelar"
               cor={Colors.vermelho}
               onPress={() => closeModal("produtos")}
+              disabled={loading}
             >
               <MaterialIcons
                 name="cancel"
@@ -808,9 +670,10 @@ const NotaServico = () => {
             </Button>
 
             <Button
-              texto="Salvar"
+              texto={loading ? "Salvando..." : "Salvar"}
               cor={Colors.verde}
               onPress={() => saveChanges("produtos")}
+              disabled={loading}
             >
               <MaterialIcons
                 name="check-circle"
@@ -861,27 +724,16 @@ const NotaServico = () => {
               />
             </View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Tempo</Text>
-              <TextInput
-                style={styles.input}
-                value={tempData.tempo || ""}
-                onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, tempo: text }))
-                }
-                placeholder="Tempo estimado (ex: 1h 30min)"
-              />
-            </View>
-            <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Valor Mão de Obra</Text>
               <TextInput
                 style={styles.input}
                 value={
-                  tempData.valorMaoDeObra !== undefined
-                    ? String(tempData.valorMaoDeObra)
+                  tempData.valor_mao_de_obra !== undefined
+                    ? String(tempData.valor_mao_de_obra)
                     : ""
                 }
                 onChangeText={(text) =>
-                  setTempData((prev) => ({ ...prev, valorMaoDeObra: text }))
+                  setTempData((prev) => ({ ...prev, valor_mao_de_obra: text }))
                 }
                 placeholder="valor mão de obra"
                 keyboardType="numeric"
@@ -893,6 +745,7 @@ const NotaServico = () => {
               texto="Cancelar"
               cor={Colors.vermelho}
               onPress={() => closeModal("servicos")}
+              disabled={loading}
             >
               <MaterialIcons
                 name="cancel"
@@ -903,9 +756,10 @@ const NotaServico = () => {
             </Button>
 
             <Button
-              texto="Salvar"
+              texto={loading ? "Salvando..." : "Salvar"}
               cor={Colors.verde}
               onPress={() => saveChanges("servicos")}
+              disabled={loading}
             >
               <MaterialIcons
                 name="check-circle"
@@ -923,7 +777,7 @@ const NotaServico = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PageHeader
-        title="Serviços em Pendência"
+        title="Nota de Serviço"
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
@@ -942,7 +796,6 @@ const NotaServico = () => {
           {renderSection(
             "VEÍCULO",
             "veiculo",
-            // conteúdo:
             <BillVehicleDropdown
               vehicles={vehiclesParam}
               selectedVehicleId={dadosNota.veiculo?.id}
@@ -950,7 +803,7 @@ const NotaServico = () => {
                 setDadosNota((prev) => ({ ...prev, veiculo: veh }))
               }
             />,
-            null // sem botão de adicionar aqui
+            null
           )}
           {renderSection(
             "PRODUTOS",
@@ -984,8 +837,6 @@ const NotaServico = () => {
           <GeneratePdfBtn dadosOrdemServico={dadosNota} />
 
           {/* Modais */}
-          {renderClienteModal()}
-          {renderVeiculoModal()}
           {renderProdutosModal()}
           {renderServicosModal()}
         </ScrollView>

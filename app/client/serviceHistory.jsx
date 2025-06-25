@@ -6,30 +6,83 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  ImageBackground,
+  Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // Esse import precisa ser diferente para funcionar corretamente
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // COMPONENTES
 import VehicleSelector from "@/components/client/VehicleSelector";
 import PageHeader from "@/components/PageHeader";
 
-// MOCKS
-import mockVehicles from "@/assets/mocks/mockVehicles.json";
-
 // CORES
 import Colors from "@/constants/Colors";
+
+// Configuração da API
+const API_BASE_URL = "https://topcar-back-end.onrender.com";
+const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
 const serviceHistory = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleData, setVehicleData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [oilChangeData, setOilChangeData] = useState(null);
   const [alignmentData, setAlignmentData] = useState(null);
 
-  // Simulando o carregamento de dados do banco
+  // Função para buscar veículos da API
+  const fetchVehicles = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/veiculos`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+      }
+
+      const vehicles = await response.json();
+      
+      // Transformar os dados da API para o formato esperado pelo componente
+      const formattedVehicles = vehicles.map(vehicle => ({
+        id: vehicle.id,
+        name: `${vehicle.marca} ${vehicle.modelo}`,
+        plate: vehicle.placa,
+        year: vehicle.ano,
+        color: vehicle.cor,
+        lastMaintenance: vehicle.ultima_manutencao,
+        km: vehicle.km,
+        clientId: vehicle.cliente_id,
+        // Dados originais para caso precise acessar
+        originalData: vehicle
+      }));
+
+      setVehicleData(formattedVehicles);
+    } catch (err) {
+      console.error('Erro ao buscar veículos:', err);
+      setError(err.message);
+      Alert.alert(
+        'Erro',
+        'Não foi possível carregar os veículos. Verifique sua conexão e tente novamente.',
+        [
+          { text: 'OK' },
+          { text: 'Tentar novamente', onPress: fetchVehicles }
+        ]
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar veículos quando o componente montar
   useEffect(() => {
-    // Em uma aplicação real, você faria uma chamada API aqui
-    setVehicleData(mockVehicles.vehicles);
+    fetchVehicles();
   }, []);
 
   // Simula o carregamento dos dados de serviços quando um veículo é selecionado
@@ -39,7 +92,7 @@ const serviceHistory = () => {
       const mockOilChange = {
         id: 1,
         date: "2023-09-15",
-        kilometrage: "45.000",
+        kilometrage: selectedVehicle.km || "45.000",
         oilType: "Sintético 5W30",
         nextServices: {
           engineOil: "50.000",
@@ -53,8 +106,8 @@ const serviceHistory = () => {
       const mockAlignment = {
         id: 2,
         date: "2023-06-22",
-        kilometrage: "42.500",
-        nextRevision: "47.500",
+        kilometrage: selectedVehicle.km ? (parseInt(selectedVehicle.km) - 2500).toString() : "42.500",
+        nextRevision: selectedVehicle.km ? (parseInt(selectedVehicle.km) + 5000).toString() : "47.500",
       };
 
       setOilChangeData(mockOilChange);
@@ -67,7 +120,6 @@ const serviceHistory = () => {
 
   const handleVehicleSelect = (vehicle) => {
     setSelectedVehicle(vehicle);
-    // Em uma aplicação real, você faria chamadas API aqui para buscar os dados de serviço do veículo
   };
 
   return (
@@ -79,13 +131,13 @@ const serviceHistory = () => {
       />
 
       <ScrollView style={styles.container}>
-        {/* <Text style={styles.title}>Histórico de Manutenção</Text> */}
-
         {/* Componente de seleção de veículo */}
         <VehicleSelector
           vehicles={vehicleData}
           onVehicleSelect={handleVehicleSelect}
           initialVehicleId={null}
+          loading={loading}
+          error={error}
         />
 
         {/* Informações do veículo selecionado */}
@@ -104,6 +156,14 @@ const serviceHistory = () => {
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Ano:</Text>
                 <Text style={styles.detailValue}>{selectedVehicle.year}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Cor:</Text>
+                <Text style={styles.detailValue}>{selectedVehicle.color}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>Quilometragem:</Text>
+                <Text style={styles.detailValue}>{selectedVehicle.km} km</Text>
               </View>
             </View>
 
@@ -207,7 +267,12 @@ const serviceHistory = () => {
         ) : (
           <View style={styles.placeholderContainer}>
             <Text style={styles.placeholderText}>
-              Selecione um veículo para visualizar seus serviços realizados
+              {loading 
+                ? "Carregando veículos..." 
+                : error 
+                ? "Erro ao carregar veículos. Toque em 'Selecionar' para tentar novamente."
+                : "Selecione um veículo para visualizar seus serviços realizados"
+              }
             </Text>
           </View>
         )}
@@ -216,6 +281,7 @@ const serviceHistory = () => {
   );
 };
 
+// ... (estilos permanecem os mesmos)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -248,7 +314,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     color: "#333",
   },
-
   sectionTitleTwo: {
     fontSize: 18,
     fontWeight: "bold",

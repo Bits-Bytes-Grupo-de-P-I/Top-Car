@@ -21,14 +21,11 @@ import FloatingActionButton from "../../components/client/FloatingActionButton";
 import {
   Entypo,
   FontAwesome6,
-  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 
 // CORES
 import Colors from "@/constants/Colors";
-
-// IMPORTANDO O COMPONENTE DE VOLTAR PARA PÁGINA INICIAL ----- ATENÇÃO EXCLUIR ELE APÓS A FINALIZAÇÃO DO PROJETO .
-import BackToHomeButton from "@/components/BackToHomeButton";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function Index() {
   const router = useRouter();
@@ -53,7 +50,7 @@ export default function Index() {
                 source={require("@/assets/images/logo.png")}
                 style={{ width: 120, height: 120 }}
               />
-              <Entypo name="login" size={24} color="white" />
+              <LogoutButton/>
             </View>
             {/* Fim Barra do topo */}
 
@@ -65,18 +62,7 @@ export default function Index() {
               </View>
               {/* Fim Container do titulo */}
 
-              {/* ATENÇÃO EXCLUIR ESSE Button */}
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Text>Página do Cliente</Text>
-                <BackToHomeButton />
-              </View>
-              {/* ATENÇÃO EXCLUIR ESSE Button */}
+              
 
               {/* Container dos cards */}
               <View style={styles.containerCards}>

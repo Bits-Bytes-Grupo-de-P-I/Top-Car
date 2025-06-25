@@ -18,15 +18,15 @@ import Colors from "@/constants/Colors";
  */
 const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editedDescription, setEditedDescription] = useState(service.description || service.descricao || "");
+  const [editedDescription, setEditedDescription] = useState(service?.description || service?.descricao || "");
 
   const handleEdit = () => {
-    setEditedDescription(service.description || service.descricao || "");
+    setEditedDescription(service?.description || service?.descricao || "");
     setEditModalVisible(true);
   };
 
   const handleDelete = () => {
-    const vehicleName = service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}`;
+    const vehicleName = service?.vehicle || service?.veiculo_completo || `${service?.veiculo || ''} ${service?.modelo || ''}`.trim();
     Alert.alert(
       "Confirmar exclusão",
       `Deseja realmente excluir o serviço pendente para o veículo ${vehicleName}?`,
@@ -34,7 +34,7 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
         { text: "Cancelar", style: "cancel" },
         {
           text: "Excluir",
-          onPress: () => onDelete && onDelete(service.id),
+          onPress: () => onDelete && onDelete(service?.id),
           style: "destructive",
         },
       ]
@@ -50,7 +50,7 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
 
     // Chama a função de edição passada como prop
     if (onEdit) {
-      onEdit(service.id, {
+      onEdit(service?.id, {
         description: editedDescription.trim(),
       });
     }
@@ -60,7 +60,7 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
 
   const cancelEdit = () => {
     // Restaura o valor original
-    setEditedDescription(service.description || service.descricao || "");
+    setEditedDescription(service?.description || service?.descricao || "");
     setEditModalVisible(false);
   };
 
@@ -74,6 +74,11 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
       return "Data inválida";
     }
   };
+
+  // Verifica se o service existe
+  if (!service) {
+    return null;
+  }
 
   return (
     <>
@@ -91,7 +96,7 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
           <View style={styles.row}>
             <Text style={styles.label}>Veículo:</Text>
             <Text style={styles.value}>
-              {service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}` || "N/A"}
+              {service.vehicle || service.veiculo_completo || `${service.veiculo || ''} ${service.modelo || ''}`.trim() || "N/A"}
             </Text>
           </View>
           
@@ -158,9 +163,15 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
             
             {/* Mostra informações do serviço (somente leitura) */}
             <View style={styles.readOnlyInfo}>
-              <Text style={styles.readOnlyLabel}>Cliente: {service.clienteName || service.cliente_nome || service.cliente}</Text>
-              <Text style={styles.readOnlyLabel}>Veículo: {service.vehicle || service.veiculo_completo || `${service.veiculo} ${service.modelo}`}</Text>
-              <Text style={styles.readOnlyLabel}>Placa: {service.licensePlate || service.placa}</Text>
+              <Text style={styles.readOnlyLabel}>
+                Cliente: {service.clienteName || service.cliente_nome || service.cliente || 'N/A'}
+              </Text>
+              <Text style={styles.readOnlyLabel}>
+                Veículo: {service.vehicle || service.veiculo_completo || `${service.veiculo || ''} ${service.modelo || ''}`.trim() || 'N/A'}
+              </Text>
+              <Text style={styles.readOnlyLabel}>
+                Placa: {service.licensePlate || service.placa || 'N/A'}
+              </Text>
             </View>
 
             <View style={styles.inputContainer}>
@@ -175,7 +186,7 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
                 maxLength={500}
               />
               <Text style={styles.characterCount}>
-                {editedDescription?.length}/500 caracteres
+                {editedDescription?.length || 0}/500 caracteres
               </Text>
             </View>
 
@@ -239,12 +250,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.cinzaEscuro,
+    color: Colors.cinzaEscuro || "#666",
     minWidth: 60,
   },
   value: {
     fontSize: 14,
-    color: Colors.preto,
+    color: Colors.preto || "#000",
     flex: 1,
   },
   descriptionContainer: {
@@ -252,7 +263,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: Colors.preto,
+    color: Colors.preto || "#000",
     marginTop: 4,
     lineHeight: 20,
   },
@@ -279,7 +290,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: Colors.preto,
+    color: Colors.preto || "#000",
+  },
+  readOnlyInfo: {
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  readOnlyLabel: {
+    fontSize: 14,
+    color: Colors.cinzaEscuro || "#666",
+    marginBottom: 4,
   },
   inputContainer: {
     marginBottom: 16,
@@ -287,12 +309,12 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.cinzaEscuro,
+    color: Colors.cinzaEscuro || "#666",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.cinzaClaro,
+    borderColor: Colors.cinzaClaro || "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -301,6 +323,12 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     textAlignVertical: "top",
+  },
+  characterCount: {
+    fontSize: 12,
+    color: Colors.cinzaEscuro || "#666",
+    marginTop: 4,
+    textAlign: "right",
   },
   modalActions: {
     flexDirection: "row",
