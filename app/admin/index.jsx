@@ -105,19 +105,6 @@ export default function Index() {
                 color={Colors.laranja}
               />
             </Card>
-            <Card
-              texto="Teste de notificação"
-              cor={Colors.azul}
-              iconName="table-list"
-              onPress={() => router.push("./admin/testeNotif")}
-            >
-              <FontAwesome6
-                style={{ marginBottom: 4 }}
-                name="atom"
-                size={30}
-                color={Colors.azul}
-              />
-            </Card>
           </View>
 
           {/* Título Clientes */}
