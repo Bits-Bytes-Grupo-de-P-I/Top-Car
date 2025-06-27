@@ -190,25 +190,6 @@ const prepararDadosParaPDF = () => {
     loadProdutosEServicos();
   }, []);
 
-  const testarBotaoPDF = () => {
-    console.log("🔍 DADOS ATUAIS:", dadosNota);
-    console.log("🔍 CLIENTE:", dadosNota.cliente);
-    console.log("🔍 VEÍCULO:", dadosNota.veiculo);
-    console.log("🔍 PRODUTOS:", dadosNota.produtos);
-    console.log("🔍 SERVIÇOS:", dadosNota.servicos);
-
-    const dadosFormatados = prepararDadosParaPDF();
-    console.log("🔍 DADOS FORMATADOS:", dadosFormatados);
-
-    Alert.alert(
-      "Debug PDF",
-      `Cliente: ${dadosNota.cliente?.nome || "Não definido"}\n` +
-        `Produtos: ${dadosNota.produtos?.length || 0}\n` +
-        `Serviços: ${dadosNota.servicos?.length || 0}\n` +
-        `Total: R$ ${calcularTotalGeral().toFixed(2)}`
-    );
-  };
-
   const loadProdutosEServicos = async () => {
     setLoading(true);
     try {
@@ -902,13 +883,6 @@ const prepararDadosParaPDF = () => {
 
           {/* Botões */}
           <GeneratePdfBtn dadosOrdemServico={dadosNota} />
-          <TouchableOpacity
-            style={[styles.botaoPrimario, { backgroundColor: Colors.verde }]}
-            onPress={testarBotaoPDF}
-          >
-            <Ionicons name="bug" size={20} color="white" />
-            <Text style={styles.textoBotaoPrimario}>Testar PDF</Text>
-          </TouchableOpacity>
 
           {/* Modais */}
           {renderProdutosModal()}

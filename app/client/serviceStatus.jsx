@@ -11,77 +11,99 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // COMPONENTES
 import PageHeader from "@/components/PageHeader";
 import ClientServiceCard from "@/components/client/ClientServiceCard";
-
 // ÍCONES
 import { FontAwesome6 } from "@expo/vector-icons";
-
 // CORES
 import Colors from "@/constants/Colors";
 
-const serviceStatus = () => {
+const ServiceStatus = () => {
   const [meuServicos, setMeuServicos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [clientes, setClientes] = useState([]);
+  const [loadingClientes, setLoadingClientes] = useState(false);
+  const [errorClientes, setErrorClientes] = useState(null);
 
   // Configurações da API
   const API_BASE_URL = "https://topcar-back-end.onrender.com";
   const AUTH_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
-  // Função para buscar pedidos da API
+  // Dados do cliente logado (mudança aqui: agora é um objeto)
+  const [clienteLogado, setClienteLogado] = useState(null);
+
+  // busca os pedidos e filtra por "nome do cliente" extraído do clienteLogado.email
   const fetchPedidos = async () => {
+    if (!clienteLogado || !clienteLogado.email) {
+      console.log('Cliente logado ainda não definido');
+      return;
+    }
+
+    if (clientes.length === 0) {
+      console.log('Lista de clientes ainda não carregada');
+      return;
+    }
+
+    // encontra o objeto cliente cujo email bate com o logado
+    const clienteObj = clientes.find(c => c.email === clienteLogado.email);
+    if (!clienteObj) {
+      console.warn('Cliente logado não encontrado na lista de clientes');
+      console.log('Email do cliente logado:', clienteLogado.email);
+      console.log('Emails dos clientes:', clientes.map(c => c.email));
+      setError('Cliente não encontrado na base de dados');
+      setLoading(false);
+      return;
+    }
+    
+    const nomeDoCliente = clienteObj.nome;
+    console.log('Nome do cliente encontrado:', nomeDoCliente);
+
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/pedidos`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-        },
+      const res = await fetch(`${API_BASE_URL}/pedidos`, {
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${AUTH_TOKEN}`
+        }
       });
+      
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      console.log('Todos os pedidos:', data);
 
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
-      }
+      // filtra pelo nome correto
+      const pedidosDoCliente = data.filter(p => p.nome === nomeDoCliente);
+      console.log('Pedidos filtrados do cliente:', pedidosDoCliente);
 
-      const data = await response.json();
-
-      // Transformar os dados da API para o formato esperado pelo componente
-      const servicosFormatados = data.map((pedido) => ({
-        id: pedido.id,
-        clienteNome: pedido.nome,
-        telefone: pedido.telefone,
-        veiculo: `${pedido.modelo} ${pedido.ano}`,
-        placa: pedido.placa,
-        servico: pedido.resumo,
-        observacoes: pedido.descricao,
-        dataAgendada: formatarData(pedido.dataPedido),
-        status: mapearStatus(pedido.status),
-        urgente: pedido.status === "urgente" || false, // Ajustar conforme sua lógica de urgência
+      const servicosFormatados = pedidosDoCliente.map(p => ({
+        id: p.id,
+        clienteNome: p.nome,
+        telefone: p.telefone,
+        veiculo: `${p.modelo} ${p.ano}`,
+        placa: p.placa,
+        servico: p.resumo,
+        observacoes: p.descricao,
+        dataAgendada: formatarData(p.dataPedido),
+        status: mapearStatus(p.status),
+        urgente: p.status === 'urgente'
       }));
 
       setMeuServicos(servicosFormatados);
     } catch (err) {
-      console.error("Erro ao buscar pedidos:", err);
+      console.error('Erro ao buscar pedidos:', err);
       setError(err.message);
       Alert.alert(
-        "Erro",
-        "Não foi possível carregar os serviços. Tente novamente.",
+        'Erro',
+        'Não foi possível carregar os serviços. Tente novamente.',
         [
-          {
-            text: "Tentar Novamente",
-            onPress: fetchPedidos,
-          },
-          {
-            text: "OK",
-            style: "cancel",
-          },
+          { text: 'Tentar Novamente', onPress: fetchPedidos },
+          { text: 'OK', style: 'cancel' }
         ]
       );
     } finally {
@@ -89,14 +111,31 @@ const serviceStatus = () => {
     }
   };
 
+  const fetchClientes = async () => {
+    try {
+      setLoadingClientes(true);
+      const res = await fetch(`${API_BASE_URL}/clientes`, {
+        headers: { Authorization: `Bearer ${AUTH_TOKEN}` }
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const data = await res.json();
+      setClientes(data);
+      console.log('Clientes carregados:', data);
+      
+    } catch (e) {
+      console.error('Erro ao buscar clientes:', e);
+      setErrorClientes(e.message);
+    } finally {
+      setLoadingClientes(false);
+    }
+  };
+
   // Função para formatar data
   const formatarData = (dataString) => {
     if (!dataString) return "Data não informada";
-
     try {
       const data = new Date(dataString);
       if (isNaN(data.getTime())) return "Data inválida";
-
       return data.toLocaleDateString("pt-BR");
     } catch (error) {
       return "Data inválida";
@@ -112,14 +151,40 @@ const serviceStatus = () => {
       concluido: "Concluído",
       finalizado: "Concluído",
     };
-
     return statusMap[status?.toLowerCase()] || status || "Pendente";
   };
 
-  // Carregar pedidos ao montar o componente
+  // Função para carregar dados do usuário logado
+  const loadUserData = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const user = JSON.parse(userData);
+        // Mudança aqui: mantém o objeto completo
+        setClienteLogado(user);
+        console.log('Dados do cliente logado:', user);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados do usuário:", error);
+    }
+  };
+
+  // Carregar dados do usuário ao montar o componente
   useEffect(() => {
-    fetchPedidos();
+    loadUserData();
   }, []);
+
+  // Carregar clientes ao montar o componente (removido a duplicação)
+  useEffect(() => {
+    fetchClientes();
+  }, []);
+
+  // Carregar pedidos quando os dados do usuário E a lista de clientes estiverem carregados
+  useEffect(() => {
+    if (clienteLogado && clientes.length > 0) {
+      fetchPedidos();
+    }
+  }, [clienteLogado, clientes]); // Dependência corrigida
 
   const handleServicoPress = (item) => {
     console.log("Serviço visualizado:", item);
@@ -217,7 +282,7 @@ const serviceStatus = () => {
   );
 };
 
-export default serviceStatus;
+export default ServiceStatus;
 
 const styles = StyleSheet.create({
   background: {

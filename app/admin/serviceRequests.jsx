@@ -137,154 +137,168 @@ const serviceRequests = () => {
 
   // Função para aceitar agendamento (criar pedido e deletar agendamento)
   const handleAccept = async (agendamento) => {
-  console.log("→ handleAccept chamado com agendamento:", agendamento);
+    console.log("→ handleAccept chamado com agendamento:", agendamento);
 
-  try {
-    // 1) buscar cliente
-    console.log(`🔍 Buscando cliente por nome: "${agendamento.cliente.nome}"`);
-    const cliente = await findClienteByName(agendamento.cliente.nome);
-    if (!cliente) {
-      console.log("❌ Cliente não encontrado");
-      Alert.alert("Erro", "Cliente não encontrado no sistema");
-      return;
-    }
-
-    // 2) buscar veículo
-    console.log(`🔍 Buscando veículo por placa: "${agendamento.veiculo.placa}"`);
-    const veiculo = await findVeiculoByPlaca(agendamento.veiculo.placa);
-    if (!veiculo) {
-      console.log("❌ Veículo não encontrado");
-      Alert.alert("Erro", "Veículo não encontrado no sistema");
-      return;
-    }
-
-    // 3) criar pedido
-    const pedidoData = {
-      cliente_id: cliente.id,
-      veiculo_id: veiculo.id,
-      resumo: agendamento.resumo,
-      descricao: agendamento.descricao,
-      status: "pendente",          // ajuste de status previamente discutido
-      dataPedido: new Date().toISOString(),
-    };
-    console.log("✏️ Enviando POST /pedidos com:", pedidoData);
-
-    const createResponse = await fetch(`${API_BASE_URL}/pedidos`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${AUTH_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(pedidoData),
-    });
-    console.log("📥 createResponse.status =", createResponse.status);
-    const createText = await createResponse.text();
-    console.log("📄 createResponse.body =", createText);
-
-    // 4) tratamento da resposta de criação
-    if (createResponse.ok) {
-      console.log(`✅ Pedido criado com sucesso. Agora apagando agendamento ID=${agendamento.id}`);
-      
-      // 5) deletar agendamento
-      const deleteResponse = await fetch(
-        `${API_BASE_URL}/agendamentos/${agendamento.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${AUTH_TOKEN}`,
-            // sem Content-Type no DELETE para não gerar erro de JSON vazio
-          },
-        }
+    try {
+      // 1) buscar cliente
+      console.log(
+        `🔍 Buscando cliente por nome: "${agendamento.cliente.nome}"`
       );
-      console.log("📥 deleteResponse.status =", deleteResponse.status);
-      const deleteText = await deleteResponse.text();
-      console.log("📄 deleteResponse.body =", deleteText);
-
-      if (deleteResponse.ok) {
-        Alert.alert("Sucesso", "Agendamento aceito com sucesso!");
-        setModalVisible(false);
-        fetchAgendamentos(); // Recarrega lista
-      } else {
-        console.log("❌ Falha ao deletar agendamento");
-        Alert.alert("Erro", "Pedido criado, mas erro ao remover agendamento");
+      const cliente = await findClienteByName(agendamento.cliente.nome);
+      if (!cliente) {
+        console.log("❌ Cliente não encontrado");
+        Alert.alert("Erro", "Cliente não encontrado no sistema");
+        return;
       }
 
-    } else {
-      console.log("❌ Falha ao criar pedido:", createText);
-      let err;
-      try { err = JSON.parse(createText); } catch { err = { error: createText }; }
-      Alert.alert("Erro", `Não foi possível aceitar o agendamento: ${err.error || "Desconhecido"}`);
-    }
+      // 2) buscar veículo
+      console.log(
+        `🔍 Buscando veículo por placa: "${agendamento.veiculo.placa}"`
+      );
+      const veiculo = await findVeiculoByPlaca(agendamento.veiculo.placa);
+      if (!veiculo) {
+        console.log("❌ Veículo não encontrado");
+        Alert.alert("Erro", "Veículo não encontrado no sistema");
+        return;
+      }
 
-  } catch (error) {
-    console.error("🔥 Exceção em handleAccept:", error);
-    Alert.alert("Erro", "Erro de conexão ao aceitar agendamento");
-  }
-};
+      // 3) criar pedido
+      const pedidoData = {
+        cliente_id: cliente.id,
+        veiculo_id: veiculo.id,
+        resumo: agendamento.resumo,
+        descricao: agendamento.descricao,
+        status: "pendente", // ajuste de status previamente discutido
+        dataPedido: new Date().toISOString(),
+      };
+      console.log("✏️ Enviando POST /pedidos com:", pedidoData);
 
-
-// Função para rejeitar agendamento (deletar)
-const handleReject = async (id) => {
-  console.log("→ handleReject chamado com ID:", id);
-
-  Alert.alert(
-    "Confirmar Rejeição",
-    "Tem certeza que deseja rejeitar este agendamento?",
-    [
-      {
-        text: "Cancelar",
-        style: "cancel",
-      },
-      {
-        text: "Rejeitar",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            console.log(`🗑️ Enviando DELETE para /agendamentos/${id}`);
-            const response = await fetch(
-              `${API_BASE_URL}/agendamentos/${id}`,
-              {
-                method: "DELETE",
-                headers: {
-                  Authorization: `Bearer ${AUTH_TOKEN}`,
-                  // removido "Content-Type": "application/json"
-                },
-              }
-            );
-
-            console.log("📥 Resposta rejectResponse.status =", response.status);
-            const responseText = await response.text();
-            console.log("📄 rejectResponse.body =", responseText);
-
-            if (response.ok) {
-              Alert.alert("Sucesso", "Agendamento rejeitado com sucesso!");
-              setModalVisible(false);
-              fetchAgendamentos(); // Recarregar lista de agendamentos
-            } else {
-              let err;
-              try {
-                err = JSON.parse(responseText);
-              } catch {
-                err = { error: responseText };
-              }
-              console.log("❌ Erro ao rejeitar agendamento:", err);
-              Alert.alert(
-                "Erro",
-                `Não foi possível rejeitar o agendamento: ${
-                  err.error || err.message || "Erro desconhecido"
-                }`
-              );
-            }
-          } catch (error) {
-            console.error("🔥 Exceção em handleReject:", error);
-            Alert.alert("Erro", "Erro de conexão ao rejeitar agendamento");
-          }
+      const createResponse = await fetch(`${API_BASE_URL}/pedidos`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+          "Content-Type": "application/json",
         },
-      },
-    ]
-  );
-};
+        body: JSON.stringify(pedidoData),
+      });
+      console.log("📥 createResponse.status =", createResponse.status);
+      const createText = await createResponse.text();
+      console.log("📄 createResponse.body =", createText);
 
+      // 4) tratamento da resposta de criação
+      if (createResponse.ok) {
+        console.log(
+          `✅ Pedido criado com sucesso. Agora apagando agendamento ID=${agendamento.id}`
+        );
+
+        // 5) deletar agendamento
+        const deleteResponse = await fetch(
+          `${API_BASE_URL}/agendamentos/${agendamento.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${AUTH_TOKEN}`,
+              // sem Content-Type no DELETE para não gerar erro de JSON vazio
+            },
+          }
+        );
+        console.log("📥 deleteResponse.status =", deleteResponse.status);
+        const deleteText = await deleteResponse.text();
+        console.log("📄 deleteResponse.body =", deleteText);
+
+        if (deleteResponse.ok) {
+          Alert.alert("Sucesso", "Agendamento aceito com sucesso!");
+          setModalVisible(false);
+          fetchAgendamentos(); // Recarrega lista
+        } else {
+          console.log("❌ Falha ao deletar agendamento");
+          Alert.alert("Erro", "Pedido criado, mas erro ao remover agendamento");
+        }
+      } else {
+        console.log("❌ Falha ao criar pedido:", createText);
+        let err;
+        try {
+          err = JSON.parse(createText);
+        } catch {
+          err = { error: createText };
+        }
+        Alert.alert(
+          "Erro",
+          `Não foi possível aceitar o agendamento: ${
+            err.error || "Desconhecido"
+          }`
+        );
+      }
+    } catch (error) {
+      console.error("🔥 Exceção em handleAccept:", error);
+      Alert.alert("Erro", "Erro de conexão ao aceitar agendamento");
+    }
+  };
+
+  // Função para rejeitar agendamento (deletar)
+  const handleReject = async (id) => {
+    console.log("→ handleReject chamado com ID:", id);
+
+    Alert.alert(
+      "Confirmar Rejeição",
+      "Tem certeza que deseja rejeitar este agendamento?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Rejeitar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              console.log(`🗑️ Enviando DELETE para /agendamentos/${id}`);
+              const response = await fetch(
+                `${API_BASE_URL}/agendamentos/${id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${AUTH_TOKEN}`,
+                    // removido "Content-Type": "application/json"
+                  },
+                }
+              );
+
+              console.log(
+                "📥 Resposta rejectResponse.status =",
+                response.status
+              );
+              const responseText = await response.text();
+              console.log("📄 rejectResponse.body =", responseText);
+
+              if (response.ok) {
+                Alert.alert("Sucesso", "Agendamento rejeitado com sucesso!");
+                setModalVisible(false);
+                fetchAgendamentos(); // Recarregar lista de agendamentos
+              } else {
+                let err;
+                try {
+                  err = JSON.parse(responseText);
+                } catch {
+                  err = { error: responseText };
+                }
+                console.log("❌ Erro ao rejeitar agendamento:", err);
+                Alert.alert(
+                  "Erro",
+                  `Não foi possível rejeitar o agendamento: ${
+                    err.error || err.message || "Erro desconhecido"
+                  }`
+                );
+              }
+            } catch (error) {
+              console.error("🔥 Exceção em handleReject:", error);
+              Alert.alert("Erro", "Erro de conexão ao rejeitar agendamento");
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -373,18 +387,6 @@ const handleReject = async (id) => {
                   <View style={styles.divider} />
 
                   <View style={styles.cardBody}>
-                    <View style={styles.resumoContainer}>
-                      <FontAwesome
-                        name="wrench"
-                        size={18}
-                        color={Colors.grafite}
-                        style={styles.icon}
-                      />
-                      <Text style={styles.resumoText}>
-                        {agendamento.resumo}
-                      </Text>
-                    </View>
-
                     <SeeMoreBtn onPress={() => handleSeeMoreBtn(agendamento)} />
                   </View>
                 </View>
@@ -435,11 +437,6 @@ const handleReject = async (id) => {
                     </View>
 
                     <View style={styles.modalContent}>
-                      <Text style={styles.modalResumoTitle}>Serviço:</Text>
-                      <Text style={styles.modalResumo}>
-                        {selectedAgendamento.resumo}
-                      </Text>
-
                       <Text style={styles.modalDescricaoTitle}>
                         Descrição detalhada:
                       </Text>
@@ -447,10 +444,6 @@ const handleReject = async (id) => {
                         {selectedAgendamento.descricao}
                       </Text>
 
-                      <Text style={styles.modalStatusTitle}>Status:</Text>
-                      <Text style={styles.modalStatus}>
-                        {selectedAgendamento.status}
-                      </Text>
                     </View>
 
                     <View style={styles.modalDate}>

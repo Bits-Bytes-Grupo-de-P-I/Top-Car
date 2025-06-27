@@ -39,6 +39,7 @@ const API_BASE_URL = "https://topcar-back-end.onrender.com";
 export default function index() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -76,7 +77,7 @@ export default function index() {
       if (resp.ok) {
         const token = data.token;
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const userData = { id: payload.id, email: payload.email, funcao: payload.funcao };
+        const userData = { id: payload.id, nome:payload.nome, email: payload.email, funcao: payload.funcao };
         await saveToken(token);
         await saveUserData(userData);
 

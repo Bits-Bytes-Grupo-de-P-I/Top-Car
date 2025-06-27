@@ -19,7 +19,7 @@ const ShortClientList = () => {
   const router = useRouter();
 
   const [clients, setClients] = useState([]);
-  const [services, setServices] = useState([]);
+  const [pedidos, setPedidos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -91,11 +91,11 @@ const ShortClientList = () => {
   // Limitar a no máximo 5 clientes para exibição
   const mostrarClientes = clientesFiltrados.slice(0, 5);
 
-  // Função para buscar a lista de serviços (ou agendamentos)
-  const fetchServices = async () => {
+  // Função para buscar a lista de pedidos
+  const fetchPedidos = async () => {
     try {
       const response = await fetch(
-        "https://topcar-back-end.onrender.com/agendamentos",
+        "https://topcar-back-end.onrender.com/pedidos",
         {
           method: "GET",
           headers: {
@@ -106,20 +106,20 @@ const ShortClientList = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Erro ao buscar agendamentos: ${response.status}`);
+        throw new Error(`Erro ao buscar pedidos: ${response.status}`);
       }
 
       const data = await response.json();
-      setServices(data);
-      // console.log(services);
+      setPedidos(data);
+      // console.log(pedidos);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchServices();
-  }, []);
+    fetchPedidos();
+  }, [fetchClients]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,17 +172,17 @@ const ShortClientList = () => {
                     <Text style={styles.nome}>{client.nome}</Text>
 
                     {(() => {
-                      const latestService = services
-                        ?.filter((service) => service.cliente === client.nome)
-                        ?.filter((service) => service.status !== "Concluído")
-                        ?.sort((a, b) => b.id - a.id)?.[0]; // Ordena por ID decrescente
+                      const latestPedido = pedidos
+                        ?.filter((pedido) => pedido.nome === client.nome)
+                        ?.filter((pedido) => pedido.status !== "concluido" && pedido.status !== "Concluido")
+                        ?.sort((a, b) => parseInt(b.id) - parseInt(a.id))?.[0]; // Ordena por ID decrescente
 
-                      return latestService ? (
+                      return latestPedido ? (
                         <Badge
-                          key={latestService.id}
-                          text={latestService.status}
+                          key={latestPedido.id}
+                          text={latestPedido.status}
                           color={
-                            latestService.status === "Pendente"
+                            latestPedido.status.toLowerCase() === "pendente"
                               ? Colors.laranja
                               : Colors.azul
                           }

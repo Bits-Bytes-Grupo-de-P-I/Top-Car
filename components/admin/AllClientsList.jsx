@@ -20,7 +20,7 @@ const AllClientsList = () => {
   const router = useRouter();
   const [filtro, setFiltro] = useState("");
   const [clients, setClients] = useState([]);
-  const [services, setServices] = useState([]);
+  const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const authToken =
@@ -76,11 +76,11 @@ const AllClientsList = () => {
     fetchClients();
   }, []); // Array vazio - executa apenas uma vez
 
-  // Função para buscar a lista de serviços (ou agendamentos)
-  const fetchServices = async () => {
+  // Função para buscar a lista de pedidos
+  const fetchPedidos = async () => {
     try {
       const response = await fetch(
-        "https://topcar-back-end.onrender.com/agendamentos",
+        "https://topcar-back-end.onrender.com/pedidos",
         {
           method: "GET",
           headers: {
@@ -91,18 +91,18 @@ const AllClientsList = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Erro ao buscar agendamentos: ${response.status}`);
+        throw new Error(`Erro ao buscar pedidos: ${response.status}`);
       }
 
       const data = await response.json();
-      setServices(data);
+      setPedidos(data);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchPedidos();
   }, []);
 
   const clientesFiltrados = clients.filter((client) => {
@@ -143,22 +143,22 @@ const AllClientsList = () => {
     >
       <View style={styles.nomeStatus}>
         <Text style={styles.nome}>{item.nome}</Text>
-        {services &&
-          services
-            .filter((service) => service.cliente === item.nome)
+        {pedidos &&
+          pedidos
+            .filter((pedido) => pedido.nome === item.nome)
+            .filter((pedido) => pedido.status !== "concluido" && pedido.status !== "Concluido")
             .map(
-              (service) =>
-                service.status !== "Concluído" && (
-                  <Badge
-                    key={service.id}
-                    text={service.status}
-                    color={
-                      service.status === "Pendente"
-                        ? Colors.laranja
-                        : Colors.azul
-                    }
-                  />
-                )
+              (pedido) => (
+                <Badge
+                  key={pedido.id}
+                  text={pedido.status}
+                  color={
+                    pedido.status.toLowerCase() === "pendente"
+                      ? Colors.laranja
+                      : Colors.azul
+                  }
+                />
+              )
             )}
       </View>
       <Text style={styles.cpf}>CPF: {item.cpfFormatado}</Text>

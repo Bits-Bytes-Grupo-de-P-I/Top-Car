@@ -2,61 +2,85 @@ import React from "react";
 import {
   TouchableOpacity,
   Text,
-  View,
   Alert,
   StyleSheet,
-  Button,
 } from "react-native";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 
 // COLORS
 import Colors from "@/constants/Colors";
-
 import { Ionicons } from "@expo/vector-icons";
 
 const GeneratePdfBtn = ({ dadosOrdemServico }) => {
   const gerarPDF = async () => {
-    // 1) Log de debug
-    console.log("🖨️ gerarPDF chamado com:", dadosOrdemServico);
+    try {
+      // Verificar se os dados existem
+      if (!dadosOrdemServico) {
+        Alert.alert("Erro", "Dados da ordem de serviço não encontrados");
+        return;
+      }
 
-    // 2) Destructuring do objeto-pai
-    const {
-      cliente = {},
-      veiculo = {},
-      produtos = [],
-      servicos = [],
-      numeroOS = "0000",
-      totalProdutos = 0,
-      totalServicos = 0,
-      totalGeral = 0,
-      profissionalResponsavel = "Responsável",
-      empresaNome = "TOPCAR",
-      empresaCNPJ = "00.000.000/0000-00",
-      empresaEndereco = "Endereço da empresa",
-      empresaTelefone = "(00) 0000-0000",
-      empresaEmail = "empresa@exemplo.com",
-    } = dadosOrdemServico;
+      const {
+        cliente = {},
+        veiculo = {},
+        produtos = [],
+        servicos = [],
+      } = dadosOrdemServico;
 
-    const {
-      nome: nomeCliente = "Nome Cliente",
-      documento: documentoCliente = "CPF/CNPJ",
-      telefone: telefoneCliente = "Telefone",
-      endereco: enderecoCliente = "Endereço Cliente",
-      cidade: cidadeCliente = "Cidade Cliente",
-      cep: cepCliente = "CEP Cliente",
-    } = cliente;
+      // Gerar número da OS
+      const numeroOS = `OS-${Date.now().toString().slice(-6)}`;
 
-    const {
-      marca: marcaVeiculo = "Marca",
-      modelo: modeloVeiculo = "Modelo",
-      ano: anoVeiculo = "Ano",
-      cor: corVeiculo = "Cor",
-      placa: placaVeiculo = "Placa",
-      km: quilometragem = "KM",
-    } = veiculo;
+      // Dados da empresa
+      const empresaInfo = {
+        nome: "TOP CAR",
+        cnpj: "12.345.678/0001-90",
+        endereco: "Rua das Oficinas, 123 - Centro",
+        telefone: "(11) 99999-9999",
+        email: "contato@topcar.com.br"
+      };
 
-    const htmlContent = `
+      // Extrair dados do cliente
+      const {
+        nome: nomeCliente = "Nome não informado",
+        documento: documentoCliente = "Documento não informado",
+        telefone: telefoneCliente = "Telefone não informado",
+        endereco: enderecoCliente = "Endereço não informado",
+        cidade: cidadeCliente = "Cidade não informada",
+        cep: cepCliente = "CEP não informado",
+      } = cliente;
+
+      // Extrair dados do veículo
+      const {
+        marca: marcaVeiculo = "Marca não informada",
+        modelo: modeloVeiculo = "Modelo não informado",
+        ano: anoVeiculo = "Ano não informado",
+        cor: corVeiculo = "Cor não informada",
+        placa: placaVeiculo = "Placa não informada",
+        km: quilometragem = "KM não informado",
+      } = veiculo || {};
+
+      // Calcular totais
+      const calcularTotalProdutos = () => {
+        return produtos.reduce((total, produto) => {
+          const valorUnit = Number(produto.valorunitario || 0);
+          const quantidade = Number(produto.quantidade || 0);
+          return total + (quantidade * valorUnit);
+        }, 0);
+      };
+
+      const calcularTotalServicos = () => {
+        return servicos.reduce((total, servico) => {
+          const valorMao = Number(servico.valor_mao_de_obra || 0);
+          return total + valorMao;
+        }, 0);
+      };
+
+      const totalProdutos = calcularTotalProdutos();
+      const totalServicos = calcularTotalServicos();
+      const totalGeral = totalProdutos + totalServicos;
+
+      const htmlContent = `
   <html>
   <head>
     <style>
@@ -202,6 +226,12 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
         margin: 30px auto 5px auto;
         width: 300px;
       }
+      .empty-message {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 20px;
+      }
     </style>
   </head>
   <body>
@@ -210,15 +240,16 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
         <h1 class="logo">TOP CAR</h1>
       </div>
       <div class="company-info">
-        <div class="company-name">${empresaNome}</div>
+        <div class="company-name">${empresaInfo.nome}</div>
         <div class="ordem-title">ORDEM DE SERVIÇO</div>
         <div class="ordem-number">${numeroOS}</div>
       </div>
       <div class="contact-info">
-        ${empresaNome}<br>
-        CNPJ: ${empresaCNPJ}<br>
-        ${empresaEndereco}<br>
-        E-MAIL: ${empresaEmail}
+        ${empresaInfo.nome}<br>
+        CNPJ: ${empresaInfo.cnpj}<br>
+        ${empresaInfo.endereco}<br>
+        Tel: ${empresaInfo.telefone}<br>
+        E-MAIL: ${empresaInfo.email}
       </div>
     </div>
 
@@ -250,11 +281,11 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
     <div class="products-services">
       <div class="section">
         <div class="section-title">PRODUTOS</div>
+        ${produtos.length > 0 ? `
         <table class="table">
           <thead>
             <tr>
               <th>Cód</th>
-              <th>Ref</th>
               <th>Qtd</th>
               <th>Unid</th>
               <th>Descrição</th>
@@ -265,76 +296,65 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
           <tbody>
             ${produtos
               .map(
-                (produto) => `
-              <tr>
-                <td>${produto.codigo}</td>
-                <td>${produto.referencia}</td>
-                <td class="text-center">${produto.quantidade}</td>
-                <td>${produto.unidade}</td>
-                <td>${produto.descricao}</td>
-                <td class="text-right">R$ ${produto.valorUnitario
-                  .toFixed(2)
-                  .replace(".", ",")}</td>
-                <td class="text-right">R$ ${produto.valorTotal
-                  .toFixed(2)
-                  .replace(".", ",")}</td>
-              </tr>
-            `
+                (produto, index) => {
+                  const valorUnit = Number(produto.valorunitario || 0);
+                  const quantidade = Number(produto.quantidade || 0);
+                  const valorTotal = quantidade * valorUnit;
+                  return `
+                  <tr>
+                    <td>${produto.id || `P${index + 1}`}</td>
+                    <td class="text-center">${quantidade}</td>
+                    <td>${produto.unidade || 'UN'}</td>
+                    <td>${produto.nome || 'Produto sem nome'}</td>
+                    <td class="text-right">R$ ${valorUnit.toFixed(2).replace(".", ",")}</td>
+                    <td class="text-right">R$ ${valorTotal.toFixed(2).replace(".", ",")}</td>
+                  </tr>
+                `;
+                }
               )
               .join("")}
           </tbody>
         </table>
+        ` : '<div class="empty-message">Nenhum produto adicionado</div>'}
       </div>
 
       <div class="section">
         <div class="section-title">SERVIÇOS</div>
+        ${servicos.length > 0 ? `
         <table class="table">
           <thead>
             <tr>
               <th>Cód</th>
-              <th>Qtd</th>
               <th>Descrição</th>
-              <th class="text-right">R$ Unit</th>
               <th class="text-right">R$ Total</th>
             </tr>
           </thead>
           <tbody>
             ${servicos
               .map(
-                (servico) => `
-              <tr>
-                <td>${servico.codigo}</td>
-                <td class="text-center">${servico.quantidade}</td>
-                <td>${servico.descricao}</td>
-                <td class="text-right">R$ ${servico.valorUnitario
-                  .toFixed(2)
-                  .replace(".", ",")}</td>
-                <td class="text-right">R$ ${servico.valorTotal
-                  .toFixed(2)
-                  .replace(".", ",")}</td>
-              </tr>
-            `
+                (servico, index) => {
+                  const valorMao = Number(servico.valor_mao_de_obra || 0);
+                  return `
+                  <tr>
+                    <td>${servico.id || `S${index + 1}`}</td>
+                    <td>${servico.descricao || 'Serviço sem descrição'}</td>
+                    <td class="text-right">R$ ${valorMao.toFixed(2).replace(".", ",")}</td>
+                  </tr>
+                `;
+                }
               )
               .join("")}
           </tbody>
         </table>
+        ` : '<div class="empty-message">Nenhum serviço adicionado</div>'}
       </div>
     </div>
 
     <div class="totals">
       <div class="totals-box">
-        <div class="total-row"><span>TOTAL PRODUTOS:</span><span>R$ ${totalProdutos
-          .toFixed(2)
-          .replace(".", ",")}</span></div>
-        <div class="total-row"><span>TOTAL SERVIÇOS:</span><span>R$ ${totalServicos
-          .toFixed(2)
-          .replace(".", ",")}</span></div>
-        <div class="total-row final"><span>TOTAL GERAL:</span><span>R$ ${totalGeral
-          .toFixed(2)
-          .replace(".", ",")}</span></div>
-        <div style="margin-top: 15px; font-size: 10px;">
-          <strong>Profissional Responsável:</strong><br>${profissionalResponsavel}
-        </div>
+        <div class="total-row"><span>TOTAL PRODUTOS:</span><span>R$ ${totalProdutos.toFixed(2).replace(".", ",")}</span></div>
+        <div class="total-row"><span>TOTAL SERVIÇOS:</span><span>R$ ${totalServicos.toFixed(2).replace(".", ",")}</span></div>
+        <div class="total-row final"><span>TOTAL GERAL:</span><span>R$ ${totalGeral.toFixed(2).replace(".", ",")}</span></div>
       </div>
     </div>
 
@@ -346,6 +366,7 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
         Assinatura do cliente ou pessoa por ele autorizada
       </div>
       <div style="margin-top: 30px; font-size: 10px;">
+        Data: ${new Date().toLocaleDateString('pt-BR')}<br>
         Gerado por: SISTEMA TOPCAR
       </div>
     </div>
@@ -353,18 +374,21 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
   </html>
 `;
 
-    try {
-      console.log("📄 HTML gerado:", htmlContent);
+      // Verificar se expo-print está disponível
+      if (!Print.printToFileAsync) {
+        throw new Error("expo-print não está disponível");
+      }
+
       const { uri } = await Print.printToFileAsync({
         html: htmlContent,
         base64: false,
       });
 
-      console.log("✅ PDF gerado em:", uri);
+      if (!uri) {
+        throw new Error("Falha ao gerar o arquivo PDF");
+      }
 
       const isAvailable = await Sharing.isAvailableAsync();
-      console.log("🔗 Compartilhamento disponível (boolean):", isAvailable);
-      console.log("🔗 Compartilhamento disponível:", isAvailable);
 
       if (isAvailable) {
         await Sharing.shareAsync(uri, {
@@ -373,13 +397,57 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
           UTI: "com.adobe.pdf",
         });
       } else {
-        Alert.alert("Compartilhamento não disponível neste dispositivo.");
+        Alert.alert(
+          "PDF Gerado",
+          "PDF foi gerado com sucesso, mas o compartilhamento não está disponível neste dispositivo.",
+          [
+            {
+              text: "OK",
+              onPress: () => {},
+            },
+          ]
+        );
       }
     } catch (error) {
-      console.error("❌ Erro ao gerar ou compartilhar PDF:", error);
-      Alert.alert("Erro ao gerar PDF", error.message);
+      Alert.alert(
+        "Erro ao gerar PDF",
+        `Detalhes do erro: ${error.message}`,
+        [
+          {
+            text: "OK",
+            onPress: () => {},
+          },
+        ]
+      );
     }
   };
+
+  // Verificar se há dados mínimos antes de mostrar o botão
+  const temDadosMinimos = dadosOrdemServico &&
+    (
+      dadosOrdemServico.cliente?.nome ||
+      (dadosOrdemServico.produtos && dadosOrdemServico.produtos.length > 0) ||
+      (dadosOrdemServico.servicos && dadosOrdemServico.servicos.length > 0)
+    );
+
+  if (!temDadosMinimos) {
+    return (
+      <TouchableOpacity
+        style={[styles.actionButton, styles.disabledButton]}
+        disabled={true}
+      >
+        <Ionicons
+          name="document-text"
+          size={20}
+          color="#999"
+          style={{ marginRight: 5 }}
+        />
+        <Text style={[styles.actionButtonText, { color: '#999' }]}>
+          Adicione dados para gerar PDF
+        </Text>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <TouchableOpacity
@@ -408,11 +476,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
-    marginRight: 10,
+    marginBottom: 10,
   },
   noteButton: {
     backgroundColor: Colors.azul,
     marginRight: 0,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
   },
   actionButtonText: {
     color: "#FFF",
