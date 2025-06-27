@@ -141,24 +141,6 @@ const servicePending = () => {
     }
   };
 
-// DADOS MOCKADOS PARA TESTE
-//   const loadClientServices = async () => {
-//   setLoading(true);
-//   // Dados de teste
-//   setServices([
-//     {
-//       id: 1,
-//       cliente: "João Silva",
-//       veiculo: "Honda",
-//       modelo: "Civic",
-//       placa: "ABC-1234",
-//       descricao: "Troca de óleo",
-//       data_registro: "2024-01-15"
-//     }
-//   ]);
-//   setLoading(false);
-// };
-
   // Função para atualizar a lista (pull to refresh)
   const onRefresh = async () => {
     setRefreshing(true);

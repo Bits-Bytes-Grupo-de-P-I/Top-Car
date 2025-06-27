@@ -354,15 +354,16 @@ const GeneratePdfBtn = ({ dadosOrdemServico }) => {
 `;
 
     try {
-      console.log("📄 HTML gerado:", htmlContent); // 👈 LOGA O HTML
+      console.log("📄 HTML gerado:", htmlContent);
       const { uri } = await Print.printToFileAsync({
         html: htmlContent,
         base64: false,
       });
 
-      console.log("✅ PDF gerado em:", uri); // 👈 DEVERIA APARECER
+      console.log("✅ PDF gerado em:", uri);
 
       const isAvailable = await Sharing.isAvailableAsync();
+      console.log("🔗 Compartilhamento disponível (boolean):", isAvailable);
       console.log("🔗 Compartilhamento disponível:", isAvailable);
 
       if (isAvailable) {

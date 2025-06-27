@@ -70,10 +70,6 @@ const serviceRequestForm = () => {
     setScheduledDate(today);
   }, []);
 
-  useEffect(() => {
-    requestNotificationPermissions();
-  }, []);
-
   const handleVehicleSelect = (selectedVehicle) => {
     setVehicle(selectedVehicle);
     if (selectedVehicle) {

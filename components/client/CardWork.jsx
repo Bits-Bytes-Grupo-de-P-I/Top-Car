@@ -113,7 +113,7 @@ export default function CardWork() {
 
   // Navegar para a tela de agendamento
   const navigateToAgendamento = () => {
-    router.push("/agendamento");
+    router.push("/client/serviceRequestForm");
   };
 
   // Navegar para a tela de mapa

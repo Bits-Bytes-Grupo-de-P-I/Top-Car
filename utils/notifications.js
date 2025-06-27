@@ -42,10 +42,8 @@ export async function sendImmediateNotification({ title, body, data }) {
       content: { title, body, data },
       trigger: { seconds: 1 },
     });
-    Alert.alert('Enviado!', 'Notificação chegará em 1 segundo');
   } catch (error) {
-    console.error('Falha ao enviar notificação imediata', error);
-    Alert.alert('Erro', 'Falha ao enviar notificação imediata');
+    console.error('Falha ao enviar notificação imediata', error);;
   }
 }
 

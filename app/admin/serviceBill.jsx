@@ -43,6 +43,54 @@ const NotaServico = () => {
   const clientParam = params.client ? JSON.parse(params.client) : null;
   const vehiclesParam = params.vehicles ? JSON.parse(params.vehicles) : [];
 
+const prepararDadosParaPDF = () => {
+  // Transformar produtos para o formato esperado pelo PDF
+  const produtosFormatados = dadosNota.produtos.map((produto, index) => ({
+    codigo: produto.id || `P${index + 1}`,
+    referencia: produto.referencia || '-',
+    quantidade: produto.quantidade || 0,
+    unidade: produto.unidade || 'UN',
+    descricao: produto.nome || 'Produto sem nome',
+    valorUnitario: Number(produto.valorunitario || 0),
+    valorTotal: produto.quantidade * Number(produto.valorunitario || 0)
+  }));
+
+  // Transformar serviços para o formato esperado pelo PDF
+  const servicosFormatados = dadosNota.servicos.map((servico, index) => ({
+    codigo: servico.id || `S${index + 1}`,
+    quantidade: 1, // Serviços geralmente têm quantidade 1
+    descricao: servico.descricao || 'Serviço sem descrição',
+    valorUnitario: Number(servico.valor_mao_de_obra || 0),
+    valorTotal: Number(servico.valor_mao_de_obra || 0)
+  }));
+
+  // Calcular totais
+  const totalProdutos = calcularTotalProdutos();
+  const totalServicos = calcularTotalServicos();
+  const totalGeral = calcularTotalGeral();
+
+  // Gerar número da OS (você pode implementar sua própria lógica)
+  const numeroOS = `OS-${Date.now().toString().slice(-6)}`;
+
+  // Retornar dados no formato esperado pelo PDF
+  return {
+    cliente: dadosNota.cliente,
+    veiculo: dadosNota.veiculo || {},
+    produtos: produtosFormatados,
+    servicos: servicosFormatados,
+    numeroOS: numeroOS,
+    totalProdutos: totalProdutos,
+    totalServicos: totalServicos,
+    totalGeral: totalGeral,
+    profissionalResponsavel: "João Silva", // Substitua pelo responsável real
+    empresaNome: "TOP CAR",
+    empresaCNPJ: "12.345.678/0001-90",
+    empresaEndereco: "Rua das Oficinas, 123 - Centro",
+    empresaTelefone: "(11) 99999-9999",
+    empresaEmail: "contato@topcar.com.br"
+  };
+};
+
   // States para definir se a seção está expandida ou não
   const [expandedSections, setExpandedSections] = useState({
     cliente: false,
@@ -141,6 +189,25 @@ const NotaServico = () => {
   useEffect(() => {
     loadProdutosEServicos();
   }, []);
+
+  const testarBotaoPDF = () => {
+    console.log("🔍 DADOS ATUAIS:", dadosNota);
+    console.log("🔍 CLIENTE:", dadosNota.cliente);
+    console.log("🔍 VEÍCULO:", dadosNota.veiculo);
+    console.log("🔍 PRODUTOS:", dadosNota.produtos);
+    console.log("🔍 SERVIÇOS:", dadosNota.servicos);
+
+    const dadosFormatados = prepararDadosParaPDF();
+    console.log("🔍 DADOS FORMATADOS:", dadosFormatados);
+
+    Alert.alert(
+      "Debug PDF",
+      `Cliente: ${dadosNota.cliente?.nome || "Não definido"}\n` +
+        `Produtos: ${dadosNota.produtos?.length || 0}\n` +
+        `Serviços: ${dadosNota.servicos?.length || 0}\n` +
+        `Total: R$ ${calcularTotalGeral().toFixed(2)}`
+    );
+  };
 
   const loadProdutosEServicos = async () => {
     setLoading(true);
@@ -835,6 +902,13 @@ const NotaServico = () => {
 
           {/* Botões */}
           <GeneratePdfBtn dadosOrdemServico={dadosNota} />
+          <TouchableOpacity
+            style={[styles.botaoPrimario, { backgroundColor: Colors.verde }]}
+            onPress={testarBotaoPDF}
+          >
+            <Ionicons name="bug" size={20} color="white" />
+            <Text style={styles.textoBotaoPrimario}>Testar PDF</Text>
+          </TouchableOpacity>
 
           {/* Modais */}
           {renderProdutosModal()}
