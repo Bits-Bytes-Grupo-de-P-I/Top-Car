@@ -877,6 +877,7 @@ const prepararDadosParaPDF = () => {
           <View style={styles.assinaturaContainer}>
             <Text style={styles.assinaturaTitle}>TOP CAR</Text>
             <Text style={styles.assinaturaSubtitle}>Oficina Mecânica</Text>
+            <Text style={styles.assinaturaName}>Diego Wallans</Text>
             <View style={styles.linhaAssinatura} />
             <Text style={styles.assinaturaLabel}>Responsável Técnico</Text>
           </View>
@@ -1044,6 +1045,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.grafite,
     marginBottom: 24,
+  },
+  assinaturaName: {
+    fontSize: 16,
+    color: Colors.grafite,
+    marginBottom: 10,
+    fontStyle: 'italic'
   },
   linhaAssinatura: {
     width: 200,
