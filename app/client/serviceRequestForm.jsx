@@ -104,7 +104,7 @@ const serviceRequestForm = () => {
       const agendamentoData = {
         cliente_id: user.id,
         veiculo_id: parseInt(vehicle.id),
-        servico_id: null,
+        servico_id: 10,
         descricao: problemDescription,
         data_agendada: scheduledDate,
         status: "Pendente",
