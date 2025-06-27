@@ -107,14 +107,6 @@ const ServiceCard = ({ service, isAdminView = false, onEdit, onDelete }) => {
             </Text>
           </View>
           
-          {/* Data de registro */}
-          <View style={styles.row}>
-            <Text style={styles.label}>Data:</Text>
-            <Text style={styles.value}>
-              {formatDate(service.data_registro)}
-            </Text>
-          </View>
-          
           <View style={styles.descriptionContainer}>
             <Text style={styles.label}>Descrição:</Text>
             <Text style={styles.description}>

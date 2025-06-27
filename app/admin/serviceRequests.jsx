@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // COMPONENTES
 import PageHeader from "@/components/PageHeader";
@@ -24,8 +25,6 @@ import Button from "@/components/Button";
 import Colors from "@/constants/Colors";
 
 const API_BASE_URL = "https://topcar-back-end.onrender.com";
-const AUTH_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
 const serviceRequests = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,44 +32,109 @@ const serviceRequests = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [authToken, setAuthToken] = useState("");
+
+  // Função para obter token de autenticação
+  const getAuthToken = async () => {
+    try {
+      // Tente obter do AsyncStorage primeiro
+      const token = await AsyncStorage.getItem('authToken');
+      if (token) {
+        setAuthToken(token);
+        return token;
+      }
+      
+      // Fallback para o token hardcoded (remova em produção)
+      const fallbackToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
+      setAuthToken(fallbackToken);
+      return fallbackToken;
+    } catch (error) {
+      console.error("Erro ao obter token:", error);
+      return null;
+    }
+  };
+
+  // Função para fazer requisições com tratamento de erro melhorado
+  const makeAuthenticatedRequest = async (url, options = {}) => {
+    const token = authToken || await getAuthToken();
+    
+    if (!token) {
+      throw new Error("Token de autenticação não encontrado");
+    }
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    // Só adiciona Content-Type se houver body
+    if (options.body && options.method !== 'DELETE') {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage;
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.error || errorJson.message || errorText;
+      } catch {
+        errorMessage = errorText || `Erro HTTP ${response.status}`;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    // Para DELETE, pode não ter conteúdo
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    }
+    
+    return await response.text();
+  };
 
   // Função para buscar agendamentos da API
   const fetchAgendamentos = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/agendamentos`, {
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Transformar os dados para o formato esperado pelo componente
-        const formattedData = data.map((agendamento) => ({
-          id: agendamento.id,
-          cliente: {
-            nome: agendamento.cliente,
-          },
-          veiculo: {
-            modelo: agendamento.veiculo,
-            placa: agendamento.placa,
-          },
-          resumo: agendamento.servico, // Usando o serviço como resumo
-          descricao: agendamento.descricao,
-          dataPedido: agendamento.dataAgendada,
-          status: agendamento.status,
-          urgente: agendamento.urgente,
-          // Dados originais para criar o pedido
-          originalData: agendamento,
-        }));
-        setAgendamentos(formattedData);
-      } else {
-        Alert.alert("Erro", "Não foi possível carregar os agendamentos");
+      const data = await makeAuthenticatedRequest(`${API_BASE_URL}/agendamentos`);
+      
+      // Validar se data é um array
+      if (!Array.isArray(data)) {
+        console.warn("Dados recebidos não são um array:", data);
+        setAgendamentos([]);
+        return;
       }
+
+      // Transformar os dados para o formato esperado pelo componente
+      const formattedData = data.map((agendamento) => ({
+        id: agendamento.id,
+        cliente: {
+          nome: agendamento.cliente || "Cliente não informado",
+        },
+        veiculo: {
+          modelo: agendamento.veiculo || "Modelo não informado",
+          placa: agendamento.placa || "Placa não informada",
+        },
+        resumo: agendamento.servico || agendamento.resumo || "Serviço não especificado",
+        descricao: agendamento.descricao || "Descrição não disponível",
+        dataPedido: agendamento.dataAgendada || agendamento.dataPedido || new Date().toISOString(),
+        status: agendamento.status || "pendente",
+        urgente: agendamento.urgente || false,
+        // Dados originais para referência
+        originalData: agendamento,
+      }));
+      
+      setAgendamentos(formattedData);
     } catch (error) {
       console.error("Erro ao buscar agendamentos:", error);
-      Alert.alert("Erro", "Erro de conexão ao buscar agendamentos");
+      Alert.alert("Erro", `Não foi possível carregar os agendamentos: ${error.message}`);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -80,18 +144,16 @@ const serviceRequests = () => {
   // Função para buscar cliente por nome
   const findClienteByName = async (nomeCliente) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/clientes`, {
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const clientes = await response.json();
-        return clientes.find((cliente) => cliente.nome === nomeCliente);
+      const clientes = await makeAuthenticatedRequest(`${API_BASE_URL}/clientes`);
+      
+      if (!Array.isArray(clientes)) {
+        console.warn("Lista de clientes não é um array:", clientes);
+        return null;
       }
-      return null;
+      
+      return clientes.find((cliente) => 
+        cliente.nome && cliente.nome.toLowerCase() === nomeCliente.toLowerCase()
+      );
     } catch (error) {
       console.error("Erro ao buscar cliente:", error);
       return null;
@@ -101,27 +163,30 @@ const serviceRequests = () => {
   // Função para buscar veículo por placa
   const findVeiculoByPlaca = async (placa) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/veiculos`, {
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const veiculos = await response.json();
-        return veiculos.find((veiculo) => veiculo.placa === placa);
+      const veiculos = await makeAuthenticatedRequest(`${API_BASE_URL}/veiculos`);
+      
+      if (!Array.isArray(veiculos)) {
+        console.warn("Lista de veículos não é um array:", veiculos);
+        return null;
       }
-      return null;
+      
+      return veiculos.find((veiculo) => 
+        veiculo.placa && veiculo.placa.toLowerCase() === placa.toLowerCase()
+      );
     } catch (error) {
       console.error("Erro ao buscar veículo:", error);
       return null;
     }
   };
 
-  // Carregar agendamentos ao montar o componente
+  // Inicializar token e carregar agendamentos
   useEffect(() => {
-    fetchAgendamentos();
+    const initializeData = async () => {
+      await getAuthToken();
+      await fetchAgendamentos();
+    };
+    
+    initializeData();
   }, []);
 
   // Função para refresh da lista
@@ -140,10 +205,10 @@ const serviceRequests = () => {
     console.log("→ handleAccept chamado com agendamento:", agendamento);
 
     try {
+      setLoading(true);
+
       // 1) buscar cliente
-      console.log(
-        `🔍 Buscando cliente por nome: "${agendamento.cliente.nome}"`
-      );
+      console.log(`🔍 Buscando cliente por nome: "${agendamento.cliente.nome}"`);
       const cliente = await findClienteByName(agendamento.cliente.nome);
       if (!cliente) {
         console.log("❌ Cliente não encontrado");
@@ -152,9 +217,7 @@ const serviceRequests = () => {
       }
 
       // 2) buscar veículo
-      console.log(
-        `🔍 Buscando veículo por placa: "${agendamento.veiculo.placa}"`
-      );
+      console.log(`🔍 Buscando veículo por placa: "${agendamento.veiculo.placa}"`);
       const veiculo = await findVeiculoByPlaca(agendamento.veiculo.placa);
       if (!veiculo) {
         console.log("❌ Veículo não encontrado");
@@ -168,70 +231,35 @@ const serviceRequests = () => {
         veiculo_id: veiculo.id,
         resumo: agendamento.resumo,
         descricao: agendamento.descricao,
-        status: "pendente", // ajuste de status previamente discutido
-        dataPedido: new Date().toISOString(),
+        status: "pendente",
+        dataPedido: new Date().toISOString().split('T')[0], // Format: YYYY-MM-DD
       };
+      
       console.log("✏️ Enviando POST /pedidos com:", pedidoData);
 
-      const createResponse = await fetch(`${API_BASE_URL}/pedidos`, {
+      await makeAuthenticatedRequest(`${API_BASE_URL}/pedidos`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${AUTH_TOKEN}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(pedidoData),
       });
-      console.log("📥 createResponse.status =", createResponse.status);
-      const createText = await createResponse.text();
-      console.log("📄 createResponse.body =", createText);
 
-      // 4) tratamento da resposta de criação
-      if (createResponse.ok) {
-        console.log(
-          `✅ Pedido criado com sucesso. Agora apagando agendamento ID=${agendamento.id}`
-        );
+      console.log("✅ Pedido criado com sucesso. Agora apagando agendamento ID =", agendamento.id);
 
-        // 5) deletar agendamento
-        const deleteResponse = await fetch(
-          `${API_BASE_URL}/agendamentos/${agendamento.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${AUTH_TOKEN}`,
-              // sem Content-Type no DELETE para não gerar erro de JSON vazio
-            },
-          }
-        );
-        console.log("📥 deleteResponse.status =", deleteResponse.status);
-        const deleteText = await deleteResponse.text();
-        console.log("📄 deleteResponse.body =", deleteText);
+      // 4) deletar agendamento
+      await makeAuthenticatedRequest(`${API_BASE_URL}/agendamentos/${agendamento.id}`, {
+        method: "DELETE",
+      });
 
-        if (deleteResponse.ok) {
-          Alert.alert("Sucesso", "Agendamento aceito com sucesso!");
-          setModalVisible(false);
-          fetchAgendamentos(); // Recarrega lista
-        } else {
-          console.log("❌ Falha ao deletar agendamento");
-          Alert.alert("Erro", "Pedido criado, mas erro ao remover agendamento");
-        }
-      } else {
-        console.log("❌ Falha ao criar pedido:", createText);
-        let err;
-        try {
-          err = JSON.parse(createText);
-        } catch {
-          err = { error: createText };
-        }
-        Alert.alert(
-          "Erro",
-          `Não foi possível aceitar o agendamento: ${
-            err.error || "Desconhecido"
-          }`
-        );
-      }
+      console.log("✅ Agendamento deletado com sucesso");
+      
+      Alert.alert("Sucesso", "Agendamento aceito com sucesso!");
+      setModalVisible(false);
+      fetchAgendamentos(); // Recarrega lista
+      
     } catch (error) {
       console.error("🔥 Exceção em handleAccept:", error);
-      Alert.alert("Erro", "Erro de conexão ao aceitar agendamento");
+      Alert.alert("Erro", `Não foi possível aceitar o agendamento: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -252,47 +280,24 @@ const serviceRequests = () => {
           style: "destructive",
           onPress: async () => {
             try {
+              setLoading(true);
               console.log(`🗑️ Enviando DELETE para /agendamentos/${id}`);
-              const response = await fetch(
-                `${API_BASE_URL}/agendamentos/${id}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: `Bearer ${AUTH_TOKEN}`,
-                    // removido "Content-Type": "application/json"
-                  },
-                }
-              );
+              
+              await makeAuthenticatedRequest(`${API_BASE_URL}/agendamentos/${id}`, {
+                method: "DELETE",
+              });
 
-              console.log(
-                "📥 Resposta rejectResponse.status =",
-                response.status
-              );
-              const responseText = await response.text();
-              console.log("📄 rejectResponse.body =", responseText);
-
-              if (response.ok) {
-                Alert.alert("Sucesso", "Agendamento rejeitado com sucesso!");
-                setModalVisible(false);
-                fetchAgendamentos(); // Recarregar lista de agendamentos
-              } else {
-                let err;
-                try {
-                  err = JSON.parse(responseText);
-                } catch {
-                  err = { error: responseText };
-                }
-                console.log("❌ Erro ao rejeitar agendamento:", err);
-                Alert.alert(
-                  "Erro",
-                  `Não foi possível rejeitar o agendamento: ${
-                    err.error || err.message || "Erro desconhecido"
-                  }`
-                );
-              }
+              console.log("✅ Agendamento rejeitado com sucesso");
+              
+              Alert.alert("Sucesso", "Agendamento rejeitado com sucesso!");
+              setModalVisible(false);
+              fetchAgendamentos(); // Recarregar lista de agendamentos
+              
             } catch (error) {
               console.error("🔥 Exceção em handleReject:", error);
-              Alert.alert("Erro", "Erro de conexão ao rejeitar agendamento");
+              Alert.alert("Erro", `Não foi possível rejeitar o agendamento: ${error.message}`);
+            } finally {
+              setLoading(false);
             }
           },
         },
@@ -301,15 +306,26 @@ const serviceRequests = () => {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getDate().toString().padStart(2, "0")}/${(
-      date.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}/${date.getFullYear()} ${date
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    try {
+      const date = new Date(dateString);
+      
+      // Verificar se a data é válida
+      if (isNaN(date.getTime())) {
+        return "Data inválida";
+      }
+      
+      return `${date.getDate().toString().padStart(2, "0")}/${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}/${date.getFullYear()} ${date
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return "Data inválida";
+    }
   };
 
   if (loading) {
@@ -321,7 +337,7 @@ const serviceRequests = () => {
           resizeMode="cover"
         >
           <PageHeader
-            title="Agendamentos"
+            title="Pedidos de Serviço"
             containerStyle={{ backgroundColor: Colors.azulClaro }}
             titleStyle={{ color: "#fff" }}
           />
@@ -381,12 +397,28 @@ const serviceRequests = () => {
                       <Text style={styles.date}>
                         {formatDate(agendamento.dataPedido)}
                       </Text>
+                      {agendamento.urgente && (
+                        <View style={styles.urgentBadge}>
+                          <Text style={styles.urgentText}>URGENTE</Text>
+                        </View>
+                      )}
                     </View>
                   </View>
 
                   <View style={styles.divider} />
 
                   <View style={styles.cardBody}>
+                    <View style={styles.resumoContainer}>
+                      <FontAwesome 
+                        name="wrench" 
+                        size={16} 
+                        color={Colors.grafite} 
+                        style={styles.icon}
+                      />
+                      <Text style={styles.resumoText} numberOfLines={2}>
+                        {agendamento.resumo}
+                      </Text>
+                    </View>
                     <SeeMoreBtn onPress={() => handleSeeMoreBtn(agendamento)} />
                   </View>
                 </View>
@@ -419,39 +451,55 @@ const serviceRequests = () => {
 
                     <View style={styles.modalDivider} />
 
-                    <View style={styles.modalClientInfo}>
-                      <Text style={styles.modalClientName}>
-                        {selectedAgendamento.cliente.nome}
-                      </Text>
-                    </View>
+                    <ScrollView style={{ maxHeight: 400 }}>
+                      <View style={styles.modalClientInfo}>
+                        <Text style={styles.modalClientName}>
+                          {selectedAgendamento.cliente.nome}
+                        </Text>
+                      </View>
 
-                    <View style={styles.modalVehicleInfo}>
-                      <Text style={styles.modalVehicleModel}>
-                        <Text style={styles.boldText}>Veículo: </Text>
-                        {selectedAgendamento.veiculo.modelo}
-                      </Text>
-                      <Text style={styles.modalVehiclePlate}>
-                        <Text style={styles.boldText}>Placa: </Text>
-                        {selectedAgendamento.veiculo.placa}
-                      </Text>
-                    </View>
+                      <View style={styles.modalVehicleInfo}>
+                        <Text style={styles.modalVehicleModel}>
+                          <Text style={styles.boldText}>Veículo: </Text>
+                          {selectedAgendamento.veiculo.modelo}
+                        </Text>
+                        <Text style={styles.modalVehiclePlate}>
+                          <Text style={styles.boldText}>Placa: </Text>
+                          {selectedAgendamento.veiculo.placa}
+                        </Text>
+                      </View>
 
-                    <View style={styles.modalContent}>
-                      <Text style={styles.modalDescricaoTitle}>
-                        Descrição detalhada:
-                      </Text>
-                      <Text style={styles.modalDescricao}>
-                        {selectedAgendamento.descricao}
-                      </Text>
+                      <View style={styles.modalContent}>
+                        <Text style={styles.modalResumoTitle}>
+                          Serviço:
+                        </Text>
+                        <Text style={styles.modalResumo}>
+                          {selectedAgendamento.resumo}
+                        </Text>
 
-                    </View>
+                        <Text style={styles.modalDescricaoTitle}>
+                          Descrição detalhada:
+                        </Text>
+                        <Text style={styles.modalDescricao}>
+                          {selectedAgendamento.descricao}
+                        </Text>
+                      </View>
 
-                    <View style={styles.modalDate}>
-                      <Text style={styles.modalDateText}>
-                        Agendado para:{" "}
-                        {formatDate(selectedAgendamento.dataPedido)}
-                      </Text>
-                    </View>
+                      {selectedAgendamento.urgente && (
+                        <View style={styles.modalUrgentContainer}>
+                          <MaterialIcons name="warning" size={20} color={Colors.vermelho} />
+                          <Text style={styles.modalUrgentText}>
+                            AGENDAMENTO URGENTE
+                          </Text>
+                        </View>
+                      )}
+
+                      <View style={styles.modalDate}>
+                        <Text style={styles.modalDateText}>
+                          Agendado para: {formatDate(selectedAgendamento.dataPedido)}
+                        </Text>
+                      </View>
+                    </ScrollView>
 
                     <View style={styles.modalActions}>
                       <Button

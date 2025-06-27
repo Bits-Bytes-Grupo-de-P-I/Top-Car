@@ -20,38 +20,47 @@ import PageHeader from "@/components/PageHeader";
 // CORES
 import Colors from "@/constants/Colors";
 
+// Constantes da API
+const API_BASE_URL = "https://topcar-back-end.onrender.com";
+const AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
+
 const ongoingServices = () => {
   const [servicos, setServicos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const authToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
-
-  // Função para buscar serviços do backend
-  const fetchServicos = async () => {
+  // Função genérica para fazer requisições HTTP
+  const makeRequest = async (url, options = {}) => {
     try {
-      setLoading(true);
-      const response = await fetch(
-        "https://topcar-back-end.onrender.com/pedidos",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AUTH_TOKEN}`,
+          ...options.headers,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Erro HTTP: ${response.status}`);
       }
 
-      const data = await response.json();
+      return await response.json();
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      throw error;
+    }
+  };
+
+  // Função para buscar serviços do backend
+  const fetchServicos = async () => {
+    try {
+      setLoading(true);
+      const data = await makeRequest(`${API_BASE_URL}/pedidos`);
 
       // Transformar os dados do backend para o formato esperado pelo componente
       const servicosFormatados = data
-        // .filter((item) => item.status !== "concluido") // Filtrar apenas serviços em andamento
+        .filter((item) => item.status !== "concluido") // Filtrar apenas serviços em andamento
         .map((item) => ({
           id: item.id,
           clienteNome: item.nome,
@@ -99,51 +108,73 @@ const ongoingServices = () => {
 
   // Função para editar serviço
   const editarServico = async (servicoId, dadosEditados) => {
-    // nunca mande 'urgente' como status
-    const statusEnviado = "em andamento";
-
-    console.log(">> enviar edição de serviço:", {
-      id: servicoId,
-      resumo: dadosEditados.servico,
-      descricao: dadosEditados.servicoCompleto || dadosEditados.servico,
-      status: statusEnviado,
-    });
-
     try {
-      const response = await fetch(`https://.../pedidos/${servicoId}`, {
+      // Primeiro, buscar os dados atuais do pedido para obter cliente_id e veiculo_id
+      const currentPedido = await makeRequest(`${API_BASE_URL}/pedidos/${servicoId}`);
+
+      const updateData = {
+        cliente_id: currentPedido.cliente_id,
+        veiculo_id: currentPedido.veiculo_id,
+        resumo: dadosEditados.servico,
+        descricao: dadosEditados.servicoCompleto || dadosEditados.servico,
+        status: dadosEditados.status || "em andamento",
+        dataPedido: dadosEditados.dataAgendada,
+      };
+
+      await makeRequest(`${API_BASE_URL}/pedidos/${servicoId}`, {
         method: "PUT",
-        headers: {
-          /* ... */
-        },
-        body: JSON.stringify({
-          resumo: dadosEditados.servico,
-          descricao: dadosEditados.servicoCompleto || dadosEditados.servico,
-          status: statusEnviado,
-        }),
+        body: JSON.stringify(updateData),
       });
 
-      const bodyText = await response.text();
-      let body;
-      try {
-        body = JSON.parse(bodyText);
-      } catch {
-        body = bodyText;
-      }
-      if (!response.ok) {
-        console.error("Erro HTTP:", response.status, body);
-        return Alert.alert("Erro", body.details || `Status ${response.status}`);
-      }
-
       Alert.alert("Sucesso", "Serviço atualizado com sucesso!");
+      await fetchServicos(); // Recarregar a lista
       return true;
-    } catch (err) {
-      console.error("Erro ao editar serviço:", err);
-      Alert.alert("Erro", err.message || "Não foi possível atualizar");
+    } catch (error) {
+      console.error("Erro ao editar serviço:", error);
+      Alert.alert("Erro", "Não foi possível atualizar o serviço.");
       return false;
     }
   };
 
-  // Função para deletar pedido
+  // Função para finalizar serviço (alterar status para concluído)
+  const finalizarServico = async (servicoId) => {
+    try {
+      Alert.alert(
+        "Confirmar Finalização",
+        "Tem certeza que deseja finalizar este serviço?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Finalizar",
+            style: "default",
+            onPress: async () => {
+              try {
+                await makeRequest(`${API_BASE_URL}/pedidos/${servicoId}`, {
+                  method: "PUT",
+                  body: JSON.stringify({ status: "concluido" }),
+                });
+
+                // Remover da lista local (já que filtramos por status !== "concluido")
+                setServicos((prevServicos) =>
+                  prevServicos.filter((servico) => servico.id !== servicoId)
+                );
+
+                Alert.alert("Sucesso", "Serviço finalizado com sucesso!");
+              } catch (error) {
+                console.error("Erro ao finalizar serviço:", error);
+                Alert.alert("Erro", "Não foi possível finalizar o serviço.");
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Erro inesperado:", error);
+      Alert.alert("Erro", "Ocorreu um erro inesperado.");
+    }
+  };
+
+  // Função para deletar pedido (remover completamente)
   const deletarServico = async (servicoId) => {
     try {
       Alert.alert(
@@ -155,37 +186,28 @@ const ongoingServices = () => {
             text: "Excluir",
             style: "destructive",
             onPress: async () => {
-              const response = await fetch(
-                `https://topcar-back-end.onrender.com/pedidos/${servicoId}`,
-                {
+              try {
+                await makeRequest(`${API_BASE_URL}/pedidos/${servicoId}`, {
                   method: "DELETE",
-                  headers: {
-                    Authorization: `Bearer ${authToken}`,
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
+                });
 
-              if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
+                // Remover da lista local
+                setServicos((prevServicos) =>
+                  prevServicos.filter((servico) => servico.id !== servicoId)
+                );
+
+                Alert.alert("Sucesso", "Serviço excluído com sucesso!");
+              } catch (error) {
+                console.error("Erro ao deletar serviço:", error);
+                Alert.alert("Erro", "Não foi possível excluir o serviço.");
               }
-
-              // Remover da lista local
-              setServicos((prevServicos) =>
-                prevServicos.filter((servico) => servico.id !== servicoId)
-              );
-
-              Alert.alert("Sucesso", "Serviço excluído com sucesso!");
             },
           },
         ]
       );
     } catch (error) {
-      console.error("Erro ao deletar serviço:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível excluir o serviço. Tente novamente."
-      );
+      console.error("Erro inesperado:", error);
+      Alert.alert("Erro", "Ocorreu um erro inesperado.");
     }
   };
 
@@ -193,7 +215,6 @@ const ongoingServices = () => {
   const onRefresh = () => {
     setRefreshing(true);
     fetchServicos();
-    setRefreshing(false);
   };
 
   // Carregar dados na inicialização
@@ -201,9 +222,13 @@ const ongoingServices = () => {
     fetchServicos();
   }, []);
 
-  const handleServicoPress = (item) => {
-    console.log("Serviço selecionado:", item);
-    // O modal já é aberto automaticamente pelo componente
+  // Callback para quando um serviço é atualizado
+  const handleServicoUpdate = (servicoId, dadosAtualizados) => {
+    setServicos((prevServicos) =>
+      prevServicos.map((servico) =>
+        servico.id === servicoId ? { ...servico, ...dadosAtualizados } : servico
+      )
+    );
   };
 
   if (loading) {
@@ -257,9 +282,10 @@ const ongoingServices = () => {
                 <OngoingServiceCard
                   key={item.id}
                   item={item}
-                  onPress={handleServicoPress}
                   onEdit={editarServico}
-                  onFinish={deletarServico}
+                  onFinish={finalizarServico}
+                  onDelete={deletarServico}
+                  onUpdate={handleServicoUpdate}
                   fetchServicos={fetchServicos}
                 />
               ))
@@ -291,30 +317,16 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  filtrosContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.cinzaClaro,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  filtroItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 20,
-    backgroundColor: Colors.cinzaClaro,
-  },
-  filtroItemAtivo: {
-    backgroundColor: Colors.azulClaro,
-  },
-  filtroTexto: {
-    fontSize: 14,
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
     color: Colors.cinzaEscuro,
-  },
-  filtroTextoAtivo: {
-    color: "white",
-    fontWeight: "bold",
+    textAlign: "center",
   },
   listaContainer: {
     padding: 16,
@@ -329,6 +341,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: Colors.cinzaEscuro,
+    textAlign: "center",
+  },
+  emptySubText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: Colors.cinzaClaro,
     textAlign: "center",
   },
 });

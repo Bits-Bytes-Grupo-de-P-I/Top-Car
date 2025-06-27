@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
@@ -343,261 +345,272 @@ const ClientSignUp = () => {
         containerStyle={{ backgroundColor: Colors.azulClaro }}
         titleStyle={{ color: "#fff" }}
       />
-      <ScrollView style={styles.container}>
-        <View style={styles.formContainer}>
-          <Text style={styles.sectionTitle}>Dados Pessoais</Text>
-          <Text style={styles.sectionSubtitle}>
-            Informe os dados do cliente para realizar o cadastro
-          </Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView 
+          style={styles.container}
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.formContainer}>
+            <Text style={styles.sectionTitle}>Dados Pessoais</Text>
+            <Text style={styles.sectionSubtitle}>
+              Informe os dados do cliente para realizar o cadastro
+            </Text>
 
-          <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="Nome Completo"
-              keyboardType="default"
-              mascara=""
-              valor={nome}
-              onChangeText={setNome}
-              placeholder="Digite o nome completo"
-            />
-          </View>
-          <View style={styles.row}>
-            <View style={[styles.formGroup, { flex: 2, marginRight: 8 }]}>
-              <CpfCnpjInput
-                label="CPF / CNPJ"
-                valor={documento}
-                placeholder="CPF / CNPJ"
-                onChangeText={handleDocumentoChange}
+            <View style={styles.formGroup}>
+              <InputField
+                tipoDeInfo="Nome Completo"
+                keyboardType="default"
+                mascara=""
+                valor={nome}
+                onChangeText={setNome}
+                placeholder="Digite o nome completo"
               />
+            </View>
+            <View style={styles.row}>
+              <View style={[styles.formGroup, { flex: 2, marginRight: 8 }]}>
+                <CpfCnpjInput
+                  label="CPF / CNPJ"
+                  valor={documento}
+                  placeholder="CPF / CNPJ"
+                  onChangeText={handleDocumentoChange}
+                />
+              </View>
+
+              <View style={[styles.formGroup, { flex: 2 }]}>
+                <PhoneInput
+                  label="Telefone"
+                  valor={telefone}
+                  placeholder="Digite seu telefone"
+                  onChangeText={handleTelefoneChange}
+                />
+              </View>
             </View>
 
             <View style={[styles.formGroup, { flex: 2 }]}>
-              <PhoneInput
-                label="Telefone"
-                valor={telefone}
-                placeholder="Digite seu telefone"
-                onChangeText={handleTelefoneChange}
+              <InputField
+                tipoDeInfo="Email"
+                keyboardType="email-address"
+                mascara=""
+                valor={email}
+                onChangeText={setEmail}
+                placeholder="Digite seu email"
               />
             </View>
-          </View>
 
-          <View style={[styles.formGroup, { flex: 2 }]}>
-            <InputField
-              tipoDeInfo="Email"
-              keyboardType="email-address"
-              mascara=""
-              valor={email}
-              onChangeText={setEmail}
-              placeholder="Digite seu email"
-            />
-          </View>
-
-          <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="Crie uma senha para você"
-              keyboardType="default"
-              mascara=""
-              valor={senha}
-              onChangeText={setSenha}
-              placeholder="Digite sua senha"
-              secureTextEntry={true}
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Endereço</Text>
-          <Text style={styles.sectionSubtitle}>
-            Informe os dados de endereço do cliente
-          </Text>
-
-          <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="CEP"
-              keyboardType="numeric"
-              mascara="99999-999"
-              valor={cep}
-              onChangeText={setCep}
-              placeholder="00000-000"
-            />
-          </View>
-
-          <View style={styles.row}>
-            <View style={[styles.formGroup, { flex: 2, marginRight: 8 }]}>
+            <View style={styles.formGroup}>
               <InputField
-                tipoDeInfo="Cidade"
+                tipoDeInfo="Crie uma senha para você"
                 keyboardType="default"
                 mascara=""
-                valor={cidade}
-                onChangeText={setCidade}
-                placeholder="Cidade"
-                largura="100%"
+                valor={senha}
+                onChangeText={setSenha}
+                placeholder="Digite sua senha"
+                secureTextEntry={true}
               />
             </View>
-            <View style={[styles.formGroup, { flex: 1 }]}>
-              <InputField
-                tipoDeInfo="Estado"
-                keyboardType="default"
-                largura="100%"
-                valor={estado}
-                onChangeText={(text) => setEstado(text.toUpperCase())}
-                mascara="AA"
-                placeholder="UF"
-              />
-            </View>
-          </View>
 
-          <View style={styles.formGroup}>
-            <InputField
-              tipoDeInfo="Endereço"
-              keyboardType="default"
-              mascara=""
-              valor={endereco}
-              onChangeText={setEndereco}
-              placeholder="Rua/Avenida"
-            />
-          </View>
+            <Text style={styles.sectionTitle}>Endereço</Text>
+            <Text style={styles.sectionSubtitle}>
+              Informe os dados de endereço do cliente
+            </Text>
 
-          <View style={styles.row}>
-            <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+            <View style={styles.formGroup}>
               <InputField
-                tipoDeInfo="Número"
+                tipoDeInfo="CEP"
                 keyboardType="numeric"
-                largura="100%"
-                mascara="99999"
-                valor={numero}
-                onChangeText={setNumero}
-                placeholder="Nº"
+                mascara="99999-999"
+                valor={cep}
+                onChangeText={setCep}
+                placeholder="00000-000"
               />
             </View>
-            <View style={[styles.formGroup, { flex: 2 }]}>
+
+            <View style={styles.row}>
+              <View style={[styles.formGroup, { flex: 2, marginRight: 8 }]}>
+                <InputField
+                  tipoDeInfo="Cidade"
+                  keyboardType="default"
+                  mascara=""
+                  valor={cidade}
+                  onChangeText={setCidade}
+                  placeholder="Cidade"
+                  largura="100%"
+                />
+              </View>
+              <View style={[styles.formGroup, { flex: 1 }]}>
+                <InputField
+                  tipoDeInfo="Estado"
+                  keyboardType="default"
+                  largura="100%"
+                  valor={estado}
+                  onChangeText={(text) => setEstado(text.toUpperCase())}
+                  mascara="AA"
+                  placeholder="UF"
+                />
+              </View>
+            </View>
+
+            <View style={styles.formGroup}>
               <InputField
-                tipoDeInfo="Bairro"
+                tipoDeInfo="Endereço"
                 keyboardType="default"
                 mascara=""
-                largura="100%"
-                valor={bairro}
-                onChangeText={setBairro}
-                placeholder="Bairro"
+                valor={endereco}
+                onChangeText={setEndereco}
+                placeholder="Rua/Avenida"
               />
             </View>
-          </View>
 
-          <View style={styles.switchContainer}>
-            <View style={styles.switchGroup}>
-              <Text style={styles.switchLabel}>Cadastrar Veículo</Text>
-              <Text style={styles.switchDescription}>
-                Marque esta opção para cadastrar um veículo para o cliente
-              </Text>
+            <View style={styles.row}>
+              <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                <InputField
+                  tipoDeInfo="Número"
+                  keyboardType="numeric"
+                  largura="100%"
+                  mascara="99999"
+                  valor={numero}
+                  onChangeText={setNumero}
+                  placeholder="Nº"
+                />
+              </View>
+              <View style={[styles.formGroup, { flex: 2 }]}>
+                <InputField
+                  tipoDeInfo="Bairro"
+                  keyboardType="default"
+                  mascara=""
+                  largura="100%"
+                  valor={bairro}
+                  onChangeText={setBairro}
+                  placeholder="Bairro"
+                />
+              </View>
             </View>
-            <Slider value={cadastrarVeiculo} onChange={setCadastrarVeiculo} />
-          </View>
 
-          {cadastrarVeiculo && (
-            <>
-              <Text style={styles.sectionTitle}>Veículo</Text>
-              <Text style={styles.sectionSubtitle}>
-                Informe os dados do veículo do cliente
-              </Text>
-
-              <View style={styles.formGroup}>
-                <InputField
-                  tipoDeInfo="Veículo"
-                  keyboardType="default"
-                  valor={veiculo}
-                  onChangeText={setVeiculo}
-                  placeholder="Ex: Kwid"
-                />
+            <View style={styles.switchContainer}>
+              <View style={styles.switchGroup}>
+                <Text style={styles.switchLabel}>Cadastrar Veículo</Text>
+                <Text style={styles.switchDescription}>
+                  Marque esta opção para cadastrar um veículo para o cliente
+                </Text>
               </View>
+              <Slider value={cadastrarVeiculo} onChange={setCadastrarVeiculo} />
+            </View>
 
-              <View style={styles.formGroup}>
-                <InputField
-                  tipoDeInfo="Modelo"
-                  keyboardType="default"
-                  valor={modelo}
-                  onChangeText={setModelo}
-                  placeholder="Ex: Zen"
-                />
-              </View>
+            {cadastrarVeiculo && (
+              <>
+                <Text style={styles.sectionTitle}>Veículo</Text>
+                <Text style={styles.sectionSubtitle}>
+                  Informe os dados do veículo do cliente
+                </Text>
 
-              <View style={styles.row}>
-                <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                <View style={styles.formGroup}>
                   <InputField
-                    tipoDeInfo="Ano"
-                    keyboardType="numeric"
-                    largura="100%"
-                    valor={ano}
-                    onChangeText={setAno}
-                    placeholder="2023"
-                  />
-                </View>
-                <View style={[styles.formGroup, { flex: 1 }]}>
-                  <InputField
-                    tipoDeInfo="Cor"
+                    tipoDeInfo="Veículo"
                     keyboardType="default"
-                    largura="100%"
-                    valor={cor}
-                    onChangeText={setCor}
-                    placeholder="Branco"
+                    valor={veiculo}
+                    onChangeText={setVeiculo}
+                    placeholder="Ex: Kwid"
                   />
                 </View>
-              </View>
 
-              <View style={styles.row}>
-                <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                <View style={styles.formGroup}>
                   <InputField
-                    tipoDeInfo="KM"
-                    keyboardType="number-pad"
-                    largura="100%"
-                    valor={km}
-                    onChangeText={setKm}
-                    placeholder="Ex: 45000"
-                  />
-                </View>
-                <View style={[styles.formGroup, { flex: 1 }]}>
-                  <InputField
-                    tipoDeInfo="Placa"
+                    tipoDeInfo="Modelo"
                     keyboardType="default"
-                    largura="100%"
-                    mascara="AAA-9A99"
-                    placeholder="ABC1234"
-                    valor={placa}
-                    onChangeText={(text) => setPlaca(text.toUpperCase())}
+                    valor={modelo}
+                    onChangeText={setModelo}
+                    placeholder="Ex: Zen"
                   />
                 </View>
-              </View>
-            </>
-          )}
 
-          {/* Botões de Ação */}
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={handleClearForm}
-              disabled={isLoading}
-            >
-              <Text style={styles.clearButtonText}>Limpar</Text>
-            </TouchableOpacity>
+                <View style={styles.row}>
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                    <InputField
+                      tipoDeInfo="Ano"
+                      keyboardType="numeric"
+                      largura="100%"
+                      valor={ano}
+                      onChangeText={setAno}
+                      placeholder="2023"
+                    />
+                  </View>
+                  <View style={[styles.formGroup, { flex: 1 }]}>
+                    <InputField
+                      tipoDeInfo="Cor"
+                      keyboardType="default"
+                      largura="100%"
+                      valor={cor}
+                      onChangeText={setCor}
+                      placeholder="Branco"
+                    />
+                  </View>
+                </View>
 
-            <TouchableOpacity
-              style={[styles.submitButton, isLoading && styles.disabledButton]}
-              onPress={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Text style={styles.submitButtonText}>Cadastrando...</Text>
-              ) : (
-                <>
-                  <MaterialIcons
-                    name="check-circle"
-                    size={18}
-                    color="#fff"
-                    style={styles.sendIcon}
-                  />
-                  <Text style={styles.submitButtonText}>Cadastrar</Text>
-                </>
-              )}
-            </TouchableOpacity>
+                <View style={styles.row}>
+                  <View style={[styles.formGroup, { flex: 1, marginRight: 8 }]}>
+                    <InputField
+                      tipoDeInfo="KM"
+                      keyboardType="number-pad"
+                      largura="100%"
+                      valor={km}
+                      onChangeText={setKm}
+                      placeholder="Ex: 45000"
+                    />
+                  </View>
+                  <View style={[styles.formGroup, { flex: 1 }]}>
+                    <InputField
+                      tipoDeInfo="Placa"
+                      keyboardType="default"
+                      largura="100%"
+                      mascara="AAA-9A99"
+                      placeholder="ABC1234"
+                      valor={placa}
+                      onChangeText={(text) => setPlaca(text.toUpperCase())}
+                    />
+                  </View>
+                </View>
+              </>
+            )}
+
+            {/* Botões de Ação */}
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={handleClearForm}
+                disabled={isLoading}
+              >
+                <Text style={styles.clearButtonText}>Limpar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.submitButton, isLoading && styles.disabledButton]}
+                onPress={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Text style={styles.submitButtonText}>Cadastrando...</Text>
+                ) : (
+                  <>
+                    <MaterialIcons
+                      name="check-circle"
+                      size={18}
+                      color="#fff"
+                      style={styles.sendIcon}
+                    />
+                    <Text style={styles.submitButtonText}>Cadastrar</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -607,6 +620,10 @@ export default ClientSignUp;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20, // Espaço extra no final
   },
   formContainer: {
     padding: 16,

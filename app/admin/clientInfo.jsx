@@ -227,11 +227,92 @@ const clientInfo = () => {
     setEditClientModal(true);
   };
 
-  const saveClientChanges = () => {
-    setClient(editingClient);
+  const handleUpdateClient = async () => {
+  try {
+    // Validação básica dos campos obrigatórios
+    if (!editingClient.nome?.trim()) {
+      Alert.alert("Erro", "O nome do cliente é obrigatório.");
+      return;
+    }
+
+    if (!editingClient.documento?.trim()) {
+      Alert.alert("Erro", "O documento (CPF/CNPJ) é obrigatório.");
+      return;
+    }
+
+    setLoading(true);
+
+    // Preparar os dados do cliente para envio
+    const clientData = {
+      nome: editingClient.nome.trim(),
+      cpf: editingClient.documento.trim(),
+      email: editingClient.email?.trim() || "",
+      tipo_pessoa: editingClient.tipoPessoa || "fisica",
+      telefone: editingClient.telefone || "",
+      cep: editingClient.cep || "",
+      endereco: editingClient.endereco?.trim() || "",
+      numero: editingClient.numero?.trim() || "",
+      bairro: editingClient.bairro?.trim() || "",
+      cidade: editingClient.cidade?.trim() || "",
+      estado: editingClient.estado?.trim() || "",
+      funcao: editingClient.funcao?.trim() || "",
+    };
+
+    // Fazer a requisição PUT para atualizar o cliente
+    const response = await fetch(
+      `https://topcar-back-end.onrender.com/clientes/${client.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(clientData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Erro ao atualizar cliente");
+    }
+
+    const updatedClient = await response.json();
+    console.log("Cliente atualizado com sucesso:", updatedClient);
+
+    // Atualizar o estado local com os dados atualizados
+    setClient({
+      ...client,
+      nome: clientData.nome,
+      documento: clientData.cpf,
+      email: clientData.email,
+      tipoPessoa: clientData.tipo_pessoa,
+      telefone: clientData.telefone,
+      cep: clientData.cep,
+      endereco: clientData.endereco,
+      numero: clientData.numero,
+      bairro: clientData.bairro,
+      cidade: clientData.cidade,
+      estado: clientData.estado,
+      funcao: clientData.funcao,
+    });
+
+    // Fechar modal e mostrar sucesso
     setEditClientModal(false);
     Alert.alert("Sucesso", "Informações do cliente atualizadas com sucesso!");
-  };
+  } catch (error) {
+    console.error("Erro ao atualizar cliente:", error);
+
+    let errorMessage =
+      "Não foi possível atualizar as informações do cliente. Por favor, tente novamente.";
+    if (error.message) {
+      errorMessage = error.message;
+    }
+
+    Alert.alert("Erro", errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleEditVehicle = (vehicle, index) => {
     setEditingVehicle({ ...vehicle });
@@ -743,7 +824,7 @@ const clientInfo = () => {
                   <Button
                     cor={Colors.verde}
                     texto="Salvar"
-                    onPress={saveClientChanges}
+                    onPress={handleUpdateClient}
                   >
                     <MaterialIcons
                       name="check-circle"

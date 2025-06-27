@@ -18,11 +18,13 @@ import Colors from "@/constants/Colors";
 
 const API_BASE_URL = "https://topcar-back-end.onrender.com";
 
-const pendingServices = () => {
+const PendingServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
+  // TODO: Implementar sistema de autenticação dinâmico
+  // Por enquanto, considere obter o token de forma dinâmica
   const authToken =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
 
@@ -37,76 +39,87 @@ const pendingServices = () => {
   const getAllPendencias = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/pendencias`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${authToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao buscar pendências: ${response.status}`);
+        const errorData = await response.text();
+        console.error("Resposta do servidor:", errorData);
+        throw new Error(`Erro ao buscar pendências: ${response.status} - ${errorData}`);
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Erro ao listar pendências:', error);
+      console.error("Erro ao listar pendências:", error);
       throw error;
     }
   };
 
   /**
    * Edita uma pendência específica
-   * @param {string} pendenciaId - ID da pendência a ser editada
+   * @param {number|string} pendenciaId - ID da pendência a ser editada
    * @param {Object} updatedData - Dados atualizados da pendência
    * @returns {Promise<Object>} Pendência atualizada
    */
   const updatePendencia = async (pendenciaId, updatedData) => {
     try {
+      console.log("Editando pendência:", pendenciaId, updatedData);
+
       const response = await fetch(`${API_BASE_URL}/pendencias/${pendenciaId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${authToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao editar pendência: ${response.status}`);
+        const errorData = await response.text();
+        console.error("Erro na resposta do servidor:", errorData);
+        throw new Error(`Erro ao editar pendência: ${response.status} - ${errorData}`);
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Erro ao editar pendência:', error);
+      console.error("Erro ao editar pendência:", error);
       throw error;
     }
   };
 
   /**
    * Exclui uma pendência específica
-   * @param {string} pendenciaId - ID da pendência a ser excluída
+   * @param {number|string} pendenciaId - ID da pendência a ser excluída
    * @returns {Promise<boolean>} True se a exclusão foi bem-sucedida
    */
   const deletePendencia = async (pendenciaId) => {
     try {
+      console.log("Excluindo pendência:", pendenciaId);
+
       const response = await fetch(`${API_BASE_URL}/pendencias/${pendenciaId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${authToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
-        throw new Error(`Erro ao excluir pendência: ${response.status}`);
+        const errorData = await response.text();
+        console.error("Erro na resposta do servidor:", errorData);
+        throw new Error(`Erro ao excluir pendência: ${response.status} - ${errorData}`);
       }
 
       return true;
     } catch (error) {
-      console.error('Erro ao excluir pendência:', error);
+      console.error("Erro ao excluir pendência:", error);
       throw error;
     }
   };
@@ -116,20 +129,21 @@ const pendingServices = () => {
     try {
       setLoading(true);
       const pendencias = await getAllPendencias();
-      
+
+      console.log("Pendências carregadas:", pendencias);
+
       // Normaliza os dados para compatibilidade com o ServiceCard
-      const normalizedServices = pendencias.map(pendencia => ({
+      const normalizedServices = pendencias.map((pendencia) => ({
         ...pendencia,
-        // Mantém os dados originais do backend
+        id: pendencia.id,
         cliente_nome: pendencia.cliente,
-        veiculo_completo: `${pendencia.veiculo} ${pendencia.modelo}`,
-        // Campos para compatibilidade com ServiceCard
-        vehicle: `${pendencia.veiculo} ${pendencia.modelo}`,
-        licensePlate: pendencia.placa,
-        description: pendencia.descricao,
-        clienteName: pendencia.cliente
+        veiculo_completo: `${pendencia.veiculo || ""} ${pendencia.modelo || ""}`.trim(),
+        vehicle: `${pendencia.veiculo || ""} ${pendencia.modelo || ""}`.trim(),
+        licensePlate: pendencia.placa || "",
+        description: pendencia.descricao || "",
+        clienteName: pendencia.cliente || "",
       }));
-      
+
       setServices(normalizedServices);
     } catch (error) {
       Alert.alert(
@@ -152,33 +166,34 @@ const pendingServices = () => {
   // Manipulador para editar serviço
   const handleEditService = async (serviceId, updatedData) => {
     try {
+      console.log("Tentando editar serviço:", serviceId, updatedData);
       setLoading(true);
-      
-      // Encontra o serviço original para manter cliente_id e veiculo_id
-      const originalService = services.find(s => s.id === serviceId);
+
+      const originalService = services.find((s) => s.id == serviceId);
       if (!originalService) {
         throw new Error("Serviço não encontrado");
       }
 
-      // Prepara os dados no formato esperado pelo backend
+      console.log("Serviço original encontrado:", originalService);
+
       const backendData = {
-        cliente_id: originalService.cliente_id || null, // Mantém o cliente_id original
-        veiculo_id: originalService.veiculo_id || null, // Mantém o veiculo_id original
         descricao: updatedData.description,
-        data_registro: originalService.data_registro || new Date().toISOString()
+        ...(originalService.cliente_id && { cliente_id: originalService.cliente_id }),
+        ...(originalService.veiculo_id && { veiculo_id: originalService.veiculo_id }),
+        ...(originalService.data_registro && { data_registro: originalService.data_registro }),
       };
-      
-      // Chama a API para atualizar o serviço
+
+      console.log("Dados sendo enviados para o backend:", backendData);
+
       await updatePendencia(serviceId, backendData);
-      
-      // Recarrega a lista para garantir dados atualizados
+
       await loadServices();
 
       Alert.alert("Sucesso", "Serviço editado com sucesso!");
     } catch (error) {
       Alert.alert(
         "Erro",
-        "Não foi possível editar o serviço. Tente novamente."
+        `Não foi possível editar o serviço: ${error.message}`
       );
       console.error("Erro ao editar serviço:", error);
     } finally {
@@ -187,28 +202,42 @@ const pendingServices = () => {
   };
 
   // Manipulador para excluir serviço
-  const handleDeleteService = async (serviceId) => {
-    try {
-      setLoading(true);
-      
-      // Chama a API para excluir o serviço
-      await deletePendencia(serviceId);
-      
-      // Remove da lista local
-      setServices(prevServices =>
-        prevServices.filter(service => service.id !== serviceId)
-      );
+  const handleDeleteService = (serviceId) => {
+    Alert.alert(
+      "Confirmar Exclusão",
+      "Tem certeza que deseja excluir este serviço?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
 
-      Alert.alert("Sucesso", "Serviço excluído com sucesso!");
-    } catch (error) {
-      Alert.alert(
-        "Erro",
-        "Não foi possível excluir o serviço. Tente novamente."
-      );
-      console.error("Erro ao excluir serviço:", error);
-    } finally {
-      setLoading(false);
-    }
+              await deletePendencia(serviceId);
+
+              setServices((prevServices) =>
+                prevServices.filter((service) => service.id != serviceId)
+              );
+
+              Alert.alert("Sucesso", "Serviço excluído com sucesso!");
+            } catch (error) {
+              Alert.alert(
+                "Erro",
+                `Não foi possível excluir o serviço: ${error.message}`
+              );
+              console.error("Erro ao excluir serviço:", error);
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading && services?.length === 0) {
@@ -250,7 +279,7 @@ const pendingServices = () => {
         ) : (
           <FlatList
             data={services}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <ServiceCard
                 service={item}
@@ -264,7 +293,7 @@ const pendingServices = () => {
             onRefresh={onRefresh}
           />
         )}
-        
+
         {/* Loading overlay para operações */}
         {loading && services?.length > 0 && (
           <View style={styles.loadingOverlay}>
@@ -276,7 +305,7 @@ const pendingServices = () => {
   );
 };
 
-export default pendingServices;
+export default PendingServices;
 
 const styles = StyleSheet.create({
   container: {

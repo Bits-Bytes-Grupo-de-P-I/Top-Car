@@ -22,33 +22,35 @@ import { FontAwesome6, MaterialIcons, Ionicons } from "@expo/vector-icons";
 // Cores
 import Colors from "@/constants/Colors";
 
+// Constantes da API
+const API_BASE_URL = "https://topcar-back-end.onrender.com";
+const AUTH_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
+
 const OngoingServiceCard = ({
   item,
-  onPress,
-  onUpdate,
+  onEdit,
   onFinish,
+  onDelete,
+  onUpdate,
   fetchServicos,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editedService, setEditedService] = useState({
-    clienteNome: item.clienteNome,
-    veiculo: item.veiculo,
-    placa: item.placa,
     servico: item.servico,
+    servicoCompleto: item.servicoCompleto || item.servico,
     dataAgendada: item.dataAgendada,
     urgente: item.urgente,
   });
 
-  // Constantes da API
-  const API_BASE_URL = "https://topcar-back-end.onrender.com";
-  const AUTH_TOKEN =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJqb2FvQGV4YW1wbGUuY29tIiwiZnVuY2FvIjoiYWRtaW4iLCJpYXQiOjE3NDg0NTQzODR9.3fxamj4FEzv265boICnC3WqcJZLiJ0Kfsmbpg9S9lFs";
-
   // Função para fazer requisições HTTP
   const makeRequest = async (url, options = {}) => {
     try {
+      console.log("🔗 Fazendo requisição para:", url);
+      console.log("📋 Opções:", JSON.stringify(options, null, 2));
+
       const response = await fetch(url, {
         ...options,
         headers: {
@@ -58,42 +60,44 @@ const OngoingServiceCard = ({
         },
       });
 
+      console.log("📊 Status da resposta:", response.status);
+      console.log(
+        "🔍 Headers da resposta:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorMessage = `Erro HTTP: ${response.status}`;
+
+        try {
+          const errorData = await response.json();
+          console.log("❌ Dados do erro:", errorData);
+          if (errorData.message) {
+            errorMessage += ` - ${errorData.message}`;
+          }
+          if (errorData.error) {
+            errorMessage += ` - ${errorData.error}`;
+          }
+        } catch (e) {
+          console.log("⚠️ Não foi possível ler o JSON do erro");
+          // Tentar ler como texto
+          try {
+            const errorText = await response.text();
+            console.log("📝 Erro como texto:", errorText);
+            errorMessage += ` - ${errorText}`;
+          } catch (textError) {
+            console.log("⚠️ Não foi possível ler o erro como texto");
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
-      return await response.json();
-    } catch (error) {
-      console.error("Erro na requisição:", error);
-      throw error;
-    }
-  };
-
-  // Função para atualizar um pedido
-  const updatePedido = async (pedidoId, pedidoData) => {
-    try {
-      const data = await makeRequest(`${API_BASE_URL}/pedidos/${pedidoId}`, {
-        method: "PUT",
-        body: JSON.stringify(pedidoData),
-      });
-      await fetchServicos();
+      const data = await response.json();
+      console.log("✅ Resposta bem-sucedida:", data);
       return data;
     } catch (error) {
-      console.error("Erro ao atualizar pedido:", error);
-      throw error;
-    }
-  };
-
-  // Função para finalizar um serviço (alterar status)
-  const finalizarServico = async (pedidoId) => {
-    try {
-      const data = await makeRequest(`${API_BASE_URL}/pedidos/${pedidoId}`, {
-        method: "PUT",
-        body: JSON.stringify({ status: "concluido" }),
-      });
-      return data;
-    } catch (error) {
-      console.error("Erro ao finalizar serviço:", error);
+      console.error("❌ Erro na requisição:", error);
       throw error;
     }
   };
@@ -127,63 +131,194 @@ const OngoingServiceCard = ({
     }
   };
 
-  const handleFinishService = async () => {
+  // Função para formatar data do formato ISO para brasileiro
+  const formatDateToBR = (dateString) => {
+    if (!dateString) return "";
+
     try {
-      Alert.alert(
-        "Confirmar Finalização",
-        "Tem certeza que deseja finalizar este serviço?",
-        [
-          {
-            text: "Cancelar",
-            style: "cancel",
-          },
-          {
-            text: "Finalizar",
-            onPress: async () => {
-              try {
-                setLoading(true);
-                await finalizarServico(item.id);
-                setModalVisible(false);
+      // Se já estiver no formato brasileiro (DD/MM/YYYY), retorna como está
+      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        return dateString;
+      }
 
-                // Chama callback para atualizar a lista
-                if (onFinish) {
-                  onFinish(item.id);
+      // Se estiver no formato ISO (YYYY-MM-DD)
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = dateString.split("-");
+        return `${day}/${month}/${year}`;
+      }
+
+      // Tentar converter outras possibilidades
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        throw new Error("Data inválida");
+      }
+
+      return `${date.getDate().toString().padStart(2, "0")}/${(
+        date.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}/${date.getFullYear()}`;
+    } catch (error) {
+      console.error("Erro ao formatar data:", error);
+      return dateString;
+    }
+  };
+
+  // Função para abrir modal de detalhes
+  const handleCardPress = () => {
+    setModalVisible(true);
+  };
+
+  const checkServiceExists = async (serviceId) => {
+    try {
+      const response = await makeRequest(
+        `${API_BASE_URL}/servicos/${serviceId}`,
+        {
+          method: "GET",
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Erro ao verificar se serviço existe:", error);
+      return null;
+    }
+  };
+
+  // Função para finalizar serviço (deletar)
+  const handleFinishServiceDirect = async () => {
+    Alert.alert(
+      "Confirmar Finalização",
+      "Tem certeza que deseja finalizar este serviço?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Finalizar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+
+              // Tentar deletar diretamente
+              if (onDelete) {
+                const success = await onDelete(item.id);
+                if (success) {
+                  setModalVisible(false);
+                  if (fetchServicos) {
+                    await fetchServicos();
+                  }
                 }
+              } else {
+                await deleteServiceDirectly(item.id);
+              }
+            } catch (error) {
+              console.error("❌ Erro ao deletar serviço:", error);
 
-                Alert.alert("Sucesso", "Serviço finalizado com sucesso!");
-              } catch (error) {
+              // Para erro 404, tratar como sucesso
+              if (error.message.includes("404")) {
+                setModalVisible(false);
+                Alert.alert(
+                  "Serviço Finalizado",
+                  "O serviço foi finalizado com sucesso.",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => {
+                        if (fetchServicos) {
+                          fetchServicos();
+                        }
+                      },
+                    },
+                  ]
+                );
+              } else {
                 Alert.alert(
                   "Erro",
                   "Não foi possível finalizar o serviço. Tente novamente."
                 );
-                console.error("Erro ao finalizar serviço:", error);
-              } finally {
-                setLoading(false);
               }
-            },
+            } finally {
+              setLoading(false);
+            }
           },
-        ]
+        },
+      ]
+    );
+  };
+
+  // Função para deletar serviço diretamente pela API
+  const deleteServiceDirectly = async (serviceId) => {
+    try {
+      // Validar se o serviceId existe
+      if (!serviceId) {
+        throw new Error("ID do serviço não fornecido");
+      }
+
+      console.log("🗑️ Tentando deletar serviço com ID:", serviceId);
+      console.log(
+        "🔑 Token sendo usado:",
+        AUTH_TOKEN
+          ? `${AUTH_TOKEN.substring(0, 20)}...`
+          : "Token não encontrado"
       );
+
+      const response = await makeRequest(
+        `${API_BASE_URL}/servicos/${serviceId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      setModalVisible(false);
+      Alert.alert("Sucesso", "Serviço finalizado com sucesso!");
+
+      // Atualizar a lista de serviços
+      if (fetchServicos) {
+        await fetchServicos();
+      }
+
+      return true;
     } catch (error) {
-      Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
-      console.error("Erro inesperado:", error);
+      console.error("❌ Erro ao deletar serviço diretamente:", error);
+
+      // Mostrar erro mais detalhado para o usuário
+      let userMessage = "Não foi possível finalizar o serviço.";
+      if (error.message.includes("400")) {
+        userMessage += " Verifique se o serviço ainda existe.";
+      } else if (error.message.includes("401")) {
+        userMessage += " Problema de autenticação.";
+      } else if (error.message.includes("404")) {
+        userMessage += " Serviço não encontrado.";
+      }
+
+      Alert.alert("Erro", userMessage);
+      throw error;
     }
   };
 
-  const handleUpdateService = () => {
+  // Função para deletar serviço
+  const handleDeleteService = async () => {
+    if (onDelete) {
+      setModalVisible(false);
+      await onDelete(item.id);
+    }
+  };
+
+  // Função para abrir modal de edição
+  const handleEditService = () => {
     setEditedService({
-      clienteNome: item.clienteNome,
-      veiculo: item.veiculo,
-      placa: item.placa,
       servico: item.servico,
+      servicoCompleto: item.servicoCompleto || item.servico,
       dataAgendada: item.dataAgendada,
       urgente: item.urgente,
     });
-    fetchServicos();
     setModalVisible(false);
     setEditModalVisible(true);
   };
 
+  // Validação dos dados do serviço
   const validateServiceData = () => {
     if (!editedService.servico.trim()) {
       Alert.alert("Erro", "O campo 'Serviço' é obrigatório.");
@@ -205,6 +340,7 @@ const OngoingServiceCard = ({
     return true;
   };
 
+  // Função para salvar alterações do serviço
   const saveServiceChanges = async () => {
     if (!validateServiceData()) {
       return;
@@ -213,59 +349,45 @@ const OngoingServiceCard = ({
     try {
       setLoading(true);
 
-      // Primeiro, buscar os dados atuais do pedido para obter cliente_id e veiculo_id
-      const currentPedido = await makeRequest(
-        `${API_BASE_URL}/pedidos/${item.id}`,
-        {
-          method: "GET",
-        }
-      );
-
-      // Dados para atualizar - incluindo todos os campos obrigatórios
-      const updateData = {
-        cliente_id: currentPedido.cliente_id, // Mantém o cliente_id atual
-        veiculo_id: currentPedido.veiculo_id, // Mantém o veiculo_id atual
-        resumo: editedService.servico,
-        descricao: editedService.servico,
-        status: editedService.status || item.status,
-        dataPedido: formatDateToISO(editedService.dataAgendada),
+      const dadosEditados = {
+        servico: editedService.servico,
+        servicoCompleto: editedService.servicoCompleto,
+        dataAgendada: formatDateToISO(editedService.dataAgendada),
+        urgente: editedService.urgente,
+        status: editedService.urgente ? "urgente" : "em andamento",
       };
 
-      console.log("Dados sendo enviados para atualização:", updateData); // Para debug
+      // Usar a função onEdit passada pelo componente pai
+      if (onEdit) {
+        const success = await onEdit(item.id, dadosEditados);
+        if (success) {
+          setEditModalVisible(false);
 
-      await updatePedido(item.id, updateData);
-
-      setEditModalVisible(false);
-
-      // Chama callback para atualizar a lista
-      if (onUpdate) {
-        onUpdate(item.id, {
-          ...item,
-          servico: editedService.servico,
-          dataAgendada: editedService.dataAgendada,
-          urgente: editedService.urgente,
-        });
+          // Atualizar dados locais se onUpdate estiver disponível
+          if (onUpdate) {
+            onUpdate(item.id, {
+              servico: editedService.servico,
+              servicoCompleto: editedService.servicoCompleto,
+              dataAgendada: formatDateToBR(editedService.dataAgendada),
+              urgente: editedService.urgente,
+            });
+          }
+        }
       }
-
-      Alert.alert("Sucesso", "Serviço atualizado com sucesso!");
     } catch (error) {
-      Alert.alert(
-        "Erro",
-        "Não foi possível atualizar o serviço. Tente novamente."
-      );
+      Alert.alert("Erro", "Não foi possível atualizar o serviço.");
       console.error("Erro ao atualizar serviço:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  // Função para cancelar edição
   const cancelEdit = () => {
     setEditModalVisible(false);
     setEditedService({
-      clienteNome: item.clienteNome,
-      veiculo: item.veiculo,
-      placa: item.placa,
       servico: item.servico,
+      servicoCompleto: item.servicoCompleto || item.servico,
       dataAgendada: item.dataAgendada,
       urgente: item.urgente,
     });
@@ -275,7 +397,7 @@ const OngoingServiceCard = ({
     <>
       <TouchableOpacity
         style={[styles.servicoItem, item.urgente ? styles.servicoUrgente : {}]}
-        onPress={() => setEditModalVisible(true)}
+        onPress={handleCardPress}
         disabled={loading}
       >
         <View style={styles.servicoHeader}>
@@ -400,7 +522,7 @@ const OngoingServiceCard = ({
                 />
                 <Text style={styles.modalInfoText}>
                   <Text style={styles.boldText}>Data Agendada: </Text>
-                  {formatDateToISO(item.dataAgendada)}
+                  {formatDateToBR(item.dataAgendada)}
                 </Text>
               </View>
             </View>
@@ -410,7 +532,7 @@ const OngoingServiceCard = ({
               <Button
                 cor={Colors.azul}
                 texto="Editar"
-                onPress={handleUpdateService}
+                onPress={handleEditService}
                 disabled={loading}
               >
                 <Ionicons
@@ -423,7 +545,7 @@ const OngoingServiceCard = ({
               <Button
                 cor={Colors.verde}
                 texto={loading ? "Finalizando..." : "Finalizar"}
-                onPress={handleFinishService}
+                onPress={handleFinishServiceDirect}
                 disabled={loading}
               >
                 {loading ? (
@@ -470,7 +592,7 @@ const OngoingServiceCard = ({
 
             {/* Campos de Edição */}
             <View style={styles.editInputContainer}>
-              <Text style={styles.editInputLabel}>Serviço:</Text>
+              <Text style={styles.editInputLabel}>Descrição:</Text>
               <TextInput
                 style={[styles.editInput, styles.textArea]}
                 value={editedService.servico}
@@ -518,38 +640,6 @@ const OngoingServiceCard = ({
                 maxLength={10}
                 editable={!loading}
               />
-            </View>
-
-            {/* Urgente Toggle */}
-            <View style={styles.urgenteContainer}>
-              <Text style={styles.editInputLabel}>Serviço Urgente:</Text>
-              <TouchableOpacity
-                style={[
-                  styles.urgenteToggle,
-                  editedService.urgente
-                    ? styles.urgenteToggleActive
-                    : styles.urgenteToggleInactive,
-                ]}
-                onPress={() =>
-                  !loading &&
-                  setEditedService({
-                    ...editedService,
-                    urgente: !editedService.urgente,
-                  })
-                }
-                disabled={loading}
-              >
-                <Text
-                  style={[
-                    styles.urgenteToggleText,
-                    editedService.urgente
-                      ? styles.urgenteToggleTextActive
-                      : styles.urgenteToggleTextInactive,
-                  ]}
-                >
-                  {editedService.urgente ? "Sim" : "Não"}
-                </Text>
-              </TouchableOpacity>
             </View>
 
             {/* Ações do Modal de Edição */}
@@ -675,6 +765,17 @@ const styles = StyleSheet.create({
   },
   statusAguardandoPeca: {
     color: Colors.laranja,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
   },
   centeredView: {
     flex: 1,
