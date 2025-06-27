@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Top-Car",
+    "name": "Top Car",
     "slug": "Top-Car",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -57,7 +57,8 @@
           "color": "#ffffff"
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "react-native-edge-to-edge"
     ],
     "experiments": {
       "typedRoutes": true
